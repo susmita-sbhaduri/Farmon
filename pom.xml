@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.bhaduri</groupId>
-    <artifactId>Machh</artifactId>
+    <artifactId>Farmon</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Machh</name>
+    <name>Farmon</name>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +29,6 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>9.2.0</version>
         </dependency>
-        
         
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -87,7 +86,16 @@
             <artifactId>poi-ooxml</artifactId>
             <version>5.4.0</version> <!-- Use the latest stable version -->
         </dependency>
-
+        <dependency>
+            <groupId>org.farmon</groupId>
+            <artifactId>FarmonDTO</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.farmon</groupId>
+            <artifactId>FarmonClient</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     
     <build>

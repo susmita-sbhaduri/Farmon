@@ -20,8 +20,6 @@
         <param-name>javax.faces.VALIDATE_EMPTY_FIELDS</param-name>
         <param-value>true</param-value>
     </context-param>
-
-
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
@@ -39,7 +37,7 @@
     <!-- Login filter -->
     <filter>
         <filter-name>LoginFilter</filter-name>
-        <filter-class>org.bhaduri.machh.controller.LoginFilter</filter-class>
+        <filter-class>org.bhaduri.farmon.controller.LoginFilter</filter-class>
     </filter>
     <!-- Set the login filter to secure all the pages in the /secured/* path of the application  -->
     <filter-mapping>

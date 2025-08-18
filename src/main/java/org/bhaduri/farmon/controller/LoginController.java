@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSF/JSFManagedBean.java to edit this template
  */
-package org.bhaduri.machh.controller;
+package org.bhaduri.farmon.controller;
 
 import jakarta.inject.Named;
 import jakarta.enterprise.context.SessionScoped;
@@ -10,8 +10,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.application.NavigationHandler;
 import java.io.Serializable;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.UsersDTO;
+
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.UserDTO;
 
 /**
  *
@@ -22,7 +24,7 @@ import org.bhaduri.machh.services.MasterDataServices;
 public class LoginController implements Serializable {
     private String username;
     private String password;
-    private UsersDTO userDTO;
+    private UserDTO userDTO;
     /**
      * Creates a new instance of LoginController
      */
@@ -46,9 +48,15 @@ public class LoginController implements Serializable {
     }
     
     public String login () throws NamingException {
-        userDTO = new UsersDTO();
-        MasterDataServices masterDataService = new MasterDataServices();
-        userDTO = masterDataService.getUserAuthDetails(username, password);
+        userDTO = new UserDTO();
+        
+        userDTO.setUsername(username);
+        userDTO.setPassword(password);
+        FarmonClient clientService = new FarmonClient();
+        userDTO = clientService.callLoginAuthService(userDTO);
+        
+//        MasterDataServices masterDataService = new MasterDataServices();
+//        userDTO = masterDataService.getUserAuthDetails(username, password);
         if(userDTO.getID().equals("null")){
             return "landing?faces-redirect=true";
         } else return "/secured/userhome?faces-redirect=true";
@@ -66,7 +74,7 @@ public class LoginController implements Serializable {
         // Reset username and password
         this.username = null;
         this.password = null;
-// Redirect to login page
+        // Redirect to login page
         NavigationHandler nav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
         nav.handleNavigation(FacesContext.getCurrentInstance(), null, "/login.xhtml?faces-redirect=true");
     }
