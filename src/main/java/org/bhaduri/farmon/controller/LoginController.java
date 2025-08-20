@@ -11,8 +11,8 @@ import jakarta.faces.application.NavigationHandler;
 import java.io.Serializable;
 import javax.naming.NamingException;
 
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 import org.farmon.farmondto.UserDTO;
 
 /**
@@ -24,7 +24,7 @@ import org.farmon.farmondto.UserDTO;
 public class LoginController implements Serializable {
     private String username;
     private String password;
-    private UserDTO userDTO;
+    private FarmonDTO farmonDTO;
     /**
      * Creates a new instance of LoginController
      */
@@ -48,16 +48,18 @@ public class LoginController implements Serializable {
     }
     
     public String login () throws NamingException {
-        userDTO = new UserDTO();
-        
+        farmonDTO = new FarmonDTO();
+        UserDTO userDTO = new UserDTO();
         userDTO.setUsername(username);
         userDTO.setPassword(password);
-        FarmonClient clientService = new FarmonClient();
-        userDTO = clientService.callLoginAuthService(userDTO);
         
-//        MasterDataServices masterDataService = new MasterDataServices();
-//        userDTO = masterDataService.getUserAuthDetails(username, password);
-        if(userDTO.getID().equals("null")){
+        
+        FarmonClient clientService = new FarmonClient();
+        farmonDTO.setUserDto(userDTO);
+        farmonDTO = clientService.callLoginAuthService(farmonDTO);
+        
+
+        if(farmonDTO.getUserDto().getID().equals("null")){
             return "landing?faces-redirect=true";
         } else return "/secured/userhome?faces-redirect=true";
 //        if (username.equals("susmita")) {

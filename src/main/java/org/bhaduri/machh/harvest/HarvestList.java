@@ -11,7 +11,7 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.HarvestDTO;
+import org.farmon.farmondto.HarvestDTO;
 import org.bhaduri.machh.services.MasterDataServices;
 
 /**

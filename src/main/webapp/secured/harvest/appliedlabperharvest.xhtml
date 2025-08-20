@@ -35,31 +35,17 @@
                             </div>
                         </div>
                     </f:facet>
-                    <p:column headerText="Application ID">
-                        <h:outputText value="#{appliedlabour.applicationId}" />
-                    </p:column>
+                    
                     <p:column headerText="Application Date">
                         <h:outputText value="#{appliedlabour.applicationDate}" />
                     </p:column>
                     <p:column headerText="Applied Amount">
                         <h:outputText value="#{appliedlabour.appliedAmount}" />
                     </p:column>
-<!--                    <p:column>
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
-                                         value="Edit"
-                                         action="#{appliedLabPerHarvest.editLabour()}" >
-                            <f:setPropertyActionListener value="#{appliedlabour}" target="#{appliedLabPerHarvest.appliedLabour}" />    
-                        </p:commandButton>
+                    <p:column headerText="Details">
+                        <h:outputText value="#{appliedlabour.expenseComments}" />
                     </p:column>
-                    <p:column>
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
-                                         value="Delete"
-                                         action="#{appliedLabPerHarvest.deleteLabour()}" >
-                            <f:setPropertyActionListener value="#{appliedlabour}" target="#{appliedLabPerHarvest.appliedLabour}" />    
-                        </p:commandButton>
-                    </p:column>-->
+                    
                 </p:dataTable>
             </h:form>
         </div>

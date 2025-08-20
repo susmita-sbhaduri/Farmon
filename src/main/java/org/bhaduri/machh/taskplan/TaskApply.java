@@ -15,7 +15,7 @@ import java.util.List;
 import javax.naming.NamingException;
 import org.bhaduri.machh.DTO.ExpenseDTO;
 import org.bhaduri.machh.DTO.FarmresourceDTO;
-import org.bhaduri.machh.DTO.HarvestDTO;
+import org.farmon.farmondto.HarvestDTO;
 import org.bhaduri.machh.DTO.LabourCropDTO;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;

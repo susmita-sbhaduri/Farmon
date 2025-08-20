@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.naming.NamingException;
 import org.bhaduri.machh.DTO.FarmresourceDTO;
-import org.bhaduri.machh.DTO.HarvestDTO;
+import org.farmon.farmondto.HarvestDTO;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;

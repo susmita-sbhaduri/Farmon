@@ -4,6 +4,8 @@
  */
 package org.bhaduri.machh.DTO;
 
+import org.farmon.farmondto.HarvestDTO;
+
 /**
  *
  * @author sb

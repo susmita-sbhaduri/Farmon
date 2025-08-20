@@ -41,7 +41,7 @@ import org.bhaduri.machh.DTO.EmpExpDTO;
 import org.bhaduri.machh.DTO.EmpLeaveDTO;
 import org.bhaduri.machh.DTO.EmployeeDTO;
 import org.bhaduri.machh.DTO.ExpenseDTO;
-import org.bhaduri.machh.DTO.HarvestDTO;
+import org.farmon.farmondto.HarvestDTO;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;

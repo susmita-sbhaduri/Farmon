@@ -11,12 +11,12 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
-import org.bhaduri.machh.DTO.HarvestDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.HarvestDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
+import org.farmon.farmondto.ResourceCropDTO;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -38,13 +38,23 @@ public class AppliedResForHarvest implements Serializable {
     }
     
     public String fillResourceValues() throws NamingException {
-        MasterDataServices masterDataService = new MasterDataServices();
-        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(appliedHarvest);
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        HarvestDTO harvestRecord = new HarvestDTO();
+        harvestRecord.setHarvestid(appliedHarvest);
+        farmondto.setHarvestrecord(harvestRecord);
+        farmondto = clientService.callHarvestRecService(farmondto);
+        harvestRecord = farmondto.getHarvestrecord();
+        
+//        MasterDataServices masterDataService = new MasterDataServices();
+//        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(appliedHarvest);
         sitename = harvestRecord.getSiteName();
         cropcat = harvestRecord.getCropCategory();
         cropname = harvestRecord.getCropName();
         
-        appliedresources = masterDataService.getResCropForHarvest(appliedHarvest);        
+        
+        farmondto = clientService.callResCropListService(farmondto);
+        appliedresources = farmondto.getRescroplist();        
         String redirectUrl = "/secured/harvest/resourceapply?faces-redirect=true&selectedHarvest=" + appliedHarvest;
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
@@ -59,92 +69,72 @@ public class AppliedResForHarvest implements Serializable {
             return null;        
     }
     
-    public String goToEdit(){
-        String redirectUrl = "/secured/harvest/resourcecropedit?faces-redirect=true&selectedRescrop=" + 
-                appliedresources.get(appliedresources.size()-1).getApplicationId();
-//        String redirectUrl = "/secured/harvest/activehrvstlst?faces-redirect=true";
-        return redirectUrl;
-    }
-    
-    public String deleteResource() throws NamingException{
-        String redirectUrl = "/secured/harvest/appliedresperharvest?faces-redirect=true&appliedHarvest=" + appliedHarvest;
-        int sqlFlag = 0;
-        FacesMessage message;
-        FacesContext f = FacesContext.getCurrentInstance();
-        f.getExternalContext().getFlash().setKeepMessages(true);
-        
-        
-        MasterDataServices masterDataService = new MasterDataServices();
-        ResourceCropDTO resourceCrop = new ResourceCropDTO();
-        resourceCrop.setApplicationId(appliedRes.getApplicationId());
-
-        FarmresourceDTO resourceRecord = masterDataService.
-                getResourceNameForId(Integer.parseInt(appliedRes.getResourceId()));
-        float farmResourceAmt = Float.parseFloat(resourceRecord.getAvailableAmt())
-                + Float.parseFloat(appliedRes.getAppliedAmount());
-        resourceRecord.setAvailableAmt(String.format("%.2f", farmResourceAmt));
-        
-        int delres = masterDataService.delResCropRecord(resourceCrop);
-//        if (delres == SUCCESS){            
-//            sqlFlag = sqlFlag+1;
-//            int updRes = masterDataService.editResource(resourceRecord);
-//            
-//            if (updRes == SUCCESS) {
-//                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-//                        "resourcecrop record deleted successfully");
+//    public String goToEdit(){
+//        String redirectUrl = "/secured/harvest/resourcecropedit?faces-redirect=true&selectedRescrop=" + 
+//                appliedresources.get(appliedresources.size()-1).getApplicationId();
+////        String redirectUrl = "/secured/harvest/activehrvstlst?faces-redirect=true";
+//        return redirectUrl;
+//    }
+//    
+//    public String deleteResource() throws NamingException{
+//        String redirectUrl = "/secured/harvest/appliedresperharvest?faces-redirect=true&appliedHarvest=" + appliedHarvest;
+//        int sqlFlag = 0;
+//        FacesMessage message;
+//        FacesContext f = FacesContext.getCurrentInstance();
+//        f.getExternalContext().getFlash().setKeepMessages(true);
+//        
+//        
+//        MasterDataServices masterDataService = new MasterDataServices();
+//        ResourceCropDTO resourceCrop = new ResourceCropDTO();
+//        resourceCrop.setApplicationId(appliedRes.getApplicationId());
+//
+//        FarmresourceDTO resourceRecord = masterDataService.
+//                getResourceNameForId(Integer.parseInt(appliedRes.getResourceId()));
+//        float farmResourceAmt = Float.parseFloat(resourceRecord.getAvailableAmt())
+//                + Float.parseFloat(appliedRes.getAppliedAmount());
+//        resourceRecord.setAvailableAmt(String.format("%.2f", farmResourceAmt));
+//        
+//        int delres = masterDataService.delResCropRecord(resourceCrop);
+//
+//                
+//
+//        if (delres == SUCCESS) {
+//            sqlFlag = sqlFlag + 1;
+//        } else {
+//            if (delres == DB_SEVERE) {
+//                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+//                        "resourcecrop record could not be deleted");
 //                f.addMessage(null, message);
 //            }
-//            if (updRes == DB_SEVERE) {
-//                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-//                        "resourcecrop record could not be updated");
-//                f.addMessage(null, message);
+//            return redirectUrl;
+//        }
+//        if (sqlFlag == 1) {
+//            int updRes = masterDataService.editResource(resourceRecord);
+//            if (updRes == SUCCESS) {
+//                sqlFlag = sqlFlag + 1;
+//            } else {
+//                if (updRes == DB_SEVERE) {
+//                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+//                            "resourcecrop record could not be updated");
+//                    f.addMessage(null, message);
+//                    
+//                }
 //                int addres = masterDataService.addResCropRecord(resourceCrop);
+//                if (addres == DB_SEVERE) {
+//                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
+//                            "Failure on resourcecrop table correction");
+//                    f.addMessage(null, message);
+//                }
+//                return redirectUrl;
 //            }
 //        }
-//        if (delres == DB_SEVERE) {
-//            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
-//                    "resourcecrop record could not be deleted");
+//        if (sqlFlag == 2) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+//                    "resourcecrop record deleted successfully");
 //            f.addMessage(null, message);
 //        }
-                
-
-        if (delres == SUCCESS) {
-            sqlFlag = sqlFlag + 1;
-        } else {
-            if (delres == DB_SEVERE) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                        "resourcecrop record could not be deleted");
-                f.addMessage(null, message);
-            }
-            return redirectUrl;
-        }
-        if (sqlFlag == 1) {
-            int updRes = masterDataService.editResource(resourceRecord);
-            if (updRes == SUCCESS) {
-                sqlFlag = sqlFlag + 1;
-            } else {
-                if (updRes == DB_SEVERE) {
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "resourcecrop record could not be updated");
-                    f.addMessage(null, message);
-                    
-                }
-                int addres = masterDataService.addResCropRecord(resourceCrop);
-                if (addres == DB_SEVERE) {
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
-                            "Failure on resourcecrop table correction");
-                    f.addMessage(null, message);
-                }
-                return redirectUrl;
-            }
-        }
-        if (sqlFlag == 2) {
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                    "resourcecrop record deleted successfully");
-            f.addMessage(null, message);
-        }
-        return redirectUrl;
-    }
+//        return redirectUrl;
+//    }
     public List<ResourceCropDTO> getAppliedresources() {
         return appliedresources;
     }

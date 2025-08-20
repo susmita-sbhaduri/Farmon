@@ -11,8 +11,9 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.HarvestDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.HarvestDTO;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -29,8 +30,13 @@ public class ActiveHarvestList implements Serializable {
     }
 
     public String fillHarvestValues() throws NamingException {
-        MasterDataServices masterDataService = new MasterDataServices();
-        harvests = masterDataService.getActiveHarvestList();
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        
+        farmondto = clientService.callActiveHarvestListService(farmondto);
+        harvests = farmondto.getHarvestlist();
+//        MasterDataServices masterDataService = new MasterDataServices();
+//        harvests = masterDataService.getActiveHarvestList();
         String redirectUrl = "/secured/userhome?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();

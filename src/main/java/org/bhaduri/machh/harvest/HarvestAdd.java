@@ -16,7 +16,7 @@ import javax.naming.NamingException;
 import org.bhaduri.machh.DTO.CropDTO;
 import org.bhaduri.machh.DTO.EmployeeDTO;
 import org.bhaduri.machh.DTO.FarmresourceDTO;
-import org.bhaduri.machh.DTO.HarvestDTO;
+import org.farmon.farmondto.HarvestDTO;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;

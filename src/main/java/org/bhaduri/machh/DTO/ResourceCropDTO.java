@@ -4,6 +4,7 @@
  */
 package org.bhaduri.machh.DTO;
 
+import org.farmon.farmondto.HarvestDTO;
 import java.io.Serializable;
 
 /**

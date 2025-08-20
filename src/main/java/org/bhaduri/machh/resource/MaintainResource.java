@@ -11,11 +11,9 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.FarmresourceDTO;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -31,8 +29,10 @@ public class MaintainResource implements Serializable {
     }
     public String fillResourceValues() throws NamingException {
         String redirectUrl = "/secured/resource/addinventory?faces-redirect=true";
-        MasterDataServices masterDataService = new MasterDataServices();
-        existingresources = masterDataService.getResourceList();      
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();        
+        farmondto = clientService.callFarmresListService(farmondto);
+        existingresources = farmondto.getFarmresourcelist();      
         
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
@@ -48,35 +48,35 @@ public class MaintainResource implements Serializable {
         }
     }
     
-    public String deleteRes() throws NamingException {
-        String redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
-        FacesMessage message = null;
-        FacesContext f = FacesContext.getCurrentInstance();
-        f.getExternalContext().getFlash().setKeepMessages(true);
-        MasterDataServices masterDataService = new MasterDataServices();
-        int shopres = masterDataService.deleteShopResForResid(selectedRes.getResourceId());
-        int res = masterDataService.delResource(selectedRes);
-        
-        if (res == SUCCESS && shopres == SUCCESS) {
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Inventory deleted", Integer.toString(SUCCESS));
-//            redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
-        } else {
-            if (res == DB_NON_EXISTING || shopres == DB_NON_EXISTING) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Record does not exist", Integer.toString(DB_NON_EXISTING));
-            }
-            if (res == DB_SEVERE || shopres == DB_SEVERE) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", Integer.toString(DB_SEVERE));
-            }
-        }
-        f.addMessage(null, message);
-        return redirectUrl;
-    }
+//    public String deleteRes() throws NamingException {
+//        String redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
+//        FacesMessage message = null;
+//        FacesContext f = FacesContext.getCurrentInstance();
+//        f.getExternalContext().getFlash().setKeepMessages(true);
+//        MasterDataServices masterDataService = new MasterDataServices();
+//        int shopres = masterDataService.deleteShopResForResid(selectedRes.getResourceId());
+//        int res = masterDataService.delResource(selectedRes);
+//        
+//        if (res == SUCCESS && shopres == SUCCESS) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Inventory deleted", Integer.toString(SUCCESS));
+////            redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
+//        } else {
+//            if (res == DB_NON_EXISTING || shopres == DB_NON_EXISTING) {
+//                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Record does not exist", Integer.toString(DB_NON_EXISTING));
+//            }
+//            if (res == DB_SEVERE || shopres == DB_SEVERE) {
+//                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", Integer.toString(DB_SEVERE));
+//            }
+//        }
+//        f.addMessage(null, message);
+//        return redirectUrl;
+//    }
     
-    public String goToShopForRes() {        
-        String redirectUrl = "/secured/shop/reshoplist?faces-redirect=true&resourceId=" + selectedRes.getResourceId()+ "&resourceName=" + selectedRes.getResourceName();
-        return redirectUrl;
-//        return "/secured/userhome";
-    }
+//    public String goToShopForRes() {        
+//        String redirectUrl = "/secured/shop/reshoplist?faces-redirect=true&resourceId=" + selectedRes.getResourceId()+ "&resourceName=" + selectedRes.getResourceName();
+//        return redirectUrl;
+////        return "/secured/userhome";
+//    }
     
     public String acquireRes() {        
         String redirectUrl = "/secured/resource/acquireresource?faces-redirect=true&selectedRes="+ selectedRes.getResourceId();

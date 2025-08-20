@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.naming.NamingException;
 import org.bhaduri.machh.DTO.FarmresourceDTO;
-import org.bhaduri.machh.DTO.HarvestDTO;
+import org.farmon.farmondto.HarvestDTO;
 import org.bhaduri.machh.DTO.TaskPlanDTO;
 import org.bhaduri.machh.services.MasterDataServices;
 
