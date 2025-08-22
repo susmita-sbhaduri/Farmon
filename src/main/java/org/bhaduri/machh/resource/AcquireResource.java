@@ -13,17 +13,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.ExpenseDTO;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.DTO.ResAcquireDTO;
-import org.bhaduri.machh.DTO.ShopResDTO;
+import org.farmon.farmondto.ExpenseDTO;
+import org.farmon.farmondto.FarmresourceDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
+import org.farmon.farmondto.ResAcquireDTO;
+import org.farmon.farmondto.ShopResDTO;
 import org.bhaduri.machh.services.MasterDataServices;
 import java.util.*;
 import java.util.stream.*;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 /**
  *
  * @author sb
@@ -54,9 +56,13 @@ public class AcquireResource implements Serializable {
     }
 
     public void fillResourceValues() throws NamingException {
-
-        MasterDataServices masterDataService = new MasterDataServices();
-        List<ShopResDTO> shopForSelectedResAll = masterDataService.getAllShopResForResid(selectedRes);
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        ShopResDTO shopresrec = new ShopResDTO();
+        shopresrec.setResourceId(selectedRes);
+        farmondto.setShopresrec(shopresrec);
+        farmondto = clientService.callShopResForResidService(farmondto);        
+        List<ShopResDTO> shopForSelectedResAll = farmondto.getShopreslist();
         shopForSelectedRes = shopForSelectedResAll.stream()
                 .collect(Collectors.collectingAndThen(
                         Collectors.toMap(
@@ -66,7 +72,12 @@ public class AcquireResource implements Serializable {
                         ),
                         map -> new ArrayList<>(map.values())
                 ));
-        FarmresourceDTO selectedResDto = masterDataService.getResourceNameForId(Integer.parseInt(selectedRes));
+        FarmresourceDTO farmresrec = new FarmresourceDTO();
+        farmresrec.setResourceId(selectedRes);
+        farmondto.setFarmresourcerec(farmresrec);
+        farmondto = clientService.callResnameForIdService(farmondto);
+        
+        FarmresourceDTO selectedResDto = farmondto.getFarmresourcerec();
         if(selectedResDto.getCropwtunit()!=null){
             rescat = "Crop";
             cropwtunit = selectedResDto.getCropwtunit();
@@ -78,10 +89,17 @@ public class AcquireResource implements Serializable {
 
     public void onShopResSelect() throws NamingException {
         System.out.println("No crop categories are found." + selectedShop);
-        MasterDataServices masterDataService = new MasterDataServices();
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        ShopResDTO shopresrec = new ShopResDTO();
+        shopresrec.setResourceId(selectedRes);
+        shopresrec.setShopId(selectedShop);
+        farmondto.setShopresrec(shopresrec);
+        farmondto = clientService.callShopResListService(farmondto);
+//        MasterDataServices masterDataService = new MasterDataServices();
 //        selectedShopResLst would contain the existing rates for the selectedRes, selectedShop combination.
 //        they are shown in the datatable of the xhtml page.
-        selectedShopResLst = masterDataService.getResShopForPk(selectedRes, selectedShop);
+        selectedShopResLst = farmondto.getShopreslist();
         ///
         ///It means if the shopresource record is newly added 
 //        then there would be only one record with resid and shopid combination. Hence first record is fetched 
@@ -92,7 +110,11 @@ public class AcquireResource implements Serializable {
 ///
         selectedShopRes = selectedShopResLst.get(0);
         rate = 0;
-        unit = masterDataService.getResourceNameForId(Integer.parseInt(selectedRes)).getUnit();
+        FarmresourceDTO farmresrec = new FarmresourceDTO();
+        farmresrec.setResourceId(selectedRes);
+        farmondto.setFarmresourcerec(farmresrec);
+        farmondto = clientService.callResnameForIdService(farmondto);
+        unit = farmondto.getFarmresourcerec().getUnit();
     }
 
     public String goToReviewRes() {
@@ -146,8 +168,10 @@ public class AcquireResource implements Serializable {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-
-        MasterDataServices masterDataService = new MasterDataServices();
+        
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+//        MasterDataServices masterDataService = new MasterDataServices();
         
 //        construction of shopresource record
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -167,7 +191,8 @@ public class AcquireResource implements Serializable {
             shopresflag = 1;
         } else {  
 //            else while we are creating ShopResDTO to add shop acquire record, with the same shop and res id 
-            int shopresid = masterDataService.getMaxIdForShopRes();
+            farmondto = clientService.callMaxShopResIdService(farmondto);
+            int shopresid = Integer.parseInt(farmondto.getShopresrec().getId());
             if (shopresid == 0) {
                 shopresid = 1;
             } else {
@@ -177,8 +202,9 @@ public class AcquireResource implements Serializable {
             shopresflag =2;
         }
 //        contruction of resourceacquire record
-        ResAcquireDTO resAcquireRec = new ResAcquireDTO();        
-        int acquireid = masterDataService.getNextIdForResAquire();
+        ResAcquireDTO resAcquireRec = new ResAcquireDTO();  
+        farmondto = clientService.callMaxResAcqIdService(farmondto);
+        int acquireid = Integer.parseInt(farmondto.getResacqrec().getAcquireId());
         if (acquireid == 0) {
             resAcquireRec.setAcquireId("1");
         } else {
@@ -191,7 +217,8 @@ public class AcquireResource implements Serializable {
 
 //        contruction of expense record
         ExpenseDTO expenseRec = new ExpenseDTO();
-        int expenseid = masterDataService.getNextIdForExpense();
+        farmondto = clientService.callMaxExpIdService(farmondto);
+        int expenseid = Integer.parseInt(farmondto.getExpenserec().getExpenseId());
         if (expenseid == 0) {
             expenseRec.setExpenseId("1");
         } else {
@@ -206,8 +233,13 @@ public class AcquireResource implements Serializable {
 
 
 //        contruction of farmresource record
-        FarmresourceDTO resourceRec = masterDataService.getResourceNameForId(Integer.parseInt(
-                selectedShopRes.getResourceId()));
+//        pt:selectedShopRes has the corresponding resource record in the farmresource 
+//        which is fetched here for updating with available amount of resource.
+        FarmresourceDTO resourceRec = new FarmresourceDTO();
+        resourceRec.setResourceId(selectedShopRes.getResourceId());
+        farmondto.setFarmresourcerec(resourceRec);
+        farmondto = clientService.callResnameForIdService(farmondto);
+        resourceRec = farmondto.getFarmresourcerec();
         float amountAcquired = amount + Float.parseFloat(resourceRec.getAvailableAmt());
         resourceRec.setAvailableAmt(String.format("%.2f", amountAcquired));
         if (cropwt > 0) {
@@ -218,8 +250,10 @@ public class AcquireResource implements Serializable {
             resourceRec.setCropweight(String.format("%.2f", amountAcquired));
         } else resourceRec.setCropweight(null);
         
-        
-        int acqres = masterDataService.addAcquireResource(resAcquireRec);
+//        starting of database operation
+        farmondto.setResacqrec(resAcquireRec);
+        farmondto = clientService.callAddResacqService(farmondto);
+        int acqres = farmondto.getResponses().getFarmon_ADD_RES();
         if (acqres == SUCCESS) {
             sqlFlag = sqlFlag + 1;
         } else {
@@ -237,7 +271,9 @@ public class AcquireResource implements Serializable {
         }
 
         if (sqlFlag == 1) {
-            int expres = masterDataService.addExpenseRecord(expenseRec);
+            farmondto.setExpenserec(expenseRec);
+            farmondto = clientService.callAddExpService(farmondto);
+            int expres = farmondto.getResponses().getFarmon_ADD_RES();
             if (expres == SUCCESS) {
                 sqlFlag = sqlFlag + 1;
             } else {
@@ -251,7 +287,8 @@ public class AcquireResource implements Serializable {
                             , "Failure on insert in expense table");
                     f.addMessage(null, message);
                 }
-                int delacq = masterDataService.delAcquireResource(resAcquireRec);
+                farmondto = clientService.callDelResAcqService(farmondto);
+                int delacq = farmondto.getResponses().getFarmon_DEL_RES();
                 if (delacq == DB_SEVERE) {
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
                             "acquireresource record could not be deleted");
@@ -261,8 +298,9 @@ public class AcquireResource implements Serializable {
         }
 
         if (sqlFlag == 2) {
-
-            int resres = masterDataService.editResource(resourceRec);
+            farmondto.setFarmresourcerec(resourceRec);
+            farmondto = clientService.callEditFarmresService(farmondto);
+            int resres = farmondto.getResponses().getFarmon_EDIT_RES();
             if (resres == SUCCESS) {
                 sqlFlag = sqlFlag + 1;
             } else {
@@ -292,8 +330,7 @@ public class AcquireResource implements Serializable {
             }
         }
         
-        if (sqlFlag == 3) {
-            
+        if (sqlFlag == 3) {            
             int shopres;
             if(shopresflag==1){
                 shopres = masterDataService.editShopForRes(shopResRec);

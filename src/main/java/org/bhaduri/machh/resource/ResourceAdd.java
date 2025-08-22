@@ -17,7 +17,6 @@ import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.ShopDTO;
 import org.farmon.farmondto.ShopResDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -132,7 +131,7 @@ public class ResourceAdd implements Serializable {
             inputrec.setResourceId(residexisting);
             inputrec.setShopId(selectedShop.getShopId());
             farmondto.setShopresrec(inputrec);
-            farmondto = clientService.callResidForNameService(farmondto);
+            farmondto = clientService.callShopResListService(farmondto);
             
             List<ShopResDTO> existingResShopIdList = farmondto.getShopreslist();
             //There is no need to add a record in Farmresource and also ShopRes table.
@@ -198,7 +197,9 @@ public class ResourceAdd implements Serializable {
         }
         resShopUpdBean.setRate(String.format("%.2f", 0.00));
         resShopUpdBean.setStockPerRate(String.format("%.2f", 0.00));
-        int shopres = masterDataService.addShopResource(resShopUpdBean);
+        farmondto.setShopresrec(resShopUpdBean);
+        farmondto = clientService.callAddShopresService(farmondto);
+        int shopres = farmondto.getResponses().getFarmon_ADD_RES();
         if (shopres != SUCCESS) {
             if (shopres == DB_DUPLICATE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
@@ -211,7 +212,10 @@ public class ResourceAdd implements Serializable {
                 f.addMessage(null, message);
             }
             if (resres == SUCCESS) { //farmresource record is added
-                int delres = masterDataService.delResource(resAddBean);
+                farmondto.setFarmresourcerec(resAddBean);
+                farmondto = clientService.callDelFarmresService(farmondto);
+                int delres = farmondto.getResponses().getFarmon_DEL_RES();
+                
                 if (delres == DB_SEVERE) {
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                             "Farmresource record could not be deleted");
