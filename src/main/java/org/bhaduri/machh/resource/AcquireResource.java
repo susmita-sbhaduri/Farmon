@@ -315,13 +315,16 @@ public class AcquireResource implements Serializable {
                     f.addMessage(null, message);
                 }
                 
-                int delacq = masterDataService.delAcquireResource(resAcquireRec);
+                farmondto = clientService.callDelResAcqService(farmondto);
+                int delacq = farmondto.getResponses().getFarmon_DEL_RES();
                 if (delacq == DB_SEVERE) {
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
                             "acquireresource record could not be deleted");
                     f.addMessage(null, message);
                 }
-                int delexpense = masterDataService.delExpenseRecord(expenseRec);
+                
+                farmondto = clientService.callDelExpService(farmondto);
+                int delexpense = farmondto.getResponses().getFarmon_DEL_RES();
                 if (delexpense == DB_SEVERE) {
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
                             "expense record could not be deleted");
@@ -333,9 +336,11 @@ public class AcquireResource implements Serializable {
         if (sqlFlag == 3) {            
             int shopres;
             if(shopresflag==1){
-                shopres = masterDataService.editShopForRes(shopResRec);
+                farmondto = clientService.callEditShopresService(farmondto);
+                shopres = farmondto.getResponses().getFarmon_EDIT_RES();
             } else {
-                shopres = masterDataService.addShopResource(shopResRec);
+                farmondto = clientService.callAddShopresService(farmondto);
+                shopres = farmondto.getResponses().getFarmon_ADD_RES();
             }
             
             if (shopres == SUCCESS) {
@@ -377,9 +382,6 @@ public class AcquireResource implements Serializable {
                             "farmresource record could not be corrected");
                     f.addMessage(null, message);
                 }
-//                redirectUrl = "/secured/resource/acquireresource?faces-redirect=true&selectedRes="
-//                        + selectedShopRes.getResourceId();
-//                return redirectUrl;
             }
         }
         
