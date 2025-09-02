@@ -31,7 +31,8 @@
                             listener="#{openSchedule.onDateSelect}" 
                             update="addDialog"
                             oncomplete="PF('addDialog').show();" />
-                    <p:ajax event="eventSelect" listener="#{openSchedule.onTaskSelect}" 
+                    <p:ajax event="eventSelect" 
+                            listener="#{openSchedule.onTaskSelect}" 
                             update="taskDetails"
                             oncomplete="PF('taskDialog').show();" />
                 </p:schedule>
@@ -54,13 +55,6 @@
                         <p:column headerText="Date">
                             #{openSchedule.getFormattedStartDate(task)}
                         </p:column>
-
-<!--                        <p:column headerText="End">
-                            <h:outputText value="#{openSchedule.getEndDateAsDate(task)}">
-                                <f:convertDateTime pattern="dd MMM yyyy" />
-                            </h:outputText>
-                        </p:column>-->
-
                         <p:column headerText="Description">                           
                             #{task.description eq 'RES' ? 'Resource' : (task.description eq 'LABHRVST' ? 'Labour(paid)': 
                                                (task.description eq 'LAB' ? 'Labour': ''))}
@@ -71,7 +65,7 @@
                                              update="taskTable"
                                              disabled="#{task.data eq 'Y'}"
                                              icon="pi pi-check"                                             
-                                             oncomplete="PF('eventDialog').hide()" />
+                                             oncomplete="PF('taskDialog').hide()" />
                         </p:column>
                         <p:column>
                             <p:commandButton value="Edit"
@@ -79,14 +73,14 @@
                                              update="taskTable"
                                              disabled="#{task.data eq 'Y'}"
                                              icon="pi pi-check"
-                                             oncomplete="PF('eventDialog').hide()" />
+                                             oncomplete="PF('taskDialog').hide()" />
                         </p:column>
                         <p:column>
                             <p:commandButton value="View"
                                              action="#{openSchedule.viewTask(task)}"
                                              update="taskTable"
                                              icon="pi pi-check"
-                                             oncomplete="PF('eventDialog').hide()" />
+                                             oncomplete="PF('taskDialog').hide()" />
                         </p:column>
                         <p:column>
                             <p:commandButton value="Delete"
@@ -94,7 +88,7 @@
                                              update="taskTable"
                                              disabled="#{task.data eq 'Y'}"
                                              icon="pi pi-check"
-                                             oncomplete="PF('eventDialog').hide()" />
+                                             oncomplete="PF('taskDialog').hide()" />
                         </p:column>
 
                     </p:dataTable>
@@ -106,24 +100,13 @@
                           header="Add new task for #{openSchedule.selectedDate}">
                     <div style="text-align: left;">
 
-<!--                        <div class="ui-g-12 ui-md-6 ui-lg-6">
-                            <h:outputText value="You selected: " />
-                        </div>
-                        <div class="ui-g-12 ui-md-6 ui-lg-6">
-                            <h:outputText value="#{openSchedule.selectedDate}"/>                                
-                        </div>-->
-                        <!--<div class="ui-g-12 ui-md-6 ui-lg-6">-->
+
                             <p:commandButton value="Create new Task"
                                              action="#{openSchedule.onDateConfirm}"
                                              update="addDialog"
                                              icon="pi pi-check"                                             
                                              oncomplete="PF('addDialog').hide()" />
-                        <!--</div>-->
-<!--                        <div class="ui-g-12 ui-md-6 ui-lg-6">
-                            <p:commandButton value="Cancel"
-                                             type="button"
-                                             onclick="PF('addDialog').hide()" />
-                        </div>-->
+ 
 
                     </div>
                 </p:dialog>

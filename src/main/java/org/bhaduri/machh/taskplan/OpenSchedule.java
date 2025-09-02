@@ -13,8 +13,7 @@ import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.TaskPlanDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.TaskPlanDTO;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleModel;
 import java.time.LocalDate;
@@ -22,6 +21,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -49,9 +50,13 @@ public class OpenSchedule implements Serializable {
     }
 
     private void fillTasksForMonth() throws NamingException {
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
         taskModel.clear();
-        MasterDataServices masterDataService = new MasterDataServices();
-        List<TaskPlanDTO> entries = masterDataService.getAllTaskPlanList();
+        farmondto = clientService.callTaskplanListService(farmondto);
+        
+//        MasterDataServices masterDataService = new MasterDataServices();
+        List<TaskPlanDTO> entries = farmondto.getTaskplanlist();
 
         for (TaskPlanDTO entry : entries) {
             LocalDate localDate = LocalDate.parse(entry.getTaskDt());
@@ -112,13 +117,13 @@ public class OpenSchedule implements Serializable {
         return ldt.toLocalDate().format(formatter);
     }
 
-    public Date getEndDateAsDate(ScheduleEvent<?> event) {
-        LocalDateTime ldt = event.getEndDate();
-        if (ldt == null) {
-            return null;
-        }
-        return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-    }
+//    public Date getEndDateAsDate(ScheduleEvent<?> event) {
+//        LocalDateTime ldt = event.getEndDate();
+//        if (ldt == null) {
+//            return null;
+//        }
+//        return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+//    }
 
     public void onTaskSelect(SelectEvent<ScheduleEvent<?>> selectTask) {
         ScheduleEvent<?> selectedEvent = selectTask.getObject();
@@ -170,24 +175,24 @@ public class OpenSchedule implements Serializable {
     }
 
     // Utility to get first/last date of a month
-    private Date[] getMonthRange(Date refDate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(refDate);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        Date start = cal.getTime();
-
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        cal.set(Calendar.MILLISECOND, 999);
-        Date end = cal.getTime();
-        return new Date[]{start, end};
-    }
+//    private Date[] getMonthRange(Date refDate) {
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(refDate);
+//        cal.set(Calendar.DAY_OF_MONTH, 1);
+//        cal.set(Calendar.HOUR_OF_DAY, 0);
+//        cal.set(Calendar.MINUTE, 0);
+//        cal.set(Calendar.SECOND, 0);
+//        cal.set(Calendar.MILLISECOND, 0);
+//        Date start = cal.getTime();
+//
+//        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+//        cal.set(Calendar.HOUR_OF_DAY, 23);
+//        cal.set(Calendar.MINUTE, 59);
+//        cal.set(Calendar.SECOND, 59);
+//        cal.set(Calendar.MILLISECOND, 999);
+//        Date end = cal.getTime();
+//        return new Date[]{start, end};
+//    }
 
     public ScheduleModel getTaskModel() {
         return taskModel;
