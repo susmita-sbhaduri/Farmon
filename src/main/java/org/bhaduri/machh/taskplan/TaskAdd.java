@@ -58,7 +58,7 @@ public class TaskAdd implements Serializable {
     public void fillValues() throws NamingException, ParseException {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        MasterDataServices masterDataService = new MasterDataServices();
+        
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
         taskDt = sdf.parse(selectedDate);
         farmondto = clientService.callActiveHarvestListService(farmondto);
@@ -107,27 +107,22 @@ public class TaskAdd implements Serializable {
     }
     
     public void onResourceSelect() throws NamingException {
-        MasterDataServices masterDataService = new MasterDataServices();
-        unit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId())).getUnit();
-        amount = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId())).getAvailableAmt();
-//        if (masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-//                get(selectedIndexRes).getResourceId()))
-//                .getCropwtunit() != null) {
-//            rescat = "Crop";
-//            cropwt = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-//                    get(selectedIndexRes).getResourceId()))
-//                    .getCropweight();
-//            cropwtunit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-//                    get(selectedIndexRes).getResourceId()))
-//                    .getCropwtunit();
-//
-//        } else {
-//            rescat = "Other";
-//            cropwt = "";
-//            cropwtunit = "";
-//        }
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        FarmresourceDTO farmresrec = new FarmresourceDTO();
+        
+        farmresrec.setResourceId(availableresources.get(selectedIndexRes).getResourceId());
+        farmondto.setFarmresourcerec(farmresrec);
+        farmondto = clientService.callResnameForIdService(farmondto);
+        
+        unit = farmondto.getFarmresourcerec().getUnit();
+        amount = farmondto.getFarmresourcerec().getAvailableAmt();
+//        MasterDataServices masterDataService = new MasterDataServices();
+//        unit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
+//                get(selectedIndexRes).getResourceId())).getUnit();
+//        amount = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
+//                get(selectedIndexRes).getResourceId())).getAvailableAmt();
+
     }
     
     public String goToSaveTask() throws NamingException {
@@ -135,6 +130,9 @@ public class TaskAdd implements Serializable {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        
         MasterDataServices masterDataService = new MasterDataServices();
 
         if (taskName.isEmpty()) {

@@ -21,7 +21,6 @@ import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.ResAcquireDTO;
 import org.farmon.farmondto.ShopResDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import java.util.*;
 import java.util.stream.*;
 import org.farmon.farmonclient.FarmonClient;
