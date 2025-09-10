@@ -19,7 +19,7 @@ import org.farmon.farmondto.HarvestDTO;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.DTO.TaskPlanDTO;
+import org.farmon.farmondto.TaskPlanDTO;
 import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
@@ -74,6 +74,12 @@ public class TaskAdd implements Serializable {
         
         unit = farmondto.getFarmresourcerec().getUnit();
         amount = farmondto.getFarmresourcerec().getAvailableAmt();
+//        by default resource is selected , so readonly fields are accordingly initialised
+        if (selectedTaskType.equals("res")) {
+            resReadonly = false;
+            costReadonly = true;
+            commReadonly = true;
+        }
 
     }
     
@@ -156,7 +162,10 @@ public class TaskAdd implements Serializable {
         }
 
         TaskPlanDTO taskplanRec = new TaskPlanDTO();
-        int taskid = masterDataService.getMaxTaskplanId();
+        farmondto.setTaskplanrec(taskplanRec);
+        farmondto = clientService.callMaxTaskplanIdService(farmondto);
+        
+        int taskid = Integer.parseInt(farmondto.getTaskplanrec().getTaskId());
         if (taskid == 0) {
             taskplanRec.setTaskId(String.valueOf("1"));
         } else {
@@ -189,7 +198,9 @@ public class TaskAdd implements Serializable {
         taskplanRec.setTaskDt(sdf.format(taskDt));
         taskplanRec.setAppliedFlag(null);
         
-        int response = masterDataService.addTaskplanRecord(taskplanRec);
+        farmondto.setTaskplanrec(taskplanRec);
+        farmondto = clientService.callAddTaskplanService(farmondto);
+        int response = farmondto.getResponses().getFarmon_ADD_RES();
         if (response == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Task is added to the date successfully");

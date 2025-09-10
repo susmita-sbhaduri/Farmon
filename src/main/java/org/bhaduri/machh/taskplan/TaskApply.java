@@ -13,18 +13,20 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.ExpenseDTO;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
+import org.farmon.farmondto.ExpenseDTO;
+import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
-import org.bhaduri.machh.DTO.LabourCropDTO;
+import org.farmon.farmondto.LabourCropDTO;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
-import org.bhaduri.machh.DTO.ShopResDTO;
-import org.bhaduri.machh.DTO.TaskPlanDTO;
+import org.farmon.farmondto.ResourceCropDTO;
+import org.farmon.farmondto.ShopResDTO;
+import org.farmon.farmondto.TaskPlanDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -45,9 +47,6 @@ public class TaskApply implements Serializable {
     private String unit;
     private String amtapplied;
     private String appDt;
-//    private String rescat;
-//    private String cropwt;
-//    private String cropwtunit;
     private String appliedcost;
     private String comments;
     private float resCropAppliedCost=0;
@@ -57,36 +56,40 @@ public class TaskApply implements Serializable {
     public TaskApply() {
     }
     public void fillValues() throws NamingException {
-        MasterDataServices masterDataService = new MasterDataServices();
-        TaskPlanDTO taskplanRec = masterDataService.getTaskPlanForId(selectedTask);
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        TaskPlanDTO taskplanRec = new TaskPlanDTO();
+        taskplanRec.setTaskId(selectedTask);
+        farmondto.setTaskplanrec(taskplanRec);
+        
+        farmondto = clientService.callTaskplanIdService(farmondto);
+//        MasterDataServices masterDataService = new MasterDataServices();
+        taskplanRec = farmondto.getTaskplanrec();
         
         taskName = taskplanRec.getTaskName();
+        HarvestDTO harvestRecord = new HarvestDTO();
+        harvestRecord.setHarvestid(taskplanRec.getHarvestId());
+        farmondto.setHarvestrecord(harvestRecord);
+        farmondto = clientService.callHarvestRecService(farmondto);
         
-        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(taskplanRec.getHarvestId());
+        harvestRecord = farmondto.getHarvestrecord();
         site = harvestRecord.getSiteName();
         cropcat = harvestRecord.getCropCategory();
         cropname = harvestRecord.getCropName();
         if (taskplanRec.getTaskType().equals("RES")) {
             taskType = "Resource";
-            FarmresourceDTO resourceRec = masterDataService
-                    .getResourceNameForId(Integer.parseInt(taskplanRec.getResourceId()));
+            FarmresourceDTO resourceRec = new FarmresourceDTO();
+            resourceRec.setResourceId(taskplanRec.getResourceId());
+            farmondto.setFarmresourcerec(resourceRec);
+            farmondto = clientService.callResnameForIdService(farmondto);
+            
+            resourceRec = farmondto.getFarmresourcerec();
             resname = resourceRec.getResourceName();
             amount = resourceRec.getAvailableAmt();
             unit = resourceRec.getUnit();
             amtapplied = taskplanRec.getAppliedAmount();
             appliedcost = "";
             comments = "";
-//            appliedcost = "NA";
-//            comments = "NA";
-//            if (resourceRec.getCropwtunit() != null) {
-//                rescat = "Crop";
-//                cropwt = resourceRec.getCropweight();
-//                cropwtunit = resourceRec.getCropwtunit();
-//            } else {
-//                rescat = "Other";
-//                cropwt = "";
-//                cropwtunit = "";
-//            }
         }
         if (taskplanRec.getTaskType().equals("LABHRVST")) {
             taskType = "Labour(to be paid)";
@@ -96,17 +99,6 @@ public class TaskApply implements Serializable {
             amount = "";
             unit = "Rs.";
             amtapplied = "";
-//            rescat = "";
-//            cropwt = "";
-//            cropwtunit = "";
-            
-//            resname = "NA";
-//            amount = "NA";
-//            unit = "Rs.";
-//            amtapplied = "NA";
-//            rescat = "NA";
-//            cropwt = "NA";
-//            cropwtunit = "NA";
         }
         if (taskplanRec.getTaskType().equals("LAB")) {
             taskType = "Labour";
@@ -116,19 +108,6 @@ public class TaskApply implements Serializable {
             amount = "";
             unit = "";
             amtapplied = "";
-//            rescat = "";
-//            cropwt = "";
-//            cropwtunit = "";
-            
-//            appliedcost = "NA";
-//            comments = taskplanRec.getComments();
-//            resname = "NA";
-//            amount = "NA";
-//            unit = "NA";
-//            amtapplied = "NA";
-//            rescat = "NA";
-//            cropwt = "NA";
-//            cropwtunit = "NA";
         }
         
         DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -145,10 +124,18 @@ public class TaskApply implements Serializable {
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
         
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
         int sqlFlag = 0;
         MasterDataServices masterDataService = new MasterDataServices();
+        
         //Fetching taskplan record
-        TaskPlanDTO taskplanRec = masterDataService.getTaskPlanForId(selectedTask);
+        TaskPlanDTO taskplanRec = new TaskPlanDTO();
+        taskplanRec.setTaskId(selectedTask);
+        farmondto.setTaskplanrec(taskplanRec);
+        
+        farmondto = clientService.callTaskplanIdService(farmondto);
+        taskplanRec = farmondto.getTaskplanrec();
         
         if (taskplanRec.getTaskType().equals("RES")) {
             float remainingAmt = Float.parseFloat(amount) - Float.parseFloat(amtapplied);

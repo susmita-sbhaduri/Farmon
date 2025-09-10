@@ -77,7 +77,7 @@ public class OpenSchedule implements Serializable {
                     .data(entry.getAppliedFlag())
                     .allDay(true)
                     .styleClass(styleClass) // <-- use your custom class!
-                    .textColor("#000000") // <--- Add this line
+                    .textColor("#000000") // <--- Add this line, text colour black in the schedule
                     .build();
             taskModel.addEvent(evt);
         }

@@ -99,27 +99,16 @@
                                          value="Submit"
                                          action="#{taskApply.saveTask()}">
 
-<!--                            <p:confirm header="Confirmation"
+                            <p:confirm header="Confirmation"
                                        message="Are you sure you want to apply this task?"
-                                       icon="pi pi-exclamation-triangle"/>-->
+                                       icon="pi pi-exclamation-triangle"/>
                         </p:commandButton> 
-                   </div>
-
-                </div>
-                <h:outputScript>
-                    $(document).on('keydown', function(e) {
-                    if (e.key === "Enter") {
-                    e.preventDefault();
-                    $('#resapplyform\\:submitBtn').click();
-                    }
-                    });
-                </h:outputScript>
-            
-            ✅ 
-            <!--                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
-                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat" icon="pi pi-times"/>
-                                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
-                            </p:confirmDialog>-->
+                    </div>
+                </div>                ✅ 
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat" icon="pi pi-times"/>
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                </p:confirmDialog>
             </h:form>
         </div>
     </ui:define>    
