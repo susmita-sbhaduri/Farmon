@@ -127,7 +127,7 @@ public class TaskApply implements Serializable {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         int sqlFlag = 0;
-        MasterDataServices masterDataService = new MasterDataServices();
+//        MasterDataServices masterDataService = new MasterDataServices();
         
         //Fetching taskplan record
         TaskPlanDTO taskplanRec = new TaskPlanDTO();
@@ -154,7 +154,8 @@ public class TaskApply implements Serializable {
         
             //resourcecrop record construction
             ResourceCropDTO resourceCrop = new ResourceCropDTO();
-            int applicationid = masterDataService.getMaxIdForResCrop();
+            farmondto = clientService.callMaxRescropIdService(farmondto);
+            int applicationid = Integer.parseInt(farmondto.getResourceCropDTO().getApplicationId());
 
             if (applicationid == 0) {
                 resourceCrop.setApplicationId("1");
@@ -176,8 +177,11 @@ public class TaskApply implements Serializable {
             resourceCrop.setApplicationDt(taskplanRec.getTaskDt());
             
             //farmresource record construction
-            FarmresourceDTO resourceRec = masterDataService
-                    .getResourceNameForId(Integer.parseInt(taskplanRec.getResourceId()));
+            FarmresourceDTO resourceRec = new FarmresourceDTO();
+            resourceRec.setResourceId(taskplanRec.getResourceId());
+            farmondto.setFarmresourcerec(resourceRec);
+            farmondto = clientService.callResnameForIdService(farmondto);
+            resourceRec = farmondto.getFarmresourcerec();
             resourceRec.setAvailableAmt(String.format("%.2f", remainingAmt));
             
             //taskplan record construction for update
@@ -402,14 +406,21 @@ public class TaskApply implements Serializable {
     }
     public String calcShopResAmt(String quantityApplied, String applId, String resId) 
             throws NamingException {
-        MasterDataServices masterDataService = new MasterDataServices();
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+//        MasterDataServices masterDataService = new MasterDataServices();
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        String redirectUrl = "/secured/taskplan/tasklist?faces-redirect=true";
-        List<ShopResDTO> shopResListResid = masterDataService.getShopResForResid(resId);
-
+        String redirectUrl = "/secured/taskplan/openschedule?faces-redirect=true";
+        
         ShopResDTO shopResRec = new ShopResDTO();
+        shopResRec.setResourceId(resId);
+        farmondto.setShopresrec(shopResRec);
+        farmondto = clientService.callNonZeroStockShopResService(farmondto);
+        List<ShopResDTO> shopResListResid = farmondto.getShopreslist();
+
+//        ShopResDTO shopResRec = new ShopResDTO();
         float appliedQuantity = Float.parseFloat(quantityApplied);
         for (int i = 0; i < shopResListResid.size(); i++) {
             shopResRec.setId(shopResListResid.get(i).getId());
@@ -427,7 +438,9 @@ public class TaskApply implements Serializable {
                 shopResRec.setStockPerRate(String.format("%.2f", shopResStock));
                 appliedQuantity = 0;
                 
-                int shopres = masterDataService.editShopForRes(shopResRec);
+                farmondto.setShopresrec(shopResRec);
+                farmondto = clientService.callEditShopresService(farmondto);
+                int shopres = farmondto.getResponses().getFarmon_EDIT_RES();
                 if (shopres != SUCCESS) {
                     resCropAppliedCost = 0;
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
@@ -444,7 +457,9 @@ public class TaskApply implements Serializable {
                 shopResStock = 0;
                 shopResRec.setStockPerRate(String.format("%.2f", shopResStock));
             }
-            int shopres = masterDataService.editShopForRes(shopResRec);
+            farmondto.setShopresrec(shopResRec);
+            farmondto = clientService.callEditShopresService(farmondto);
+            int shopres = farmondto.getResponses().getFarmon_EDIT_RES();
             if (shopres != SUCCESS) {
                 resCropAppliedCost = 0;
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
