@@ -154,6 +154,7 @@ public class TaskApply implements Serializable {
         
             //resourcecrop record construction
             ResourceCropDTO resourceCrop = new ResourceCropDTO();
+            farmondto.setResourceCropDTO(resourceCrop);
             farmondto = clientService.callMaxRescropIdService(farmondto);
             int applicationid = Integer.parseInt(farmondto.getResourceCropDTO().getApplicationId());
 
@@ -187,8 +188,10 @@ public class TaskApply implements Serializable {
             //taskplan record construction for update
             taskplanRec.setAppliedFlag("Y");
             
-            //Addition and update started
-            int rescropres = masterDataService.addResCropRecord(resourceCrop);
+            //################Addition and update started####################################
+            farmondto.setResourceCropDTO(resourceCrop);
+            farmondto = clientService.callAddResCropService(farmondto);
+            int rescropres = farmondto.getResponses().getFarmon_ADD_RES();
             
             if (rescropres == SUCCESS) {
                 sqlFlag = sqlFlag + 1;
@@ -208,7 +211,9 @@ public class TaskApply implements Serializable {
             }
             
             if (sqlFlag == 1) {
-                int resres = masterDataService.editResource(resourceRec);
+                farmondto.setFarmresourcerec(resourceRec);
+                farmondto = clientService.callEditFarmresService(farmondto);
+                int resres = farmondto.getResponses().getFarmon_EDIT_RES();
                 if (resres == SUCCESS) {
                     sqlFlag = sqlFlag + 1;
                 } else {
@@ -222,7 +227,9 @@ public class TaskApply implements Serializable {
                                  "Failure on resource update");
                         f.addMessage(null, message);
                     }
-                    int delres = masterDataService.delResCropRecord(resourceCrop);
+                    farmondto.setResourceCropDTO(resourceCrop);
+                    farmondto = clientService.callDelResCropService(farmondto);
+                    int delres = farmondto.getResponses().getFarmon_DEL_RES();
                     if (delres == DB_SEVERE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                                  "resourcecrop record could not be deleted");
@@ -233,7 +240,9 @@ public class TaskApply implements Serializable {
             }
             
             if (sqlFlag == 2) {
-                int taskres = masterDataService.editTaskplanRecord(taskplanRec);
+                farmondto.setTaskplanrec(taskplanRec);
+                farmondto = clientService.callEditTaskplanService(farmondto);
+                int taskres = farmondto.getResponses().getFarmon_EDIT_RES();
                 if (taskres == SUCCESS) {
                     sqlFlag = sqlFlag + 1;
                 } else {
@@ -247,7 +256,9 @@ public class TaskApply implements Serializable {
                                 "Failure on taskplan update");
                         f.addMessage(null, message);
                     }
-                    int delres = masterDataService.delResCropRecord(resourceCrop);
+                    farmondto.setResourceCropDTO(resourceCrop);
+                    farmondto = clientService.callDelResCropService(farmondto);
+                    int delres = farmondto.getResponses().getFarmon_DEL_RES();
                     if (delres == DB_SEVERE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                                 "resourcecrop record could not be deleted");
@@ -255,8 +266,10 @@ public class TaskApply implements Serializable {
                     }
                     //rollback changes in farmresource
                     resourceRec.setAvailableAmt(amount);
-                    int delfarmres = masterDataService.editResource(resourceRec);
-                    if (delfarmres == DB_SEVERE) {
+                    farmondto.setFarmresourcerec(resourceRec);
+                    farmondto = clientService.callEditFarmresService(farmondto);
+                    int editfarmres = farmondto.getResponses().getFarmon_EDIT_RES();
+                    if (editfarmres == DB_SEVERE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                                 "farmresource record could not be updated");
                         f.addMessage(null, message);
@@ -275,7 +288,10 @@ public class TaskApply implements Serializable {
         if (taskplanRec.getTaskType().equals("LABHRVST")) {
             //        contruction of labourcrop record
             LabourCropDTO labCropRec = new LabourCropDTO();
-            int applicationid = masterDataService.getMaxIdForLabCrop();
+            farmondto.setLabcroprecord(labCropRec);
+            farmondto = clientService.callMaxLabcropIdService(farmondto);
+            int applicationid = Integer.parseInt(farmondto.getLabcroprecord()
+                    .getApplicationId());
             if (applicationid == 0) {
                 labCropRec.setApplicationId("1");
             } else {
@@ -286,8 +302,10 @@ public class TaskApply implements Serializable {
             
 //        contruction of expense record
             ExpenseDTO expenseRec = new ExpenseDTO();
-            int expenseid = masterDataService.getNextIdForExpense();
-            if (expenseid == 0 || expenseid == DB_SEVERE) {
+            farmondto.setExpenserec(expenseRec);
+            farmondto = clientService.callMaxExpIdService(farmondto);
+            int expenseid = Integer.parseInt(farmondto.getExpenserec().getExpenseId());
+            if (expenseid == 0) {
                 expenseRec.setExpenseId("1");
             } else {
                 expenseRec.setExpenseId(String.valueOf(expenseid + 1));
@@ -301,7 +319,10 @@ public class TaskApply implements Serializable {
             //taskplan record construction for update
             taskplanRec.setAppliedFlag("Y");
             
-            int labourapply = masterDataService.addLabourCropRecord(labCropRec);
+            //################Addition and update started####################################
+            farmondto.setLabcroprecord(labCropRec);
+            farmondto = clientService.callAddLabcropService(farmondto);
+            int labourapply = farmondto.getResponses().getFarmon_ADD_RES();
             if (labourapply == SUCCESS) {
                 sqlFlag = sqlFlag + 1;
             } else {
@@ -319,7 +340,9 @@ public class TaskApply implements Serializable {
             }
             
             if (sqlFlag == 1) {
-                int expres = masterDataService.addExpenseRecord(expenseRec);
+                farmondto.setExpenserec(expenseRec);
+                farmondto = clientService.callAddExpService(farmondto);
+                int expres = farmondto.getResponses().getFarmon_ADD_RES();
                 if (expres == SUCCESS) {
                     sqlFlag = sqlFlag + 1;
                 } else {
@@ -333,7 +356,9 @@ public class TaskApply implements Serializable {
                                 "Failure", "Failure on insert in expense table");
                         f.addMessage(null, message);
                     }
-                    int dellab = masterDataService.delLabourCropRecord(labCropRec);
+                    farmondto.setLabcroprecord(labCropRec);
+                    farmondto = clientService.callDelLabcropService(farmondto);
+                    int dellab = farmondto.getResponses().getFarmon_DEL_RES();
                     if (dellab == DB_SEVERE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                                  "labourcrop record could not be deleted");
@@ -344,7 +369,9 @@ public class TaskApply implements Serializable {
             }
             
             if (sqlFlag == 2) {
-                int taskres = masterDataService.editTaskplanRecord(taskplanRec);
+                farmondto.setTaskplanrec(taskplanRec);
+                farmondto = clientService.callEditTaskplanService(farmondto);
+                int taskres = farmondto.getResponses().getFarmon_EDIT_RES();
                 if (taskres == SUCCESS) {
                     sqlFlag = sqlFlag + 1;
                 } else {
@@ -358,13 +385,17 @@ public class TaskApply implements Serializable {
                                 "Failure", "Failure in update of Taskplan table");
                         f.addMessage(null, message);
                     }
-                    int dellab = masterDataService.delLabourCropRecord(labCropRec);
+                    farmondto.setLabcroprecord(labCropRec);
+                    farmondto = clientService.callDelLabcropService(farmondto);
+                    int dellab = farmondto.getResponses().getFarmon_DEL_RES();
                     if (dellab == DB_SEVERE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                                  "labourcrop record could not be deleted");
                         f.addMessage(null, message);
                     }
-                    int delexp = masterDataService.delExpenseRecord(expenseRec);
+                    farmondto.setExpenserec(expenseRec);
+                    farmondto = clientService.callDelExpService(farmondto);                    
+                    int delexp = farmondto.getResponses().getFarmon_EDIT_RES();
                     if (delexp == DB_SEVERE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                                  "expense record could not be deleted");
@@ -383,7 +414,9 @@ public class TaskApply implements Serializable {
         if (taskplanRec.getTaskType().equals("LAB")) {
             //taskplan record construction for update
             taskplanRec.setAppliedFlag("Y");
-            int taskres = masterDataService.editTaskplanRecord(taskplanRec);
+            farmondto.setTaskplanrec(taskplanRec);
+            farmondto = clientService.callEditTaskplanService(farmondto);
+            int taskres = farmondto.getResponses().getFarmon_EDIT_RES();
             if (taskres == SUCCESS) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                         "Labour task applied successfully." );
