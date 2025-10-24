@@ -21,6 +21,7 @@ import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import org.farmon.farmondto.ResAcquireDTO;
 import org.farmon.farmondto.ResourceCropDTO;
 import org.farmon.farmondto.ShopResDTO;
 import org.farmon.farmondto.TaskPlanDTO;
@@ -137,6 +138,8 @@ public class TaskApply implements Serializable {
         farmondto = clientService.callTaskplanIdService(farmondto);
         taskplanRec = farmondto.getTaskplanrec();
         
+        
+        
         if (taskplanRec.getTaskType().equals("RES")) {
             float remainingAmt = Float.parseFloat(amount) - Float.parseFloat(amtapplied);
             if (remainingAmt == 0) {
@@ -151,7 +154,24 @@ public class TaskApply implements Serializable {
                 f.addMessage(null, message);
                 return "/secured/taskplan/taskedit?faces-redirect=true&selectedTask=" + selectedTask;
             }
-        
+            //checking is task applied date is before the resacqdate
+            ResAcquireDTO resacqfores = new ResAcquireDTO();
+            resacqfores.setResoureId(taskplanRec.getResourceId());
+            farmondto.setResacqrec(resacqfores);
+            farmondto = clientService.callResacqPerResService(farmondto);
+            
+            String dateStrTask = taskplanRec.getTaskDt();
+            String dateStrResacq = farmondto.getResacqrec().getAcquireDate();
+            
+            LocalDate dateTask = LocalDate.parse(dateStrTask);
+            LocalDate dateAcq = LocalDate.parse(dateStrResacq);
+            
+            if (dateTask.isBefore(dateAcq)) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure.",
+                        "Resource cannot be applied before aquisition date.");
+                f.addMessage(null, message);
+                return "/secured/taskplan/taskedit?faces-redirect=true&selectedTask=" + selectedTask;
+            }
             //resourcecrop record construction
             ResourceCropDTO resourceCrop = new ResourceCropDTO();
             farmondto.setResourceCropDTO(resourceCrop);

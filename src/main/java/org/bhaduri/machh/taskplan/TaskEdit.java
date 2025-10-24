@@ -15,13 +15,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
+import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.DTO.TaskPlanDTO;
+import org.farmon.farmondto.TaskPlanDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -55,14 +57,21 @@ public class TaskEdit implements Serializable {
     public TaskEdit() {
     }
     public void fillValues() throws NamingException, ParseException {
-        MasterDataServices masterDataService = new MasterDataServices();
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        TaskPlanDTO taskRecord = new TaskPlanDTO();
+        taskRecord.setTaskId(selectedTask);
+        farmondto.setTaskplanrec(taskRecord);        
+        farmondto = clientService.callTaskplanIdService(farmondto);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        TaskPlanDTO taskRecord = masterDataService.getTaskPlanForId(selectedTask);
+        taskRecord = farmondto.getTaskplanrec();
         taskDt = sdf.parse(taskRecord.getTaskDt());
         taskType = taskRecord.getTaskType();
         taskName = taskRecord.getTaskName();
+                
+        farmondto = clientService.callActiveHarvestListService(farmondto);
+        activeharvests = farmondto.getHarvestlist();
         
-        activeharvests = masterDataService.getActiveHarvestList();
         for (int i = 0; i < activeharvests.size(); i++) {            
             if (activeharvests.get(i).getHarvestid().equals(taskRecord.getHarvestId())) {
                 selectedIndexHarvest = i;
@@ -70,13 +79,14 @@ public class TaskEdit implements Serializable {
             }
         }
         
-        availableresources = masterDataService.getNonzeroResList();
-        for (int i = 0; i < availableresources.size(); i++) {            
-            if (availableresources.get(i).getResourceId().equals(taskRecord.getResourceId())) {
-                selectedIndexRes = i;
-                break;
-            }
-        }
+//        farmondto = clientService.callNonzeroresListService(farmondto);
+//        availableresources = farmondto.getFarmresourcelist();
+//        for (int i = 0; i < availableresources.size(); i++) {            
+//            if (availableresources.get(i).getResourceId().equals(taskRecord.getResourceId())) {
+//                selectedIndexRes = i;
+//                break;
+//            }
+//        }
         
         if (taskType.equals("LABHRVST")) {
             resReadonly = true;
@@ -107,22 +117,28 @@ public class TaskEdit implements Serializable {
             costReadonly = true;
             commReadonly = true;
             taskType = "Resource";
-
-            unit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                    get(selectedIndexRes).getResourceId())).getUnit();
-            amount = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                    get(selectedIndexRes).getResourceId())).getAvailableAmt();
-            if (masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                    get(selectedIndexRes).getResourceId()))
-                    .getCropwtunit() != null) {
+            
+            farmondto = clientService.callNonzeroresListService(farmondto);
+            availableresources = farmondto.getFarmresourcelist();
+            for (int i = 0; i < availableresources.size(); i++) {
+                if (availableresources.get(i).getResourceId().equals(taskRecord.getResourceId())) {
+                    selectedIndexRes = i;
+                    break;
+                }
+            }
+                        
+            FarmresourceDTO farmresrec = new FarmresourceDTO();
+            farmresrec.setResourceId(availableresources.get(selectedIndexRes)
+                    .getResourceId());
+            farmondto.setFarmresourcerec(farmresrec);
+            farmondto = clientService.callResnameForIdService(farmondto);
+            
+            unit = farmondto.getFarmresourcerec().getUnit();
+            amount = farmondto.getFarmresourcerec().getAvailableAmt();
+            if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
                 rescat = "Crop";
-                cropwt = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                        get(selectedIndexRes).getResourceId()))
-                        .getCropweight();
-                cropwtunit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                        get(selectedIndexRes).getResourceId()))
-                        .getCropwtunit();
-
+                cropwt = farmondto.getFarmresourcerec().getCropweight();
+                cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
             } else {
                 rescat = "Other";
                 cropwt = "";
@@ -140,22 +156,22 @@ public class TaskEdit implements Serializable {
             appliedcost = Float.parseFloat(taskRecord.getAppliedAmtCost());
     }
     public void onResourceChange() throws NamingException {
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        FarmresourceDTO farmresrec = new FarmresourceDTO();
+        farmresrec.setResourceId(availableresources.get(selectedIndexRes)
+                .getResourceId());
+        farmondto.setFarmresourcerec(farmresrec);
+        farmondto = clientService.callResnameForIdService(farmondto);
+        
         MasterDataServices masterDataService = new MasterDataServices();
-        unit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId())).getUnit();
-        amount = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                    get(selectedIndexRes).getResourceId())).getAvailableAmt();
+        unit = farmondto.getFarmresourcerec().getUnit();
+        amount = farmondto.getFarmresourcerec().getAvailableAmt();
         amtapplied = 0;
-        if(masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId()))
-                .getCropwtunit()!=null){
+        if(farmondto.getFarmresourcerec().getCropwtunit()!=null){
             rescat = "Crop";
-            cropwt = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId()))
-                    .getCropweight();
-            cropwtunit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId()))
-                    .getCropwtunit();
+            cropwt = farmondto.getFarmresourcerec().getCropweight();
+            cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
             
         } else{ 
             rescat = "Other";
