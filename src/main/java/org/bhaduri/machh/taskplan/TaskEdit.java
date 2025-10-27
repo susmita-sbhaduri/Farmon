@@ -11,7 +11,6 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
@@ -21,7 +20,6 @@ import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
 import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
 import org.farmon.farmondto.TaskPlanDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -163,8 +161,6 @@ public class TaskEdit implements Serializable {
                 .getResourceId());
         farmondto.setFarmresourcerec(farmresrec);
         farmondto = clientService.callResnameForIdService(farmondto);
-        
-        MasterDataServices masterDataService = new MasterDataServices();
         unit = farmondto.getFarmresourcerec().getUnit();
         amount = farmondto.getFarmresourcerec().getAvailableAmt();
         amtapplied = 0;
@@ -220,14 +216,20 @@ public class TaskEdit implements Serializable {
             return redirectUrl;
         }
 //        int sqlFlag = 0;
-        MasterDataServices masterDataService = new MasterDataServices();
-//        //taskplan record construction
-        TaskPlanDTO taskplanRec = masterDataService.getTaskPlanForId(selectedTask);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        TaskPlanDTO taskplanRec = new TaskPlanDTO();
+        taskplanRec.setTaskId(selectedTask);
+        farmondto.setTaskplanrec(taskplanRec);        
+        farmondto = clientService.callTaskplanIdService(farmondto);
+        
+        taskplanRec = farmondto.getTaskplanrec();
+        //#######editted taskplan record construction ########
         taskplanRec.setTaskId(selectedTask);
         taskplanRec.setHarvestId(activeharvests.get(selectedIndexHarvest).getHarvestid());
         taskplanRec.setTaskName(taskName);
+        
         if (taskplanRec.getTaskType().equals("RES")) {
-//            taskplanRec.setTaskType("RES");
             taskplanRec.setResourceId(availableresources.get(selectedIndexRes).getResourceId());
             taskplanRec.setAppliedAmount(String.format("%.2f", amtapplied));
             taskplanRec.setAppliedAmtCost(null);
@@ -249,7 +251,10 @@ public class TaskEdit implements Serializable {
         taskplanRec.setTaskDt(sdf.format(taskDt));
         taskplanRec.setAppliedFlag(null);
         
-        int response = masterDataService.editTaskplanRecord(taskplanRec);
+        farmondto.setTaskplanrec(taskplanRec);
+        farmondto = clientService.callEditTaskplanService(farmondto);
+        int response = farmondto.getResponses().getFarmon_EDIT_RES();
+//        int response = masterDataService.editTaskplanRecord(taskplanRec);
         redirectUrl = "/secured/taskplan/openschedule?faces-redirect=true";
         if (response == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
@@ -263,7 +268,7 @@ public class TaskEdit implements Serializable {
             }
             if (response == DB_SEVERE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                         "Failure on adding task");
+                         "Failure on updating task");
                 f.addMessage(null, message);
             }
 

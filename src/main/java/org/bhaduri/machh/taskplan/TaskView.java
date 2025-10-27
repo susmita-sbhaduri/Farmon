@@ -10,10 +10,12 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
+import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
-import org.bhaduri.machh.DTO.TaskPlanDTO;
+import org.farmon.farmondto.TaskPlanDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -42,19 +44,39 @@ public class TaskView implements Serializable {
     public TaskView() {
     }
     public void fillValues() throws NamingException {
-        MasterDataServices masterDataService = new MasterDataServices();
-        TaskPlanDTO taskplanRec = masterDataService.getTaskPlanForId(selectedTask);
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        TaskPlanDTO taskplanRec = new TaskPlanDTO();
+        taskplanRec.setTaskId(selectedTask);
+        farmondto.setTaskplanrec(taskplanRec);        
+        farmondto = clientService.callTaskplanIdService(farmondto);
+        
+        taskplanRec = farmondto.getTaskplanrec();
         
         taskName = taskplanRec.getTaskName();
         
-        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(taskplanRec.getHarvestId());
+        HarvestDTO harvestRecord = new HarvestDTO();
+        harvestRecord.setHarvestid(taskplanRec.getHarvestId());
+        farmondto.setHarvestrecord(harvestRecord);
+        farmondto = clientService.callHarvestRecService(farmondto);        
+        harvestRecord = farmondto.getHarvestrecord();
+        
+//        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(taskplanRec.getHarvestId());
         site = harvestRecord.getSiteName();
         cropcat = harvestRecord.getCropCategory();
         cropname = harvestRecord.getCropName();
         if (taskplanRec.getTaskType().equals("RES")) {
             taskType = "Resource";
-            FarmresourceDTO resourceRec = masterDataService
-                    .getResourceNameForId(Integer.parseInt(taskplanRec.getResourceId()));
+//            FarmresourceDTO resourceRec = masterDataService
+//                    .getResourceNameForId(Integer.parseInt(taskplanRec.getResourceId()));
+            
+            FarmresourceDTO resourceRec = new FarmresourceDTO();
+            resourceRec.setResourceId(taskplanRec.getResourceId());
+            farmondto.setFarmresourcerec(resourceRec);
+            farmondto = clientService.callResnameForIdService(farmondto);
+            
+            resourceRec = farmondto.getFarmresourcerec();
+            
             resname = resourceRec.getResourceName();
             amount = resourceRec.getAvailableAmt();
             unit = resourceRec.getUnit();
