@@ -10,8 +10,10 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.ResAcqReportDTO;
+import org.farmon.farmondto.ResAcqReportDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -34,10 +36,13 @@ public class ResAcqDetails implements Serializable {
 //        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
 //        startDate = formatter.parse(startDt);
 //        endDate = formatter.parse(endDt);
-        MasterDataServices masterDataService = new MasterDataServices();
-        resacqs = masterDataService.getAcqResources();
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto = clientService.callRecAcqRptService(farmondto);
         
-        System.out.println("No resourcecrop record is found for this harvest.");
+        resacqs = farmondto.getResacqreport();
+        
+//        System.out.println("No resourcecrop record is found for this harvest.");
     }
 
     public List<ResAcqReportDTO> getResacqs() {

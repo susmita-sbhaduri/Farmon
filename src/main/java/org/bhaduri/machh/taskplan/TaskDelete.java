@@ -136,18 +136,12 @@ private String selectedTask;
         
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        MasterDataServices masterDataService = new MasterDataServices();
         TaskPlanDTO taskplanRec = new TaskPlanDTO();
         taskplanRec.setTaskId(selectedTask);
         farmondto.setTaskplanrec(taskplanRec);        
-        farmondto = clientService.callTaskplanIdService(farmondto);
-        taskplanRec = farmondto.getTaskplanrec();
-//        TaskPlanDTO taskplanRec = masterDataService.getTaskPlanForId(selectedTask);
-        taskplanRec.setTaskId(selectedTask);
+        farmondto = clientService.callDeleteTaskplanService(farmondto);
         
-        
-        int response = masterDataService.deleteTaskplanRecord(taskplanRec);
-//        redirectUrl = "/secured/taskplan/openschedule?faces-redirect=true";
+        int response = farmondto.getResponses().getFarmon_DEL_RES();
         if (response == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Task is deleted successfully");

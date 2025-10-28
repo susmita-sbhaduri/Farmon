@@ -15,9 +15,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
+import org.farmon.farmondto.FarmresourceDTO;
+import org.farmon.farmondto.ResourceCropDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -43,9 +45,11 @@ public class AppliedResDetails implements Serializable {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        MasterDataServices masterDataService = new MasterDataServices();
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto = clientService.callNonzeroresListService(farmondto);       
         
-        availableresources = masterDataService.getNonzeroResList();
+        availableresources = farmondto.getFarmresourcelist();
         if (availableresources.isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                     "No available resources.");
@@ -71,9 +75,15 @@ public class AppliedResDetails implements Serializable {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        MasterDataServices masterDataService = new MasterDataServices();
-        List<ResourceCropDTO> listforRes = masterDataService.getResCropForResource(availableresources.
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        ResourceCropDTO resourceCrop = new ResourceCropDTO();
+        resourceCrop.setResourceId(availableresources.
                 get(selectedIndexRes).getResourceId());
+        farmondto.setResourceCropDTO(resourceCrop);
+        farmondto = clientService.callResCropPerResService(farmondto);
+//        MasterDataServices masterDataService = new MasterDataServices();
+        List<ResourceCropDTO> listforRes = farmondto.getRescroplist();
         if (listforRes.isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                     "This resource is not applied so far.");
@@ -83,18 +93,16 @@ public class AppliedResDetails implements Serializable {
             f.responseComplete();
             return null; // Return null after a programmatic redirect
         }
-        unit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId())).getUnit();
-        if (masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                get(selectedIndexRes).getResourceId()))
-                .getCropwtunit() != null) {
+        FarmresourceDTO farmresrec = new FarmresourceDTO();
+            farmresrec.setResourceId(availableresources.get(selectedIndexRes)
+                    .getResourceId());
+            farmondto.setFarmresourcerec(farmresrec);
+            farmondto = clientService.callResnameForIdService(farmondto);
+        unit = farmondto.getFarmresourcerec().getUnit();
+        if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
             rescat = "Crop";
-            cropwt = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                    get(selectedIndexRes).getResourceId()))
-                    .getCropweight();
-            cropwtunit = masterDataService.getResourceNameForId(Integer.parseInt(availableresources.
-                    get(selectedIndexRes).getResourceId()))
-                    .getCropwtunit();
+            cropwt = farmondto.getFarmresourcerec().getCropweight();
+            cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
 
         } else {
             rescat = "Other";
