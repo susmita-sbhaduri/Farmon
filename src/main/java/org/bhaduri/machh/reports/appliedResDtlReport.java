@@ -14,8 +14,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
+import org.farmon.farmondto.ResourceCropDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -38,14 +40,17 @@ public class appliedResDtlReport implements Serializable {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        Date startDate;
-        Date endDate;
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        startDate = formatter.parse(startDt);
-        endDate = formatter.parse(endDt);
-        MasterDataServices masterDataService = new MasterDataServices();
-        resapps = masterDataService.getRescropDetailsForRes(resourceId, startDate, endDate);
+        
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto.setReportstartdt(startDt);
+        farmondto.setReportenddt(endDt);
+        ResourceCropDTO rescroprec = new ResourceCropDTO();
+        rescroprec.setResourceId(resourceId);
+        farmondto.setResourceCropDTO(rescroprec);
+        
+        farmondto = clientService.callResCropPerResDtService(farmondto);
+        resapps = farmondto.getRescroplist();
         if (resapps.isEmpty() || resapps == null) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
                     "No applied resource found for this date range.");

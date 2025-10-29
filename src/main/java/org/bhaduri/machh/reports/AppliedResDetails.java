@@ -39,27 +39,23 @@ public class AppliedResDetails implements Serializable {
     
 
     public String fillValues() throws NamingException, IOException {
-//        String redirectUrl = "/secured/harvest/activehrvstlst?faces-redirect=true";
-        String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-        String redirectUrl = contextPath + "/faces/secured/harvest/activehrvstlst.xhtml";
+        String redirectUrl = "/secured/userhome?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        FarmonDTO farmondto= new FarmonDTO();
+        FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        farmondto = clientService.callNonzeroresListService(farmondto);       
-        
+        farmondto = clientService.callNonzeroresListService(farmondto);
+
         availableresources = farmondto.getFarmresourcelist();
         if (availableresources.isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                     "No available resources.");
             f.addMessage(null, message);
-            // Do the redirect here:
-            f.getExternalContext().redirect(redirectUrl);
-            f.responseComplete();
-            return null; // Return null after a programmatic redirect
-        } 
-        else return null;        
+            return redirectUrl;
+        } else {
+            return null;
+        }
     }
     
     public AppliedResDetails() {
@@ -94,10 +90,10 @@ public class AppliedResDetails implements Serializable {
             return null; // Return null after a programmatic redirect
         }
         FarmresourceDTO farmresrec = new FarmresourceDTO();
-            farmresrec.setResourceId(availableresources.get(selectedIndexRes)
-                    .getResourceId());
-            farmondto.setFarmresourcerec(farmresrec);
-            farmondto = clientService.callResnameForIdService(farmondto);
+        farmresrec.setResourceId(availableresources.get(selectedIndexRes)
+                .getResourceId());
+        farmondto.setFarmresourcerec(farmresrec);
+        farmondto = clientService.callResnameForIdService(farmondto);
         unit = farmondto.getFarmresourcerec().getUnit();
         if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
             rescat = "Crop";

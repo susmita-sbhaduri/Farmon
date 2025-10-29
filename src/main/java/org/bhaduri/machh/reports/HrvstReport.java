@@ -15,6 +15,8 @@ import java.util.List;
 import javax.naming.NamingException;
 import org.farmon.farmondto.HarvestDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -34,8 +36,11 @@ public class HrvstReport implements Serializable {
     public HrvstReport() {
     }
     public String fillHarvestValues() throws NamingException {
-        MasterDataServices masterDataService = new MasterDataServices();
-        activeharvests = masterDataService.getActiveHarvestList();
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto = clientService.callActiveHarvestListService(farmondto);
+        activeharvests = farmondto.getHarvestlist();
+        
         String redirectUrl = "/secured/userhome?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
