@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.LabourCropDTO;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
+import org.farmon.farmondto.LabourCropDTO;
+import org.farmon.farmondto.ResourceCropDTO;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -26,37 +28,47 @@ import org.bhaduri.machh.services.MasterDataServices;
 @Named(value = "hrvstResTotal")
 @ViewScoped
 public class HrvstResTotal implements Serializable {
+
     List<ResourceCropDTO> rescrops;
     List<LabourCropDTO> labcrops;
     private String startDt;
     private String endDt;
     private String harvestId;
+
     /**
      * Creates a new instance of HrvstResTotal
      */
     public HrvstResTotal() {
         System.out.println("No resourcecrop record is found for this harvest.");
     }
-    public String fillValues() throws NamingException, ParseException {
+
+    public String fillValues() {
         String redirectUrl = "/secured/reports/harvestrpts?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        Date startDate;
-        Date endDate;
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        startDate = formatter.parse(startDt);
-        endDate = formatter.parse(endDt);
-        MasterDataServices masterDataService = new MasterDataServices();
-        rescrops = masterDataService.getSummaryPerResForHrvst(startDate, endDate, harvestId);
-        LabourCropDTO recordtotal = masterDataService.getTotalLabcropReport(harvestId, startDate, endDate);
+
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto.setReportstartdt(startDt);
+        farmondto.setReportenddt(endDt);
+        ResourceCropDTO rescroprec = new ResourceCropDTO();
+        rescroprec.setHarvestId(harvestId);
+        farmondto.setResourceCropDTO(rescroprec);
+        farmondto = clientService.callResCropSumHarDtService(farmondto);
+        rescrops = farmondto.getRescroplist();
+
+        LabourCropDTO recordtotal = new LabourCropDTO();
+        recordtotal.setHarvestId(harvestId);
+        farmondto.setLabcroprecord(recordtotal);
+        farmondto = clientService.callLabCropSumHarDtService(farmondto);
+        recordtotal = farmondto.getLabcroprecord();
         labcrops = new ArrayList<>();
         labcrops.add(recordtotal);
         if (rescrops.isEmpty() || rescrops == null) {
-            if (recordtotal == null) {
+            if (Float.parseFloat(recordtotal.getAppliedAmount()) == 0) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                        "No applied resource or labour records found.");
+                        "No applied resource and labour records found.");
                 f.addMessage(null, message);
                 return redirectUrl;
             } else {
@@ -65,9 +77,15 @@ public class HrvstResTotal implements Serializable {
                 f.addMessage(null, message);
                 return null;
             }
-        } else
-            return null;       
-        
+        } else {
+            if (Float.parseFloat(recordtotal.getAppliedAmount()) == 0) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "No applied labour records found.");
+                f.addMessage(null, message);
+                return null;
+            } 
+            else return null;
+        }
     }
 
     public List<ResourceCropDTO> getRescrops() {
@@ -109,5 +127,5 @@ public class HrvstResTotal implements Serializable {
     public void setLabcrops(List<LabourCropDTO> labcrops) {
         this.labcrops = labcrops;
     }
-    
+
 }

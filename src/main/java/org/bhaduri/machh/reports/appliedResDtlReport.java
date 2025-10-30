@@ -35,7 +35,7 @@ public class appliedResDtlReport implements Serializable {
      */
     public appliedResDtlReport() {
     }
-    public String fillValues() throws NamingException, ParseException {
+    public String fillValues() throws NamingException {
         String redirectUrl = "/secured/reports/appliedresdetails?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();

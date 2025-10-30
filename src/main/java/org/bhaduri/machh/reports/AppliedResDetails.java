@@ -36,7 +36,7 @@ public class AppliedResDetails implements Serializable {
     private String rescat;
     private String cropwt;
     private String cropwtunit;
-    
+    private boolean messageShown = false;
 
     public String fillValues() throws NamingException, IOException {
         String redirectUrl = "/secured/userhome?faces-redirect=true";
@@ -53,9 +53,25 @@ public class AppliedResDetails implements Serializable {
                     "No available resources.");
             f.addMessage(null, message);
             return redirectUrl;
+        } 
+        
+       
+        ResourceCropDTO resourceCrop = new ResourceCropDTO();
+        resourceCrop.setResourceId(availableresources.
+                get(selectedIndexRes).getResourceId());
+        farmondto.setResourceCropDTO(resourceCrop);
+        farmondto = clientService.callResCropPerResService(farmondto);
+        List<ResourceCropDTO> listforRes = farmondto.getRescroplist();
+        if (listforRes.isEmpty()) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                    "This resource is not applied so far.");
+            f.addMessage(null, message);
+            messageShown = true; // prevent repeated messages
+            return null; // Return null will return to the current loading page
         } else {
             return null;
         }
+        
     }
     
     public AppliedResDetails() {
@@ -65,20 +81,21 @@ public class AppliedResDetails implements Serializable {
         Date oneMonthAgo = cal.getTime();
         startDt = oneMonthAgo;
     }
-    public String onResourceSelect() throws NamingException, IOException {
+    public void onResourceSelect() throws IOException {
+        //here redirection is done programmatically using ExternalContext.redirect()
         String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
         String redirectUrl = contextPath + "/faces/secured/reports/appliedresdetails.xhtml";
+
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        FarmonDTO farmondto= new FarmonDTO();
+        FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         ResourceCropDTO resourceCrop = new ResourceCropDTO();
         resourceCrop.setResourceId(availableresources.
                 get(selectedIndexRes).getResourceId());
         farmondto.setResourceCropDTO(resourceCrop);
         farmondto = clientService.callResCropPerResService(farmondto);
-//        MasterDataServices masterDataService = new MasterDataServices();
         List<ResourceCropDTO> listforRes = farmondto.getRescroplist();
         if (listforRes.isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
@@ -87,7 +104,6 @@ public class AppliedResDetails implements Serializable {
             // Do the redirect here:
             f.getExternalContext().redirect(redirectUrl);
             f.responseComplete();
-            return null; // Return null after a programmatic redirect
         }
         FarmresourceDTO farmresrec = new FarmresourceDTO();
         farmresrec.setResourceId(availableresources.get(selectedIndexRes)
@@ -105,9 +121,8 @@ public class AppliedResDetails implements Serializable {
             cropwt = "";
             cropwtunit = "";
         }
-        return null;
     }
-    
+
     public String resourceDetails() {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
@@ -190,5 +205,14 @@ public class AppliedResDetails implements Serializable {
     public void setCropwtunit(String cropwtunit) {
         this.cropwtunit = cropwtunit;
     }
+
+    public boolean isMessageShown() {
+        return messageShown;
+    }
+
+    public void setMessageShown(boolean messageShown) {
+        this.messageShown = messageShown;
+    }
+    
     
 }
