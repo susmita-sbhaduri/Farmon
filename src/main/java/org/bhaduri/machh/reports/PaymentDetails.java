@@ -9,14 +9,11 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.ExpenseDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.ExpenseDTO;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -31,26 +28,25 @@ public class PaymentDetails implements Serializable {
     
     public PaymentDetails() {
     }
-    public String fillValues() throws NamingException, ParseException {
+    public String fillValues() {
         String redirectUrl = "/secured/reports/harvestrpts?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        Date startDate;
-        Date endDate;
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        startDate = formatter.parse(startDt);
-        endDate = formatter.parse(endDt);
-        MasterDataServices masterDataService = new MasterDataServices();
-        empexps = masterDataService.getAllEmpExpenseInRange(startDate, endDate);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto.setReportstartdt(startDt);
+        farmondto.setReportenddt(endDt);
+        farmondto = clientService.callEmpExpPerDtService(farmondto);
+        empexps = farmondto.getExpenselist();
         if (empexps.isEmpty() || empexps == null) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
                     "No applied resource found.");
             f.addMessage(null, message);
             return redirectUrl;
         } else {
-//            empexps.sort(Comparator.comparing(ExpenseDTO::getExpenseRefId, String.CASE_INSENSITIVE_ORDER));
+//      sorted First descending order of date then for the same date alphabetical order 
+//      of empname stored in ExpenseRefId.
             empexps.sort(Comparator.comparing(ExpenseDTO::getDate).reversed()
             .thenComparing(ExpenseDTO::getExpenseRefId, String.CASE_INSENSITIVE_ORDER)
                         );

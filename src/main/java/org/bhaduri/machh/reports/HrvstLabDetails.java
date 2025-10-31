@@ -9,13 +9,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.LabourCropDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.LabourCropDTO;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -33,19 +30,20 @@ public class HrvstLabDetails implements Serializable {
      */
     public HrvstLabDetails() {
     }
-    public String fillValues() throws NamingException, ParseException {
+    public String fillValues(){
         String redirectUrl = "/secured/reports/harvestrpts?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        Date startDate;
-        Date endDate;
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        startDate = formatter.parse(startDt);
-        endDate = formatter.parse(endDt);
-        MasterDataServices masterDataService = new MasterDataServices();
-        labcrops = masterDataService.getLabcropDetails(harvestId, startDate, endDate);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto.setReportstartdt(startDt);
+        farmondto.setReportenddt(endDt);
+        LabourCropDTO labcroprec = new LabourCropDTO();
+        labcroprec.setHarvestId(harvestId);
+        farmondto.setLabcroprecord(labcroprec);
+        farmondto = clientService.callLabCropDtlsHarDtService(farmondto);
+        labcrops = farmondto.getLabcroplist();
         if (labcrops.isEmpty() || labcrops == null) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
                     "No applied labour details found.");

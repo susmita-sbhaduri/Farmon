@@ -9,13 +9,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.ResourceCropDTO;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -34,19 +31,22 @@ public class HrvstDetails implements Serializable {
     public HrvstDetails() {
         System.out.println("No resourcecrop record is found for this harvest.");
     }
-    public String fillValues() throws NamingException, ParseException {
+    public String fillValues(){
         String redirectUrl = "/secured/reports/harvestrpts?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        Date startDate;
-        Date endDate;
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        startDate = formatter.parse(startDt);
-        endDate = formatter.parse(endDt);
-        MasterDataServices masterDataService = new MasterDataServices();
-        rescrops = masterDataService.getRescropDetails(harvestId, startDate, endDate);
+        
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto.setReportstartdt(startDt);
+        farmondto.setReportenddt(endDt);
+        ResourceCropDTO rescroprec = new ResourceCropDTO();
+        rescroprec.setHarvestId(harvestId);
+        farmondto.setResourceCropDTO(rescroprec);
+        farmondto = clientService.callResCropPerHarDtService(farmondto);
+        
+        rescrops = farmondto.getRescroplist();
         if (rescrops.isEmpty() || rescrops == null) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
                     "No applied resource found.");
