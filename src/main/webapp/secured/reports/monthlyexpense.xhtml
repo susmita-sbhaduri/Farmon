@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"                
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <h4>Details of Expense for the Month of #{monthlyExpense.monthText}.</h4>
+        <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
+        <f:metadata>  
+            <f:viewParam name="month" value="#{monthlyExpense.selectedMonth}"></f:viewParam>
+            <f:viewParam name="year" value="#{monthlyExpense.selectedYear}"></f:viewParam>
+            <f:viewAction action="#{monthlyExpense.fillValues()}" />
+        </f:metadata>  
+        <div class="card">
+            <h:form id="monexpform" style="text-align: center">
+                <div style="text-align: left;">
+                    <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+                    &nbsp;&nbsp;&nbsp;
+                    <p:commandButton value="Export as CSV" ajax="false">
+                        <p:dataExporter type="csv" 
+                                        target="monexpform:monexp" 
+                                        fileName="Monthlyexp"/>
+                    </p:commandButton>
+                    &nbsp;&nbsp;&nbsp;
+                    <p:button outcome="/secured/reports/monthsforexprpt" value="Go Back" id="goback"/>
+                </div>
+
+                <p:dataTable id="monexp" var="monexp" value="#{monthlyExpense.expdetails}">                   
+
+                    <p:column headerText="Expense Category" >
+                        <h:outputText value="#{monexp.expenseCategory}" />
+                    </p:column>
+                    <p:column headerText="Description" >
+                        <h:outputText value="#{monexp.expenseName}" />
+                    </p:column>
+                    <p:column headerText="Date" >
+                        <h:outputText value="#{monexp.date}" />
+                    </p:column>
+                    <p:column headerText="Cost">
+                        <h:outputText value="#{monexp.cost}" />
+                    </p:column>                    
+                </p:dataTable>
+            </h:form>
+        </div>
+    </ui:define>    
+
+</ui:composition>
+

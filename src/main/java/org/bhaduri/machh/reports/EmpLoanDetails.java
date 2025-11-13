@@ -32,10 +32,10 @@ public class EmpLoanDetails implements Serializable {
     public EmpLoanDetails() {
     }
     public void fillValues() throws NamingException, ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        MasterDataServices masterDataService = new MasterDataServices(); 
+//        MasterDataServices masterDataService = new MasterDataServices(); 
         farmondto = clientService.callEmpActiveLoanService(farmondto);
         List<EmpExpDTO> loanList = farmondto.getEmpexplist();
         EmpExpDTO record = new EmpExpDTO();
@@ -53,18 +53,18 @@ public class EmpLoanDetails implements Serializable {
            record.setSdate(loanList.get(i).getSdate());
            loanrecords.add(record);
            
-           farmondto.setEmpexprec(record);
+           farmondto.setEmpexprec(loanList.get(i));
            farmondto = clientService.callEmpPaybkLoanService(farmondto);
            
            List<EmpExpDTO> paybackList = farmondto.getEmpexplist();
            for (int j = 0; j < paybackList.size(); j++) {
+               record = new EmpExpDTO();
                record.setEmpid("");
                record.setId("REPAYMENT");
                record.setTotal(paybackList.get(j).getTotal());
                record.setOutstanding("");
                record.setSdate(paybackList.get(j).getSdate());
-               loanrecords.add(record);
-               record = new EmpExpDTO();
+               loanrecords.add(record);               
            }
            record = new EmpExpDTO();
         }

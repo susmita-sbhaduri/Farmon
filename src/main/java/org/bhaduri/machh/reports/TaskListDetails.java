@@ -9,14 +9,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
-import org.bhaduri.machh.DTO.TaskPlanDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.TaskPlanDTO;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -30,19 +26,18 @@ public class TaskListDetails implements Serializable {
     private String endDt;
     public TaskListDetails() {
     }
-    public String fillValues() throws NamingException, ParseException {
+    public String fillValues(){
         String redirectUrl = "/secured/reports/taskdetails?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        Date startDate;
-        Date endDate;
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        startDate = formatter.parse(startDt);
-        endDate = formatter.parse(endDt);
-        MasterDataServices masterDataService = new MasterDataServices();
-        tasks = masterDataService.getTaskdDetailsBetweenDates(startDate, endDate);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto.setReportstartdt(startDt);
+        farmondto.setReportenddt(endDt);
+        
+        farmondto = clientService.callTaskLstBtnDatesService(farmondto);
+        tasks = farmondto.getTaskplanlist();
         if (tasks.isEmpty() || tasks == null) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
                     "No applied resource found for this date range.");
