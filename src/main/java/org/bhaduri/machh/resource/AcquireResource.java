@@ -67,7 +67,7 @@ public class AcquireResource implements Serializable {
                         Collectors.toMap(
                                 row -> Arrays.asList(row.getResourceId(), row.getShopId()), // key: two columns
                                 row -> row,
-                                (row1, row2) -> row2 // keep the first occurrence
+                                (row1, row2) -> row1 // keep the first occurrence
                         ),
                         map -> new ArrayList<>(map.values())
                 ));

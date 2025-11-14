@@ -12,11 +12,13 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.EmployeeDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import org.farmon.farmondto.EmployeeDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -68,10 +70,12 @@ public class EmployeeAdd implements Serializable {
             f.addMessage("empsal", message);
             return redirectUrl;
         }
-        
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto = clientService.callMaxEmpIdService(farmondto);
         MasterDataServices masterDataService = new MasterDataServices();
         EmployeeDTO empToAdd = new EmployeeDTO();
-        int maxid = masterDataService.getMaxEmployeeId();
+        int maxid = Integer.parseInt(farmondto.getEmprec().getId());
         if (maxid == 0 ) {
             empToAdd.setId("1");
         } else {
@@ -88,7 +92,9 @@ public class EmployeeAdd implements Serializable {
         }else{
            empToAdd.setEdate(sdf.format(edate));
         }
-        int empaddres = masterDataService.addEmployeeRecord(empToAdd);
+        farmondto.setEmprec(empToAdd);
+        farmondto = clientService.callAddEmpService(farmondto);
+        int empaddres = farmondto.getResponses().getFarmon_ADD_RES();
         if (empaddres == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Employee added successfully");

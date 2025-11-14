@@ -14,12 +14,10 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Locale;
 import javax.naming.NamingException;
 import org.farmon.farmondto.AllExpenseReportDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -39,7 +37,7 @@ public class MonthlyExpense implements Serializable {
      */
     public MonthlyExpense() {
     }
-    public void fillValues() throws NamingException, ParseException {
+    public void fillValues() {
         DateTimeFormatter parser = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
         TemporalAccessor accessor = parser.parse(selectedMonth);
         int monthNumber = accessor.get(java.time.temporal.ChronoField.MONTH_OF_YEAR); 
@@ -66,7 +64,6 @@ public class MonthlyExpense implements Serializable {
         farmondto.setReportstartdt(firstDayFormatted);
         farmondto.setReportenddt(lastDayFormatted);
         farmondto = clientService.callMonthlyExpRptService(farmondto);
-        MasterDataServices masterDataService = new MasterDataServices();
         expdetails = farmondto.getAllexplist();
     }
 

@@ -188,7 +188,7 @@ public class ResourceAdd implements Serializable {
         resShopUpdBean.setId(String.valueOf(shopresid));
         resShopUpdBean.setShopId(selectedShop.getShopId());
         resShopUpdBean.setShopName(selectedShop.getShopName());
-        if (existingreswithName == null) {//new resource added in Farmresource and ShopRes record ghas to be added
+        if (existingreswithName == null) {//new resource added in Farmresource and ShopRes record has to be added
             resShopUpdBean.setResourceId(resid);
             resShopUpdBean.setResourceName(resname);
         } else {//resource is not new for ShopRes record(Farmresource+shopid) is new
