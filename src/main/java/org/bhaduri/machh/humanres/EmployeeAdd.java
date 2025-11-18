@@ -16,7 +16,6 @@ import org.farmon.farmondto.EmployeeDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -73,7 +72,6 @@ public class EmployeeAdd implements Serializable {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         farmondto = clientService.callMaxEmpIdService(farmondto);
-        MasterDataServices masterDataService = new MasterDataServices();
         EmployeeDTO empToAdd = new EmployeeDTO();
         int maxid = Integer.parseInt(farmondto.getEmprec().getId());
         if (maxid == 0 ) {

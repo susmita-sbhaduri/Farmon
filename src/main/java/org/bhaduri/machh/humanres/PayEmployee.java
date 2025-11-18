@@ -14,14 +14,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.EmpExpDTO;
-import org.bhaduri.machh.DTO.EmployeeDTO;
-import org.bhaduri.machh.DTO.ExpenseDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import org.farmon.farmondto.EmpExpDTO;
+import org.farmon.farmondto.EmpLeaveDTO;
+import org.farmon.farmondto.EmployeeDTO;
+import org.farmon.farmondto.ExpenseDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -46,25 +49,42 @@ public class PayEmployee implements Serializable {
      */
     public PayEmployee() {
     }
-    public void fillValues() throws NamingException {
-
-        MasterDataServices masterDataService = new MasterDataServices();     
+    public void fillValues(){
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+//        EmployeeDTO record = new EmployeeDTO();
+        empRec.setAddress(selectedEmp);
+        farmondto.setEmprec(empRec);
+        farmondto = clientService.callEmpNameforIdService(farmondto);
+//        MasterDataServices masterDataService = new MasterDataServices();     
         
-        empRec = masterDataService.getEmpNameForId(selectedEmp);
+        empRec = farmondto.getEmprec();
         selectedEmpName = empRec.getName();
         salary = 0; 
+        
 //        If the employee has LOAN then EmpExpense record will have a record. Based on this, Loan Repayment
 //        field is based editable. If there is no record then this field becomes readonly
-        List<EmpExpDTO> empLoanRecs = masterDataService.getEmpActiveExpRecs(selectedEmp, "LOAN");
-        if(empLoanRecs.isEmpty()){            
+        EmpExpDTO empLoanRec = new EmpExpDTO();
+        empLoanRec.setEmpid(selectedEmp);
+        empLoanRec.setExpcategory("LOAN");
+        farmondto.setEmpexprec(empLoanRec);
+        farmondto = clientService.callActiveEmpExpService(farmondto);
+        empLoanRec = farmondto.getEmpexprec();
+        
+        if(empLoanRec == null){            
            readOnlyCondition = true;
            outstanding = "NA";
         } else
             //at one time only one loan will be active hence 0th record is taken out            
-            outstanding = empLoanRecs.get(0).getOutstanding();
+            outstanding = empLoanRec.getOutstanding();
         bonus = 0; 
+        EmpLeaveDTO leaverec = new EmpLeaveDTO();
+        leaverec.setEmpid(selectedEmp);
+        farmondto.setEmpleaverec(leaverec);
+        farmondto = clientService.callEmpLeaveCountService(farmondto);
         leaveApplicable = (Float.parseFloat(empRec.getSalary())/2) - 
-                ((Float.parseFloat(empRec.getSalary())/30)*masterDataService.getCountLeaveEmp(selectedEmp));
+                ((Float.parseFloat(empRec.getSalary())/30)*
+                Integer.parseInt(farmondto.getEmpleaverec().getId()));
         leave = 0;
     }
     
@@ -75,6 +95,26 @@ public class PayEmployee implements Serializable {
         f.getExternalContext().getFlash().setKeepMessages(true);
         int resp;
         if (salary > 0) {
+            // salary entered is more than the salary of the employee in the employee table
+            if (salary > Float.parseFloat(empRec.getSalary())) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                        "Paid salary cannot more than the salary set for the employee");
+                f.addMessage(null, message);
+                return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
+            }
+            // there is loan and user has entered payback
+            if(readOnlyCondition==false){
+                if (payback > 0) {
+                    //Payback + Salary cannot be greater than salary as payback will be deducted from salary
+                    if ((payback + salary) > Float.parseFloat(empRec.getSalary())) {
+                        message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                                "Payback + Salary cannot be greater than salary");
+                        f.addMessage(null, message);
+                        return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
+                    }
+                }                
+            }
+            
             resp = createExpenseRec("SALARY", String.format("%.2f",salary));
             if (resp == SUCCESS) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
@@ -137,19 +177,22 @@ public class PayEmployee implements Serializable {
         // there is loan hence one can enter payback and Loan Repayment is an editable field. 
         if(readOnlyCondition==false){
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            FarmonDTO farmondto = new FarmonDTO();
+            FarmonClient clientService = new FarmonClient();
             MasterDataServices masterDataService = new MasterDataServices();
             String expCat = "LOAN";
         //The closed loan that is the enddate field in empexpense record is not filled up, is taken out.
         //One loan can be active at a time. Hence 0th record is selected.
-            EmpExpDTO empexpUpd = masterDataService.getEmpActiveExpRecs(selectedEmp, expCat).get(0);
+            EmpExpDTO empexpUpd = new EmpExpDTO();
+            empexpUpd.setEmpid(selectedEmp);
+            empexpUpd.setExpcategory(expCat);
+            farmondto.setEmpexprec(empexpUpd);
+            farmondto = clientService.callActiveEmpExpService(farmondto);
+            empexpUpd = farmondto.getEmpexprec();
+        
+//          If payback is entered!!!
             if (payback > 0) {
-                //Payback + Salary cannot be greater than salary
-                if((payback+salary)> Float.parseFloat(empRec.getSalary())){
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "Payback + Salary cannot be greater than salary");
-                    f.addMessage(null, message);
-                    return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
-                }
+                
                 Date loanStartDate = sdf.parse(empexpUpd.getSdate());
                 if (paydate.compareTo(loanStartDate) < 0) {//if paydate is before loanStartDate
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
@@ -161,16 +204,18 @@ public class PayEmployee implements Serializable {
                 float outstngcalc = Float.parseFloat(empexpUpd.getOutstanding()) - payback;
                 if (outstngcalc < 0) {
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "Repayment date must not be more than outstanding amount");
+                            "Repayment amount must not be more than outstanding amount");
                     f.addMessage(null, message);
                     return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
                 }
                 empexpUpd.setOutstanding(String.format("%.2f", outstngcalc));
                 //if outstngcalc = 0 then loan is closed with the repayment date  
                 if (outstngcalc == 0) {
-                    empexpUpd.setEdate(sdf.format(paydate));
+                    empexpUpd.setEdate(sdf.format(paydate));                
                 }
-                int empexpupd = masterDataService.editEmpExpRecord(empexpUpd);
+                farmondto.setEmpexprec(empexpUpd);
+                farmondto = clientService.callEditEmpExpService(farmondto);
+                int empexpupd = farmondto.getResponses().getFarmon_EDIT_RES();
                 if (empexpupd == SUCCESS) {
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                             "Loan updated successfully");
@@ -190,8 +235,9 @@ public class PayEmployee implements Serializable {
                 }
                 // If there is a payback then PAYBACK record is inserted in empexpense
                  //Construction of empexpense record
+                farmondto = clientService.callMaxEmpExpIdService(farmondto);
                 EmpExpDTO empexpRec = new EmpExpDTO();
-                int empexpid = masterDataService.getMaxEmpExpenseId();
+                int empexpid = Integer.parseInt(farmondto.getEmpexprec().getId());
                 if (empexpid == 0) {
                     empexpRec.setId("1");
                 } else {
@@ -223,11 +269,6 @@ public class PayEmployee implements Serializable {
 
                 }
             }
-        
-//           
-//            if (payback > 0) {                
-//               
-//            }
         }
         return redirectUrl;
 
