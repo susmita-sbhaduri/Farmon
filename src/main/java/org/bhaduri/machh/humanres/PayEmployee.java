@@ -12,8 +12,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.EmpExpDTO;
 import org.farmon.farmondto.EmpLeaveDTO;
 import org.farmon.farmondto.EmployeeDTO;
@@ -22,7 +20,6 @@ import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -52,11 +49,10 @@ public class PayEmployee implements Serializable {
     public void fillValues(){
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-//        EmployeeDTO record = new EmployeeDTO();
-        empRec.setAddress(selectedEmp);
+        empRec = new EmployeeDTO();
+        empRec.setId(selectedEmp);
         farmondto.setEmprec(empRec);
         farmondto = clientService.callEmpNameforIdService(farmondto);
-//        MasterDataServices masterDataService = new MasterDataServices();     
         
         empRec = farmondto.getEmprec();
         selectedEmpName = empRec.getName();
@@ -88,33 +84,40 @@ public class PayEmployee implements Serializable {
         leave = 0;
     }
     
-    public String payEmp() throws NamingException, ParseException {
+    public String payEmp() throws ParseException {
         String redirectUrl = "/secured/humanresource/maintainemp?faces-redirect=true"; 
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
         int resp;
+        if (paydate == null) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                    "Payment date is a mandatory field.");
+            f.addMessage(null, message);
+            return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
+        }
+        // there is loan and user has entered payback, user can just enter the payback and not
+        // salary but Payback + Salary > employee salary
+        
+        if (readOnlyCondition == false) {
+            if (payback > 0) {
+                //Payback + Salary cannot be greater than salary as payback will be deducted from salary
+                if ((payback + salary) > Float.parseFloat(empRec.getSalary())) {
+                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                            "Payback + Salary cannot be greater than salary");
+                    f.addMessage(null, message);
+                    return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
+                }
+            }
+        }
         if (salary > 0) {
             // salary entered is more than the salary of the employee in the employee table
             if (salary > Float.parseFloat(empRec.getSalary())) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                        "Paid salary cannot more than the salary set for the employee");
+                        "Salary cannot more than the salary set for the employee");
                 f.addMessage(null, message);
                 return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
             }
-            // there is loan and user has entered payback
-            if(readOnlyCondition==false){
-                if (payback > 0) {
-                    //Payback + Salary cannot be greater than salary as payback will be deducted from salary
-                    if ((payback + salary) > Float.parseFloat(empRec.getSalary())) {
-                        message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                                "Payback + Salary cannot be greater than salary");
-                        f.addMessage(null, message);
-                        return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
-                    }
-                }                
-            }
-            
             resp = createExpenseRec("SALARY", String.format("%.2f",salary));
             if (resp == SUCCESS) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
@@ -179,7 +182,6 @@ public class PayEmployee implements Serializable {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             FarmonDTO farmondto = new FarmonDTO();
             FarmonClient clientService = new FarmonClient();
-            MasterDataServices masterDataService = new MasterDataServices();
             String expCat = "LOAN";
         //The closed loan that is the enddate field in empexpense record is not filled up, is taken out.
         //One loan can be active at a time. Hence 0th record is selected.
@@ -250,7 +252,10 @@ public class PayEmployee implements Serializable {
                 empexpRec.setSdate(sdf.format(paydate));
                 empexpRec.setEdate(null);
                 empexpRec.setEmprefid(empexpUpd.getId());
-                int paybackadd = masterDataService.addEmpExpRecord(empexpRec);
+                
+                farmondto.setEmpexprec(empexpRec);
+                farmondto = clientService.callAddEmpExpService(farmondto);
+                int paybackadd = farmondto.getResponses().getFarmon_ADD_RES();
                 if (paybackadd == SUCCESS) {
                     message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                             "Payback updated successfully");
@@ -274,11 +279,15 @@ public class PayEmployee implements Serializable {
 
     }
     
-    public int createExpenseRec(String empexptype, String expenseAmt) throws NamingException{
-        MasterDataServices masterDataService = new MasterDataServices();
+    public int createExpenseRec(String empexptype, String expenseAmt) {
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        
         ExpenseDTO expenseRec = new ExpenseDTO();
-        int expenseid = masterDataService.getNextIdForExpense();
+        farmondto = clientService.callMaxExpIdService(farmondto);
+        int expenseid = Integer.parseInt(farmondto.getExpenserec().getExpenseId());
         if (expenseid == 0) {
             expenseRec.setExpenseId("1");
         } else {
@@ -289,7 +298,10 @@ public class PayEmployee implements Serializable {
         expenseRec.setExpenseType(empexptype);
         expenseRec.setExpenditure(expenseAmt);
         expenseRec.setCommString(empexptype);
-        int expres = masterDataService.addExpenseRecord(expenseRec);
+        farmondto.setExpenserec(expenseRec);
+        farmondto = clientService.callAddExpService(farmondto);
+        int expres = farmondto.getResponses().getFarmon_ADD_RES();
+        
         return expres;
     }
 

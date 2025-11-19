@@ -13,11 +13,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.EmployeeDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import org.farmon.farmondto.EmployeeDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -37,10 +39,16 @@ public class EditEmp implements Serializable {
     
     public EditEmp() {
     }
-    public void fillValues() throws NamingException, ParseException {
-        MasterDataServices masterDataService = new MasterDataServices();
+    public void fillValues() throws ParseException {
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        empRec = new EmployeeDTO();
+        empRec.setId(selectedEmp);
+        farmondto.setEmprec(empRec);
+        farmondto = clientService.callEmpNameforIdService(farmondto);        
+        empRec = farmondto.getEmprec();        
+       
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        empRec = masterDataService.getEmpNameForId(selectedEmp);
         name = empRec.getName();
         address = empRec.getAddress();
         phno = empRec.getPhno();
@@ -52,7 +60,7 @@ public class EditEmp implements Serializable {
             edate = null;
         }
     }
-    public String goToSaveEmp() throws NamingException {
+    public String goToSaveEmp() {
         
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
@@ -66,9 +74,8 @@ public class EditEmp implements Serializable {
             return redirectUrl;
         }
         
-        MasterDataServices masterDataService = new MasterDataServices();
-//        EmployeeDTO empToAdd = new EmployeeDTO();
-        
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();       
         
         empRec.setSalary(String.format("%.2f",salary));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -78,12 +85,13 @@ public class EditEmp implements Serializable {
         }else{
            empRec.setEdate(sdf.format(edate));
         }
-        int empeditres = masterDataService.editEmployeeRecord(empRec);
+        farmondto.setEmprec(empRec);
+        farmondto = clientService.callEditEmpService(farmondto);
+        int empeditres = farmondto.getResponses().getFarmon_EDIT_RES();
         if (empeditres == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Employee updated successfully");
             f.addMessage(null, message);
-//            return "/secured/userhome?faces-redirect=true";
             return redirectUrl;
         } else {  
             if (empeditres == DB_NON_EXISTING) {
@@ -96,7 +104,6 @@ public class EditEmp implements Serializable {
                         Integer.toString(DB_SEVERE));
                 f.addMessage(null, message);
             } 
-//            return "/secured/userhome?faces-redirect=true";
         }
         return redirectUrl;
     }

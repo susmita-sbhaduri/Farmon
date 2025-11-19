@@ -14,13 +14,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.EmpExpDTO;
-import org.bhaduri.machh.DTO.EmployeeDTO;
-import org.bhaduri.machh.DTO.ExpenseDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import org.farmon.farmondto.EmpExpDTO;
+import org.farmon.farmondto.EmployeeDTO;
+import org.farmon.farmondto.ExpenseDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -43,13 +45,25 @@ public class EmpLoan implements Serializable {
      */
     public EmpLoan() {
     }
-    public void fillValues() throws NamingException, ParseException {
+    public void fillValues() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        MasterDataServices masterDataService = new MasterDataServices(); 
-        EmployeeDTO empRec = masterDataService.getEmpNameForId(selectedEmp);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        EmployeeDTO empRec = new EmployeeDTO();
+        empRec.setId(selectedEmp);
+        farmondto.setEmprec(empRec);
+        farmondto = clientService.callEmpNameforIdService(farmondto);        
+        empRec = farmondto.getEmprec();
         selectedEmpName = empRec.getName();
-        List<EmpExpDTO> empLoanRecs = masterDataService.getEmpActiveExpRecs(selectedEmp, "LOAN");
-        if(empLoanRecs.isEmpty()){
+        
+        EmpExpDTO empLoanRec = new EmpExpDTO();
+        empLoanRec.setEmpid(selectedEmp);
+        empLoanRec.setExpcategory("LOAN");
+        farmondto.setEmpexprec(empLoanRec);
+        farmondto = clientService.callActiveEmpExpService(farmondto);
+        empLoanRec = farmondto.getEmpexprec();
+//        List<EmpExpDTO> empLoanRecs = masterDataService.getEmpActiveExpRecs(selectedEmp, "LOAN");
+        if(empLoanRec == null){
             totalLoan = 0;
             outstanding = String.format("%.2f", totalLoan);
             newRecord = true;
@@ -57,30 +71,44 @@ public class EmpLoan implements Serializable {
         } else {
 //          at one time only one loan will be active hence 0th record is taken out
 //          This is an existing loan. hence all the records are populated and made read only
-            totalLoan = Float.parseFloat(empLoanRecs.get(0).getTotal());
-            outstanding = empLoanRecs.get(0).getOutstanding();
-            sdate =  sdf.parse(empLoanRecs.get(0).getSdate());
+            totalLoan = Float.parseFloat(empLoanRec.getTotal());
+            outstanding = empLoanRec.getOutstanding();
+            sdate =  sdf.parse(empLoanRec.getSdate());
             readOnlyCondition = true;
         }
     }
-    public void calculateOutstanding() throws NamingException {
+    public void calculateOutstanding(){
         outstanding = String.format("%.2f", totalLoan);
     }
     
-    public String saveDetails() throws NamingException {
+    public String saveDetails(){
         int sqlFlag = 0;
         String redirectUrl = "/secured/humanresource/maintainemp?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        MasterDataServices masterDataService = new MasterDataServices();
+        
+        
+        
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        
         if (newRecord && (Float.parseFloat(outstanding) == totalLoan)
                 && (totalLoan > 0)) {
+            
+            if (sdate == null) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                        "Loan start date is a mandatory field.");
+                f.addMessage(null, message);
+                return "/secured/humanresource/emploan?faces-redirect=true&selectedEmp=" + selectedEmp;
+            }
 //              Construction of expense record, as newRecord is true 2 records would be inserted in 
 //              two tables.            
             ExpenseDTO expenseRec = new ExpenseDTO();
-            int expenseid = masterDataService.getNextIdForExpense();
+            farmondto = clientService.callMaxExpIdService(farmondto);
+            int expenseid = Integer.parseInt(farmondto.getExpenserec().getExpenseId());
             if (expenseid == 0) {
                 expenseRec.setExpenseId("1");
             } else {
@@ -94,7 +122,8 @@ public class EmpLoan implements Serializable {
             
             //Construction of empexpense record
             EmpExpDTO empexpRec = new EmpExpDTO();
-            int empexpid = masterDataService.getMaxEmpExpenseId();
+            farmondto = clientService.callMaxEmpExpIdService(farmondto);
+            int empexpid = Integer.parseInt(farmondto.getEmpexprec().getId());
             if (empexpid == 0) {
                 empexpRec.setId("1");
             } else {
@@ -104,10 +133,11 @@ public class EmpLoan implements Serializable {
             empexpRec.setOutstanding(outstanding);
             empexpRec.setExpcategory("LOAN");
             empexpRec.setSdate(sdf.format(sdate));
-            empexpRec.setEmpid(selectedEmp); //######empid as ref id   
-//            empexpRec.setEmprefid(null);
-            
-            int expres = masterDataService.addExpenseRecord(expenseRec);
+            empexpRec.setEmpid(selectedEmp);
+
+            farmondto.setExpenserec(expenseRec);
+            farmondto = clientService.callAddExpService(farmondto);
+            int expres = farmondto.getResponses().getFarmon_ADD_RES();
             if (expres == SUCCESS) {
                 sqlFlag = sqlFlag+1;
             } else {
@@ -123,7 +153,9 @@ public class EmpLoan implements Serializable {
                 }
             }
             if (sqlFlag == 1) {
-                int insempexp = masterDataService.addEmpExpRecord(empexpRec);
+                farmondto.setEmpexprec(empexpRec);
+                farmondto = clientService.callAddEmpExpService(farmondto);
+                int insempexp = farmondto.getResponses().getFarmon_ADD_RES();
                 if (insempexp == SUCCESS) {                    
                     sqlFlag = sqlFlag + 1;
                 } else {
@@ -146,35 +178,7 @@ public class EmpLoan implements Serializable {
                 f.addMessage(null, message);
                 
             }
-        }//if newRecord
-//        if (newRecord == false) {
-//            empexpUpd = masterDataService.getEmpActiveExpRecs(selectedEmp,"LOAN").get(0);
-//            empexpUpd.setOutstanding(outstanding);
-//            empexpUpd.setSdate(sdf.format(sdate));
-////            if (edate != null) {
-////                empexpUpd.setEdate(sdf.format(sdate));
-////            } else {
-////                empexpUpd.setEdate(null);
-////            }
-//            int empexpupd = masterDataService.editEmpExpRecord(empexpUpd);
-//            if (empexpupd == SUCCESS) {
-//                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-//                        "Loan updated successfully");
-//                f.addMessage(null, message);
-//            } else {
-//                if (empexpupd == DB_NON_EXISTING) {
-//                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-//                            "This expexpense record does not exist.");
-//                    f.addMessage(null, message);
-//                }
-//                if (empexpupd == DB_SEVERE) {
-//                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-//                            "Failure on updating expexpense record.");
-//                    f.addMessage(null, message);
-//                }
-//                
-//            }
-//        }//if not newRecord
+        }
         return redirectUrl;
     }
 

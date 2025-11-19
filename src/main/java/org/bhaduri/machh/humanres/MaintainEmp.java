@@ -10,9 +10,7 @@ import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.EmployeeDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -31,11 +29,10 @@ public class MaintainEmp implements Serializable {
     
     public MaintainEmp() {
     }
-    public String fillValues() throws NamingException {
+    public String fillValues() {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         farmondto = clientService.callGetActiveEmpService(farmondto);
-        MasterDataServices masterDataService = new MasterDataServices();
         emps = farmondto.getEmplist();
         String redirectUrl = "/secured/userhome?faces-redirect=true";
         FacesMessage message;
