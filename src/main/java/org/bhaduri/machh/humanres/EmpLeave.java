@@ -13,13 +13,13 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.EmpLeaveDTO;
-import org.bhaduri.machh.DTO.EmployeeDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.services.MasterDataServices;
+import org.farmon.farmondto.EmpLeaveDTO;
+import org.farmon.farmondto.EmployeeDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -37,15 +37,17 @@ public class EmpLeave implements Serializable {
      */
     public EmpLeave() {
     }
-    public String fillValues() throws NamingException, IOException {
+    public String fillValues() throws IOException {
         String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
         String redirectUrl = contextPath + "/faces/secured/humanresource/createemp.xhtml";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        MasterDataServices masterDataService = new MasterDataServices();
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto = clientService.callGetActiveEmpService(farmondto);
         
-        employees = masterDataService.getActiveEmployeeList();
+        employees = farmondto.getEmplist();
         if (employees.isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                     "No active employee.");
@@ -58,15 +60,24 @@ public class EmpLeave implements Serializable {
         else return null;        
     }
     
-    public String saveEmpLeave() throws NamingException {
+    public String saveEmpLeave(){
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
         String redirectUrl = "/secured/humanresource/empleave?faces-redirect=true";
         
-        MasterDataServices masterDataService = new MasterDataServices();
+        if (leaveDt == null) {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                    "Date of leave is a mandatory field.");
+            f.addMessage("empsal", message);
+            return redirectUrl;
+        }
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto = clientService.callMaxLeaveIdService(farmondto);
         EmpLeaveDTO leaveRec = new EmpLeaveDTO();
-        int maxid = masterDataService.getMaxEmpLeaveId();
+        int maxid = Integer.parseInt(farmondto.getEmpleaverec().getId());
+
         if (maxid == 0) {
             leaveRec.setId("1");
         } else {
@@ -78,7 +89,9 @@ public class EmpLeave implements Serializable {
         leaveRec.setLeavedate(sdf.format(leaveDt));
         leaveRec.setComments(comments);
         
-        int response = masterDataService.addEmpleaveRecord(leaveRec);
+        farmondto.setEmpleaverec(leaveRec);
+        farmondto = clientService.callAddEmpLeaveService(farmondto);
+        int response = farmondto.getResponses().getFarmon_ADD_RES();
         if (response == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Employee leave added successfully");
