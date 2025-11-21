@@ -9,9 +9,7 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.ResAcqReportDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -29,7 +27,7 @@ public class ResAcqDetails implements Serializable {
      */
     public ResAcqDetails() {
     }
-    public void fillValues() throws NamingException, ParseException {
+    public void fillValues() throws ParseException {
 //        Date startDate;
 //        Date endDate;
 //        String pattern = "yyyy-MM-dd";

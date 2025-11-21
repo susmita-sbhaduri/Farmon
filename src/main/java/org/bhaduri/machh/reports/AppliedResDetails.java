@@ -14,10 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.ResourceCropDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -38,7 +36,7 @@ public class AppliedResDetails implements Serializable {
     private String cropwtunit;
     private boolean messageShown = false;
 
-    public String fillValues() throws NamingException, IOException {
+    public String fillValues() throws IOException {
         String redirectUrl = "/secured/userhome?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();

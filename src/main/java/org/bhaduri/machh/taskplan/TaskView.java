@@ -9,11 +9,9 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import javax.naming.NamingException;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.TaskPlanDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -43,7 +41,7 @@ public class TaskView implements Serializable {
     private String comments;
     public TaskView() {
     }
-    public void fillValues() throws NamingException {
+    public void fillValues(){
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         TaskPlanDTO taskplanRec = new TaskPlanDTO();

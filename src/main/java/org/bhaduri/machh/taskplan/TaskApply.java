@@ -12,20 +12,18 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.ExpenseDTO;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.LabourCropDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.ResAcquireDTO;
 import org.farmon.farmondto.ResourceCropDTO;
 import org.farmon.farmondto.ShopResDTO;
 import org.farmon.farmondto.TaskPlanDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -56,7 +54,7 @@ public class TaskApply implements Serializable {
      */
     public TaskApply() {
     }
-    public void fillValues() throws NamingException {
+    public void fillValues() {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         TaskPlanDTO taskplanRec = new TaskPlanDTO();
@@ -118,7 +116,7 @@ public class TaskApply implements Serializable {
         
     }
     
-    public String saveTask() throws NamingException{
+    public String saveTask() {
         String redirectUrl = "/secured/taskplan/openschedule?faces-redirect=true";
         
         FacesMessage message;
@@ -458,7 +456,7 @@ public class TaskApply implements Serializable {
         return redirectUrl;
     }
     public String calcShopResAmt(String quantityApplied, String applId, String resId) 
-            throws NamingException {
+            {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
 //        MasterDataServices masterDataService = new MasterDataServices();

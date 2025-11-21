@@ -9,17 +9,14 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import javax.naming.NamingException;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.TaskPlanDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -49,7 +46,7 @@ private String selectedTask;
     private String comments;
     public TaskDelete() {
     }
-    public void fillValues() throws NamingException {
+    public void fillValues() {
         
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
@@ -127,7 +124,7 @@ private String selectedTask;
         taskDt = date.format(outputFormat);
     }
     
-    public String deleteTask() throws NamingException {
+    public String deleteTask() {
         
         String redirectUrl = "/secured/taskplan/openschedule?faces-redirect=true";
         FacesMessage message;

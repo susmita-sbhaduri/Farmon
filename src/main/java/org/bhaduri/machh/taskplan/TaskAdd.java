@@ -13,14 +13,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_DUPLICATE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.TaskPlanDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -55,7 +53,7 @@ public class TaskAdd implements Serializable {
      */
     public TaskAdd() {
     }
-    public void fillValues() throws NamingException, ParseException {
+    public void fillValues() throws ParseException {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         
@@ -83,7 +81,7 @@ public class TaskAdd implements Serializable {
 
     }
     
-    public void onTaskTypeSelect() throws NamingException{
+    public void onTaskTypeSelect() {
 //        System.out.println("No crop categories are found." + selectedShop);
         if (selectedTaskType.equals("labhar")) {
             resReadonly = true;
@@ -112,7 +110,7 @@ public class TaskAdd implements Serializable {
         }
     }
     
-    public void onResourceSelect() throws NamingException {
+    public void onResourceSelect() {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         FarmresourceDTO farmresrec = new FarmresourceDTO();
@@ -131,7 +129,7 @@ public class TaskAdd implements Serializable {
 
     }
     
-    public String goToSaveTask() throws NamingException {
+    public String goToSaveTask() {
         String redirectUrl = "/secured/taskplan/openschedule?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
@@ -139,7 +137,6 @@ public class TaskAdd implements Serializable {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         
-        MasterDataServices masterDataService = new MasterDataServices();
 
         if (taskName.isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",

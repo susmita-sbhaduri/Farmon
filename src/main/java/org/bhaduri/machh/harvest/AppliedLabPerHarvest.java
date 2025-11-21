@@ -10,14 +10,8 @@ import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
-import javax.naming.NamingException;
-import org.farmon.farmondto.ExpenseDTO;
-import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.LabourCropDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -39,7 +33,7 @@ public class AppliedLabPerHarvest implements Serializable {
      */
     public AppliedLabPerHarvest() {
     }
-    public String fillResourceValues() throws NamingException {
+    public String fillResourceValues() {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         HarvestDTO harvestRecord = new HarvestDTO();

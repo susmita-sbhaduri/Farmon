@@ -9,13 +9,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.ResourceCropDTO;
-import org.bhaduri.machh.services.MasterDataServices;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -35,7 +30,7 @@ public class appliedResDtlReport implements Serializable {
      */
     public appliedResDtlReport() {
     }
-    public String fillValues() throws NamingException {
+    public String fillValues() {
         String redirectUrl = "/secured/reports/appliedresdetails?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();

@@ -38,7 +38,7 @@ public class EmployeeAdd implements Serializable {
     public EmployeeAdd() {
     }
     
-    public String goToSaveEmp() throws NamingException {
+    public String goToSaveEmp() {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);

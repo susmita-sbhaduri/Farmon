@@ -13,12 +13,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.TaskPlanDTO;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
@@ -54,7 +53,7 @@ public class TaskEdit implements Serializable {
      */
     public TaskEdit() {
     }
-    public void fillValues() throws NamingException, ParseException {
+    public void fillValues() throws ParseException {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         TaskPlanDTO taskRecord = new TaskPlanDTO();
@@ -153,7 +152,7 @@ public class TaskEdit implements Serializable {
         else
             appliedcost = Float.parseFloat(taskRecord.getAppliedAmtCost());
     }
-    public void onResourceChange() throws NamingException {
+    public void onResourceChange() {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         FarmresourceDTO farmresrec = new FarmresourceDTO();
@@ -176,7 +175,7 @@ public class TaskEdit implements Serializable {
         }
     }
     
-    public String saveTask() throws NamingException {
+    public String saveTask() {
         
         String redirectUrl = "/secured/taskplan/taskedit?faces-redirect=true&selectedTask=" + selectedTask;
         FacesMessage message;

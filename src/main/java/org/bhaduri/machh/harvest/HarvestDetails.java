@@ -11,18 +11,14 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.naming.NamingException;
-import org.bhaduri.machh.DTO.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
-import org.bhaduri.machh.DTO.LabourCropDTO;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_NON_EXISTING;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.DB_SEVERE;
-import static org.bhaduri.machh.DTO.MachhResponseCodes.SUCCESS;
-import org.bhaduri.machh.DTO.ResourceCropDTO;
-import org.bhaduri.machh.services.MasterDataServices;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
+import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.FarmonDTO;
 
 /**
  *
@@ -45,25 +41,16 @@ public class HarvestDetails implements Serializable {
      */
     public HarvestDetails() {
     }
-    public void fillValues() throws NamingException, ParseException {
-        MasterDataServices masterDataService = new MasterDataServices();
-//        appliedreslist = masterDataService.getResCropForHarvest(selectedHarvest);        
-//        ResourceCropDTO record = new ResourceCropDTO();
-//        for (int i = 0; i < appliedreslist.size(); i++) {
-//            FarmresourceDTO farmres = masterDataService.getResourceNameForId(Integer.parseInt(
-//                    appliedreslist.get(i).getResourceId()));
-//            if(farmres.getCropwtunit()!=null){
-//                record.setResourceName(farmres.getResourceName());
-//                record.setAppliedAmount(appliedreslist.get(i).getAppliedAmount());
-//                record.setApplicationDt(appliedreslist.get(i).getApplicationDt());
-//                appliedcroplist.add(record);                
-//            } else  {
-//                applresourcelist.add(record);
-//            }
-//            record = new ResourceCropDTO();
-//        }
+    public void fillValues() throws ParseException {
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        harvestRecord = new HarvestDTO();
+        harvestRecord.setHarvestid(selectedHarvest);
+        farmondto.setHarvestrecord(harvestRecord);
+        farmondto = clientService.callHarvestRecService(farmondto);
+        
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        harvestRecord = masterDataService.getHarvestRecForId(selectedHarvest);
+        harvestRecord = farmondto.getHarvestrecord();
         site = harvestRecord.getSiteName();
         cropcat = harvestRecord.getCropCategory();
         cropname = harvestRecord.getCropName();
@@ -84,10 +71,14 @@ public class HarvestDetails implements Serializable {
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
         String redirectUrl = "/secured/harvest/activehrvstlst?faces-redirect=true";
-        harvestRecord.setDesc(desc);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();        
         
-        MasterDataServices masterDataService = new MasterDataServices();
-        int empeditres = masterDataService.editHarvestRecord(harvestRecord);
+        harvestRecord.setDesc(desc);
+        farmondto.setHarvestrecord(harvestRecord);
+        farmondto = clientService.callEditHarvRecService(farmondto);
+        int empeditres = farmondto.getResponses().getFarmon_EDIT_RES();
+        
         if (empeditres == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Harvest description updated successfully");
