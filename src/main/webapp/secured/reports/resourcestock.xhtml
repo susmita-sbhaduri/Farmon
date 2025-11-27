@@ -8,7 +8,7 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <h4>Maintain Resource</h4>
+        <h4>Maintain Resource.</h4>
         <p:growl id="growl" showDetail="true" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         &nbsp;&nbsp;&nbsp;
@@ -35,19 +35,12 @@
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          icon="fa fa-edit" 
-                                         value="Delete Resource"
-                                         action="#{maintainResource.deleteRes()}" >
-                            <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />
-                        </p:commandButton>
-                    </p:column>
-                    <p:column>
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
                                          value="Acquire Resource"
                                          action="#{maintainResource.acquireRes()}" >
                             <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />
                         </p:commandButton>
                     </p:column>
+                    
                 </p:dataTable>
             </h:form>
         </div>

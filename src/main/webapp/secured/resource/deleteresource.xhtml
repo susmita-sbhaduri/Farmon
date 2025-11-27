@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" />
+        <h4>Delete Resource.</h4>
+        <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+        
+        <f:metadata> 
+            <f:viewParam name="selectedRes" value="#{deleteResource.selectedRes}"></f:viewParam>
+            <f:viewAction action="#{deleteResource.fillExistingDetails()}" />
+        </f:metadata>
+        
+        <div class="card">
+            <h:form id="resaddform" style="text-align: left">
+                <div class="ui-g">
+                    
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel value="Resource Name"/>
+                    </div>                    
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{deleteResource.resname}" style="font-weight:bold;"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel value="Shop Names" />
+                    </div>                    
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:dataTable var="shopres" value="#{deleteResource.shopreslist}" style="font-size: 10px;">
+                            <p:column headerText="Name">
+                                #{shopres.shopName} 
+                            </p:column>
+                            <p:column headerText="Rate">
+                                #{shopres.rate}
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel value="Unit"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{deleteResource.unit}" style="font-weight:bold;"/>
+                    </div>
+                                           
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:commandButton styleClass="blue-button" 
+                                         icon="fa fa-edit" 
+                                         value="Delete"
+                                         action="#{deleteResource.deleteRes()}" >                        
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/resource/maintainresource" />
+                    </div>
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+
+
+</ui:composition>

@@ -83,7 +83,35 @@ public class MaintainResource implements Serializable {
         return redirectUrl;
 //        return "/secured/userhome";
     }
-
+    
+    public String deleteRes() {  
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        FarmresourceDTO farmresrec = new FarmresourceDTO();
+        farmresrec.setResourceId(selectedRes.getResourceId());
+        farmondto.setFarmresourcerec(farmresrec);
+        farmondto = clientService.callResnameForIdService(farmondto);
+        String amount = farmondto.getFarmresourcerec().getAvailableAmt();
+        
+        String redirectUrl;
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true); 
+        
+        if (amount.equals("0.00")) {
+            redirectUrl = "/secured/resource/deleteresource?faces-redirect=true&selectedRes="+ selectedRes.getResourceId();
+            return redirectUrl;
+        }
+        else {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                    "Resource with non-zero stock cannot be deleted.");
+            f.addMessage(null, message);
+            redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
+            return redirectUrl;
+            
+        }
+    }
+    
     public List<FarmresourceDTO> getExistingresources() {
         return existingresources;
     }
