@@ -10,10 +10,10 @@ import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.List;
-import javax.naming.NamingException;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
+import org.farmon.farmondto.ResAcquireDTO;
 
 /**
  *
@@ -27,25 +27,36 @@ public class MaintainResource implements Serializable {
     
     public MaintainResource() {
     }
-    public String fillResourceValues() throws NamingException {
+    public void fillResourceValues() {
         String redirectUrl = "/secured/resource/addinventory?faces-redirect=true";
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();        
         farmondto = clientService.callFarmresListService(farmondto);
         existingresources = farmondto.getFarmresourcelist();      
         
-        FacesMessage message;
-        FacesContext f = FacesContext.getCurrentInstance();
-        f.getExternalContext().getFlash().setKeepMessages(true);
-        if(existingresources.isEmpty()){            
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                    "Add one resource.");
-            f.addMessage(null, message);
-            return redirectUrl;
-            
-        } else {
-            return null;    
-        }
+        farmondto = clientService.callDisResacqPerResService(farmondto);
+        List<ResAcquireDTO> acqreslist = farmondto.getResacqreclist();
+        // Remove from existingresources all resources that are ALREADY in acqreslist
+        existingresources.removeIf(res -> {
+            for (ResAcquireDTO resacq : acqreslist) {  // nested loop check
+                if (resacq.getResoureId().equals(res.getResourceId())) {
+                    return true;  // remove this resource
+                }
+            }
+            return false;
+        });
+        
+//        FacesMessage message;
+//        FacesContext f = FacesContext.getCurrentInstance();
+//        f.getExternalContext().getFlash().setKeepMessages(true);
+//        if(existingresources.isEmpty()){            
+//            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+//                    "Add one resource.");
+//            f.addMessage(null, message);
+//            return redirectUrl;            
+//        } else {
+//            return null;    
+//        }
     }
     
 //    public String deleteRes() throws NamingException {
@@ -112,6 +123,11 @@ public class MaintainResource implements Serializable {
         }
     }
     
+    public String editRes() {
+        String redirectUrl = "/secured/resource/editresource?faces-redirect=true&selectedRes=" + selectedRes.getResourceId();
+        return redirectUrl;
+
+    }
     public List<FarmresourceDTO> getExistingresources() {
         return existingresources;
     }

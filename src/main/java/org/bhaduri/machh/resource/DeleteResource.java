@@ -17,9 +17,7 @@ import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.FarmresourceDTO;
-import org.farmon.farmondto.ShopDTO;
 import org.farmon.farmondto.ShopResDTO;
-import org.farmon.farmondto.TaskPlanDTO;
 
 /**
  *
@@ -32,7 +30,7 @@ public class DeleteResource implements Serializable {
     private String resname;
     private String unit;
     private List<ShopResDTO> shopreslist;
-    
+    private FarmresourceDTO farmresrec;
     
     /**
      * Creates a new instance of DeleteResource
@@ -40,10 +38,10 @@ public class DeleteResource implements Serializable {
     public DeleteResource() {
     }
     
-    public void fillExistingDetails() throws NamingException {
+    public void fillExistingDetails() {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        FarmresourceDTO farmresrec = new FarmresourceDTO();
+        farmresrec = new FarmresourceDTO();
         farmresrec.setResourceId(selectedRes);
         farmondto.setFarmresourcerec(farmresrec);
         farmondto = clientService.callResnameForIdService(farmondto);
@@ -64,19 +62,19 @@ public class DeleteResource implements Serializable {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
+        int sqlFlag = 0;
         
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        TaskPlanDTO taskplanRec = new TaskPlanDTO();
-        taskplanRec.setTaskId(selectedTask);
-        farmondto.setTaskplanrec(taskplanRec);        
-        farmondto = clientService.callDeleteTaskplanService(farmondto);
+        FarmresourceDTO resourceRec = new FarmresourceDTO();
+        resourceRec.setResourceId(selectedRes);
+        farmondto.setFarmresourcerec(resourceRec);
+        farmondto = clientService.callDelFarmresService(farmondto);
         
         int response = farmondto.getResponses().getFarmon_DEL_RES();
         if (response == SUCCESS) {
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                    "Task is deleted successfully");
-            f.addMessage(null, message);
+            sqlFlag = sqlFlag + 1;
+           
         } else {
             if (response == DB_NON_EXISTING) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
@@ -90,6 +88,42 @@ public class DeleteResource implements Serializable {
             }
 
         }
+        
+        if (sqlFlag == 1) {
+            ShopResDTO shopresrec = new ShopResDTO();
+            shopresrec.setResourceId(selectedRes);
+            farmondto.setShopresrec(shopresrec);
+            farmondto = clientService.callDelShopresService(farmondto);            
+            int resres = farmondto.getResponses().getFarmon_DEL_RES();
+            if (resres == SUCCESS) {
+                sqlFlag = sqlFlag + 1;
+            } else {
+                if (resres == DB_NON_EXISTING) {
+                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                            "Shop Resource record does not exist");
+                    f.addMessage(null, message);
+                }
+                if (resres == DB_SEVERE) {
+                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                            "Failure on Shop Resource update");
+                    f.addMessage(null, message);
+                }
+                farmondto.setFarmresourcerec(farmresrec);
+                farmondto = clientService.callAddFarmresService(farmondto);
+                int delres = farmondto.getResponses().getFarmon_ADD_RES();
+                if (delres == DB_SEVERE) {
+                    message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                            "Farm resource record could not be deleted");
+                    f.addMessage(null, message);
+                }
+                return redirectUrl;
+            }
+        }
+        if (sqlFlag == 2) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                    "Resource is deleted successfully");
+            f.addMessage(null, message);
+        } 
         return redirectUrl;
         
     }
