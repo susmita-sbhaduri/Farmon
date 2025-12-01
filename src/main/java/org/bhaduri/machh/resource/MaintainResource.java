@@ -28,7 +28,7 @@ public class MaintainResource implements Serializable {
     public MaintainResource() {
     }
     public void fillResourceValues() {
-        String redirectUrl = "/secured/resource/addinventory?faces-redirect=true";
+//        String redirectUrl = "/secured/resource/addinventory?faces-redirect=true";
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();        
         farmondto = clientService.callFarmresListService(farmondto);
@@ -96,31 +96,33 @@ public class MaintainResource implements Serializable {
     }
     
     public String deleteRes() {  
-        FarmonDTO farmondto= new FarmonDTO();
-        FarmonClient clientService = new FarmonClient();
-        FarmresourceDTO farmresrec = new FarmresourceDTO();
-        farmresrec.setResourceId(selectedRes.getResourceId());
-        farmondto.setFarmresourcerec(farmresrec);
-        farmondto = clientService.callResnameForIdService(farmondto);
-        String amount = farmondto.getFarmresourcerec().getAvailableAmt();
-        
-        String redirectUrl;
-        FacesMessage message;
-        FacesContext f = FacesContext.getCurrentInstance();
-        f.getExternalContext().getFlash().setKeepMessages(true); 
-        
-        if (amount.equals("0.00")) {
-            redirectUrl = "/secured/resource/deleteresource?faces-redirect=true&selectedRes="+ selectedRes.getResourceId();
-            return redirectUrl;
-        }
-        else {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                    "Resource with non-zero stock cannot be deleted.");
-            f.addMessage(null, message);
-            redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
-            return redirectUrl;
-            
-        }
+//        FarmonDTO farmondto= new FarmonDTO();
+//        FarmonClient clientService = new FarmonClient();
+//        FarmresourceDTO farmresrec = new FarmresourceDTO();
+//        farmresrec.setResourceId(selectedRes.getResourceId());
+//        farmondto.setFarmresourcerec(farmresrec);
+//        farmondto = clientService.callResnameForIdService(farmondto);
+//        String amount = farmondto.getFarmresourcerec().getAvailableAmt();
+//        
+//        String redirectUrl;
+//        FacesMessage message;
+//        FacesContext f = FacesContext.getCurrentInstance();
+//        f.getExternalContext().getFlash().setKeepMessages(true); 
+//        
+//        if (amount.equals("0.00")) {
+//            redirectUrl = "/secured/resource/deleteresource?faces-redirect=true&selectedRes="+ selectedRes.getResourceId();
+//            return redirectUrl;
+//        }
+//        else {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Resource with non-zero stock cannot be deleted.");
+//            f.addMessage(null, message);
+//            redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
+//            return redirectUrl;
+//            
+//        }
+        String redirectUrl = "/secured/resource/deleteresource?faces-redirect=true&selectedRes="+ selectedRes.getResourceId();
+        return redirectUrl;
     }
     
     public String editRes() {

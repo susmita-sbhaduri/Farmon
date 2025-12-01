@@ -27,7 +27,7 @@ import org.farmon.farmondto.FarmonDTO;
 @Named(value = "resourceAdd")
 @ViewScoped
 public class ResourceAdd implements Serializable {
-    private String resid;
+    
     private String resname;
     private int selectedIndex;
     private List<ShopDTO> shoplist;
@@ -37,19 +37,12 @@ public class ResourceAdd implements Serializable {
     private String unitcrop;
     private boolean unitcropReadonly = true; // default as readonly
 
-    public String fillExistingDetails() throws NamingException {
+    public String fillExistingDetails(){
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient(); 
-        farmondto = clientService.callMaxFarmresIdService(farmondto);
+        
 //        MasterDataServices masterDataService = new MasterDataServices();
-        resid = farmondto.getFarmresourcerec().getResourceId();
-        if(resid.equals("0")){
-            resid="1";
-        } else {
-            int residInt = Integer.parseInt(resid);
-            residInt = residInt + 1;
-            resid = String.valueOf(residInt);
-        }
+        
         farmondto = clientService.callShopListService(farmondto);
         shoplist = farmondto.getShoplist();
         String redirectUrl;
@@ -59,9 +52,7 @@ public class ResourceAdd implements Serializable {
         if (shoplist.isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "No shops to be linked.");
-//            f.addMessage("othershopid", message);
             f.addMessage(null, message);
-//            redirectUrl = "/secured/shop/reshoplist?faces-redirect=true&resourceId=" + resourceId + "&resourceName=" + resourceName;
             redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
             return redirectUrl;
         }
@@ -76,8 +67,10 @@ public class ResourceAdd implements Serializable {
             unitcropReadonly = false;
         } 
     }
-    public String goToSaveRes() throws NamingException {
+    public String goToSaveRes() {
         String redirectUrl = "/secured/resource/addinventory?faces-redirect=true";
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient(); 
         
         FacesMessage message = null;
         FacesContext f = FacesContext.getCurrentInstance();
@@ -87,16 +80,16 @@ public class ResourceAdd implements Serializable {
         if (resname.isBlank()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Resource name cannot be empty.",
                     "Resource name cannot be empty.");
-            f.addMessage("unit", message);
+            f.addMessage("resname", message);
             return redirectUrl;
         }
 
-        if (selectedShop.getShopId().isEmpty()) {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "First add shop.",
-                    "First add shop.");
-            f.addMessage("shopid", message);
-            return redirectUrl;
-        }
+//        if (selectedShop.getShopId().isEmpty()) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "First add shop.",
+//                    "First add shop.");
+//            f.addMessage("shopid", message);
+//            return redirectUrl;
+//        }
 
         if (unit.isBlank()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unit cannot be empty.",
@@ -104,18 +97,12 @@ public class ResourceAdd implements Serializable {
             f.addMessage("unit", message);
             return redirectUrl;
         }
-        
-        
-        
-        if ("crop".equalsIgnoreCase(rescat) && unitcrop.isEmpty()) {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                    "Unit for crop is mandatory.");
-            f.addMessage("unitcrop", message);
-            return redirectUrl;
-        }
-        
-        FarmonDTO farmondto= new FarmonDTO();
-        FarmonClient clientService = new FarmonClient(); 
+//        if ("crop".equalsIgnoreCase(rescat) && unitcrop.isEmpty()) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Unit for crop is mandatory.");
+//            f.addMessage("unitcrop", message);
+//            return redirectUrl;
+//        }  
         FarmresourceDTO restopasswithname = new FarmresourceDTO();
         restopasswithname.setResourceName(resname);
         farmondto.setFarmresourcerec(restopasswithname);
@@ -145,19 +132,27 @@ public class ResourceAdd implements Serializable {
         
         redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
         
-        int resres = 999; //initialisation issue
+        int resid = -1; //initialisation issue
+        int resres = -1;
         FarmresourceDTO resAddBean = new FarmresourceDTO();
         if (existingreswithName == null) { // there is no record in Farmresource with the given resourcename
-            resAddBean.setResourceId(resid);
+            farmondto = clientService.callMaxFarmresIdService(farmondto);
+            resid = Integer.parseInt(farmondto.getFarmresourcerec().getResourceId());
+            if (resid == 0) {
+                resid = 1;
+            } else {
+                resid = resid + 1;
+            }
+            resAddBean.setResourceId(String.valueOf(resid));
             resAddBean.setResourceName(resname);
             resAddBean.setUnit(unit);
             resAddBean.setAvailableAmt(String.format("%.2f", 0.00));
-            if ("crop".equalsIgnoreCase(rescat) && !unitcrop.isEmpty()){
-                resAddBean.setCropwtunit(unitcrop);
-            }
-            if ("other".equalsIgnoreCase(rescat)){
-                resAddBean.setCropwtunit(null);
-            }
+//            if ("crop".equalsIgnoreCase(rescat) && !unitcrop.isEmpty()){
+//                resAddBean.setCropwtunit(unitcrop);
+//            }
+//            if ("other".equalsIgnoreCase(rescat)){
+//                resAddBean.setCropwtunit(null);
+//            }
             farmondto.setFarmresourcerec(resAddBean);
             farmondto = clientService.callAddFarmresService(farmondto);
             resres = farmondto.getResponses().getFarmon_ADD_RES();
@@ -189,7 +184,7 @@ public class ResourceAdd implements Serializable {
         resShopUpdBean.setShopId(selectedShop.getShopId());
         resShopUpdBean.setShopName(selectedShop.getShopName());
         if (existingreswithName == null) {//new resource added in Farmresource and ShopRes record has to be added
-            resShopUpdBean.setResourceId(resid);
+            resShopUpdBean.setResourceId(String.valueOf(resid));
             resShopUpdBean.setResourceName(resname);
         } else {//resource is not new for ShopRes record(Farmresource+shopid) is new
             resShopUpdBean.setResourceId(existingreswithName.getResourceId());
@@ -244,14 +239,7 @@ public class ResourceAdd implements Serializable {
     public ResourceAdd() {
     }
 
-    public String getResid() {
-        return resid;
-    }
-
-    public void setResid(String resid) {
-        this.resid = resid;
-    }
-
+    
     public String getResname() {
         return resname;
     }

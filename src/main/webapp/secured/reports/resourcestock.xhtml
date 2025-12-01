@@ -8,19 +8,18 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <h4>Maintain Resource.</h4>
+        <h4>Stock of Resource.</h4>
         <p:growl id="growl" showDetail="true" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         &nbsp;&nbsp;&nbsp;
-        <p:button value="Add Resource" outcome="/secured/resource/addinventory"/>
         
         <f:metadata>
-            <f:viewAction action="#{maintainResource.fillResourceValues()}" />
+            <f:viewAction action="#{resourceStock.fillResourceValues()}" />
         </f:metadata>
 
         <div class="card">            
             <h:form id="resourcegrid" style="text-align: center">                
-                <p:dataTable var="existingres" value="#{maintainResource.existingresources}" 
+                <p:dataTable var="existingres" value="#{resourceStock.existingresources}" 
                              reflow="true">
                     <p:column headerText="Resource Name">
                         <h:outputText value="#{existingres.resourceName}" />
@@ -30,17 +29,7 @@
                     </p:column>
                     <p:column headerText="Unit">
                         <h:outputText value="#{existingres.unit}" />
-                    </p:column>                 
-                    
-                    <p:column>
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
-                                         value="Acquire Resource"
-                                         action="#{maintainResource.acquireRes()}" >
-                            <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />
-                        </p:commandButton>
-                    </p:column>
-                    
+                    </p:column> 
                 </p:dataTable>
             </h:form>
         </div>
