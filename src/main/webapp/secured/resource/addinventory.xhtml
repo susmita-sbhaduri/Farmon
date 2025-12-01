@@ -19,12 +19,6 @@
         <div class="card">
             <h:form id="resaddform" style="text-align: left">
                 <div class="ui-g">
-<!--                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="resid" value="Resource ID" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="resid" value="#{resourceAdd.resid}" readonly="true"/>
-                    </div>-->
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="resname" value="Resource Name"/>
                     </div>
@@ -47,24 +41,7 @@
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:inputText id="unit" value="#{resourceAdd.unit}" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel for="rescat" value="Resource Category" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:selectOneMenu id="rescat" value="#{resourceAdd.rescat}">                            
-                            <f:selectItem itemLabel="Other" itemValue="other"/>
-                            <f:selectItem itemLabel="Crop" itemValue="crop"/>
-                        <p:ajax event="itemSelect" listener="#{resourceAdd.onResourceCatChange}" 
-                                update="unitcrop" process="@this"/>    
-                        </p:selectOneMenu>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="unitcrop" value="Unit(Crop Weight)" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="unitcrop" value="#{resourceAdd.unitcrop}" 
-                                     readonly="#{resourceAdd.unitcropReadonly}"/>
-                    </div>
+
                         
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
