@@ -33,7 +33,7 @@ import org.farmon.farmondto.FarmonDTO;
 @ViewScoped
 public class AcquireResource implements Serializable {
 
-    private boolean saveDisabled = true;
+//    private boolean saveDisabled = true;
     private String selectedRes;
     private String selectedResName;
     private String selectedShop;
@@ -43,13 +43,13 @@ public class AcquireResource implements Serializable {
     private List<FarmresourceDTO> existingresources;
     private ShopResDTO selectedShopRes;
     private float amount;
-    private Date purchaseDt = new Date();
-    private String rescat;
-    private float cropwt;
-    private String cropwtunit;
+    private Date purchaseDt;
+//    private String rescat;
+//    private float cropwt;
+//    private String cropwtunit;
     private String comments;
     private List<ShopResDTO> selectedShopResLst;
-    private boolean cropwtReadonly = true; // default as readonly
+//    private boolean cropwtReadonly = true; // default as readonly
 
     public AcquireResource() {
     }
@@ -77,11 +77,11 @@ public class AcquireResource implements Serializable {
         farmondto = clientService.callResnameForIdService(farmondto);
         
         FarmresourceDTO selectedResDto = farmondto.getFarmresourcerec();
-        if(selectedResDto.getCropwtunit()!=null){
-            rescat = "Crop";
-            cropwtunit = selectedResDto.getCropwtunit();
-            cropwtReadonly = false;
-        } else rescat = "Other";
+//        if(selectedResDto.getCropwtunit()!=null){
+//            rescat = "Crop";
+//            cropwtunit = selectedResDto.getCropwtunit();
+//            cropwtReadonly = false;
+//        } else rescat = "Other";
         
         selectedResName = selectedResDto.getResourceName();
     }
@@ -126,28 +126,34 @@ public class AcquireResource implements Serializable {
             return null;
         }
         
-        if(rate==0){
+        if(rate<=0){
            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Provide a non-zero rate.");
             f.addMessage("rate", message); 
             return null;
         }
         
-        if (amount == 0) {
+        if (amount <= 0) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Provide non-zero purchase amount.");
             f.addMessage("amount", message);
             return null;
         }
         
-        if(rescat.equals("Crop")){
-            if (cropwt == 0) {
-                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                        "Cropweight has to be given.");
-                f.addMessage("cropwt", message);
-                return null;
-            }            
+        if (purchaseDt == null) {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                    "Purchase Date is a mandatory field.");
+            f.addMessage("pdate", message);
+            return null;
         }
+//        if(rescat.equals("Crop")){
+//            if (cropwt == 0) {
+//                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                        "Cropweight has to be given.");
+//                f.addMessage("cropwt", message);
+//                return null;
+//            }            
+//        }
         
         float calculatedAmount = rate*amount;
         message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Total cost for "+selectedShopRes.getResourceName()
@@ -155,11 +161,11 @@ public class AcquireResource implements Serializable {
                     "=Rs."+String.format("%.2f", calculatedAmount));
         
         f.addMessage(null, message);
-        saveDisabled = false; // Enable the save button
+//        saveDisabled = false; // Enable the save button
         return null;
     }
 
-    public String goToSaveRes() throws NamingException {
+    public String goToSaveRes() {
         int sqlFlag = 0;
 //        String redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
         String redirectUrl = "/secured/resource/acquireresource?faces-redirect=true&selectedRes="
@@ -241,13 +247,13 @@ public class AcquireResource implements Serializable {
         resourceRec = farmondto.getFarmresourcerec();
         float amountAcquired = amount + Float.parseFloat(resourceRec.getAvailableAmt());
         resourceRec.setAvailableAmt(String.format("%.2f", amountAcquired));
-        if (cropwt > 0) {
-            if(resourceRec.getCropweight()==null)
-                amountAcquired = cropwt + Float.parseFloat("0.00");
-            else
-                amountAcquired = cropwt + Float.parseFloat(resourceRec.getCropweight());
-            resourceRec.setCropweight(String.format("%.2f", amountAcquired));
-        } else resourceRec.setCropweight(null);
+//        if (cropwt > 0) {
+//            if(resourceRec.getCropweight()==null)
+//                amountAcquired = cropwt + Float.parseFloat("0.00");
+//            else
+//                amountAcquired = cropwt + Float.parseFloat(resourceRec.getCropweight());
+//            resourceRec.setCropweight(String.format("%.2f", amountAcquired));
+//        } else resourceRec.setCropweight(null);
         
 //        starting of database operation
         farmondto.setResacqrec(resAcquireRec);
@@ -443,9 +449,7 @@ public class AcquireResource implements Serializable {
 
     public void setRate(float rate) {
         this.rate = rate;
-    }
-
-    
+    }    
 
     public String getUnit() {
         return unit;
@@ -479,13 +483,13 @@ public class AcquireResource implements Serializable {
         this.purchaseDt = purchaseDt;
     }
 
-    public boolean isSaveDisabled() {
-        return saveDisabled;
-    }
-
-    public void setSaveDisabled(boolean saveDisabled) {
-        this.saveDisabled = saveDisabled;
-    }
+//    public boolean isSaveDisabled() {
+//        return saveDisabled;
+//    }
+//
+//    public void setSaveDisabled(boolean saveDisabled) {
+//        this.saveDisabled = saveDisabled;
+//    }
 
     public String getSelectedResName() {
         return selectedResName;
@@ -502,40 +506,4 @@ public class AcquireResource implements Serializable {
     public void setSelectedShopResLst(List<ShopResDTO> selectedShopResLst) {
         this.selectedShopResLst = selectedShopResLst;
     }
-
-    public String getRescat() {
-        return rescat;
-    }
-
-    public void setRescat(String rescat) {
-        this.rescat = rescat;
-    }
-
-    public float getCropwt() {
-        return cropwt;
-    }
-
-    public void setCropwt(float cropwt) {
-        this.cropwt = cropwt;
-    }
-
-    public String getCropwtunit() {
-        return cropwtunit;
-    }
-
-    public void setCropwtunit(String cropwtunit) {
-        this.cropwtunit = cropwtunit;
-    }
-
-    public boolean isCropwtReadonly() {
-        return cropwtReadonly;
-    }
-
-    public void setCropwtReadonly(boolean cropwtReadonly) {
-        this.cropwtReadonly = cropwtReadonly;
-    }
-
-    
-
-    
 }

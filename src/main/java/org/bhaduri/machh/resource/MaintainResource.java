@@ -9,7 +9,9 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
@@ -24,6 +26,7 @@ import org.farmon.farmondto.ResAcquireDTO;
 public class MaintainResource implements Serializable {
     private FarmresourceDTO selectedRes;
     List<FarmresourceDTO> existingresources;
+    private Map<String, Boolean> resEditable = new HashMap<>();
     
     public MaintainResource() {
     }
@@ -36,15 +39,30 @@ public class MaintainResource implements Serializable {
         
         farmondto = clientService.callDisResacqPerResService(farmondto);
         List<ResAcquireDTO> acqreslist = farmondto.getResacqreclist();
-        // Remove from existingresources all resources that are ALREADY in acqreslist
-        existingresources.removeIf(res -> {
-            for (ResAcquireDTO resacq : acqreslist) {  // nested loop check
+        
+//      Resources which are ALREADY in acqreslist cannot be deleted
+        
+        for (FarmresourceDTO res : existingresources) {
+            boolean deletable = true;
+            for (ResAcquireDTO resacq : acqreslist) {
                 if (resacq.getResoureId().equals(res.getResourceId())) {
-                    return true;  // remove this resource
+                     deletable =false;
+                     break;
                 }
-            }
-            return false;
-        });
+            }            
+            resEditable.put(res.getResourceId(), deletable);
+        }
+        
+        // Remove from existingresources all resources that are ALREADY in acqreslist
+//             
+//        existingresources.removeIf(res -> {
+//            for (ResAcquireDTO resacq : acqreslist) {  // nested loop check
+//                if (resacq.getResoureId().equals(res.getResourceId())) {
+//                    return true;  // remove this resource
+//                }
+//            }
+//            return false;
+//        });
         
 //        FacesMessage message;
 //        FacesContext f = FacesContext.getCurrentInstance();
@@ -144,6 +162,14 @@ public class MaintainResource implements Serializable {
 
     public void setSelectedRes(FarmresourceDTO selectedRes) {
         this.selectedRes = selectedRes;
+    }
+
+    public Map<String, Boolean> getResEditable() {
+        return resEditable;
+    }
+
+    public void setResEditable(Map<String, Boolean> resEditable) {
+        this.resEditable = resEditable;
     }
     
     

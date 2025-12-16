@@ -79,7 +79,7 @@
                             <p:keyFilter regEx="/[\d\.]/" />
                         </p:inputText>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+<!--                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel value="Resource Category" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
@@ -94,18 +94,21 @@
                             <f:convertNumber pattern="#0.00" />
                             <p:keyFilter regEx="/[\d\.]/" />
                         </p:inputText>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    </div>-->
+<!--                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel value="Crop Weight Unit" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputText value="#{acquireResource.cropwtunit}" style="font-weight:bold;"/> 
-                    </div>
+                    </div>-->
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="comments" value="Comments" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="comments" value="#{acquireResource.comments}"/>
+                        <p:inputTextarea id="comments" 
+                                         value="#{acquireResource.comments}"
+                                         rows="4"
+                                         autoResize="true" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 

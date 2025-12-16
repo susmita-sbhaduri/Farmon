@@ -10,9 +10,9 @@
     <ui:define name="content">
         <h4>Maintain Resource</h4>
         <p:growl id="growl" showDetail="true" />
-        <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+        
         &nbsp;&nbsp;&nbsp;
-        <p:button value="Add Resource" outcome="/secured/resource/addinventory"/>
+        <p:button value="Add" outcome="/secured/resource/addinventory"/>
         
         <f:metadata>
             <f:viewAction action="#{maintainResource.fillResourceValues()}" />
@@ -29,7 +29,7 @@
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          icon="fa fa-edit" 
-                                         value="Edit Resource"
+                                         value="Edit"
                                          action="#{maintainResource.editRes()}" >
                             <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />
                         </p:commandButton>
@@ -37,15 +37,17 @@
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          icon="fa fa-edit" 
-                                         value="Delete Resource"
-                                         action="#{maintainResource.deleteRes()}" >
+                                         value="Delete"
+                                         action="#{maintainResource.deleteRes()}"
+                                         disabled="#{not maintainResource.resEditable[existingres.resourceId]}"
+                                         >
                             <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />
                         </p:commandButton>
                     </p:column>
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          icon="fa fa-edit" 
-                                         value="Acquire Resource"
+                                         value="Acquire"
                                          action="#{maintainResource.acquireRes()}" >
                             <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />
                         </p:commandButton>
