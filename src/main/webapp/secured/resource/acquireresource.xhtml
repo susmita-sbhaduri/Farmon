@@ -10,9 +10,7 @@
     <ui:define name="content">
         <h4>Acquire Resource for:</h4>
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
-        <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
-        &nbsp;&nbsp;&nbsp;
-        <p:button value="Goback" outcome="/secured/resource/maintainresource"/>
+        
         <f:metadata>
             <f:viewParam name="selectedRes" value="#{acquireResource.selectedRes}"></f:viewParam>
             <f:viewAction action="#{acquireResource.fillResourceValues()}" />
@@ -79,28 +77,6 @@
                             <p:keyFilter regEx="/[\d\.]/" />
                         </p:inputText>
                     </div>
-<!--                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Resource Category" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{acquireResource.rescat}" style="font-weight:bold;"/> 
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel for="cropwt" value="Amount(Crop Weight) if applicable" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:inputText id="cropwt" value="#{acquireResource.cropwt}" 
-                                     readonly="#{acquireResource.cropwtReadonly}">
-                            <f:convertNumber pattern="#0.00" />
-                            <p:keyFilter regEx="/[\d\.]/" />
-                        </p:inputText>
-                    </div>-->
-<!--                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Crop Weight Unit" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{acquireResource.cropwtunit}" style="font-weight:bold;"/> 
-                    </div>-->
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="comments" value="Comments" />
                     </div>
@@ -110,24 +86,45 @@
                                          rows="4"
                                          autoResize="true" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
-                                         value="Review First"
-                                         action="#{acquireResource.goToReviewRes()}" 
-                                         update="growl saveBtn" > 
-                        </p:commandButton>
-                    </div>
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton id="saveBtn"
                                          styleClass="blue-button" 
                                          icon="fa fa-edit" 
-                                         value="Save"
-                                         action="#{acquireResource.goToSaveRes()}" 
-                                         disabled="#{acquireResource.saveDisabled}"> 
+                                         value="Save"                       
+                                         actionListener="#{acquireResource.goToReviewRes}"
+                                         update="@form growl" >
+                            
                         </p:commandButton>
                     </div>
                 </div>    
+                <!-- Confirmation dialog (same form) -->
+                <p:dialog id="saveConfirmDlg"
+                          widgetVar="saveConfirmDlg"
+                          header="Confirmation"
+                          modal="true"
+                          closable="false"
+                          resizable="false">
+                    <h:panelGroup id="confirmPanel">
+                        <h:outputText
+                            value="Total cost for #{acquireResource.selectedShopRes.resourceName} 
+                                   for shop #{acquireResource.selectedShopRes.shopName} =Rs.#{acquireResource.calcAmt}.
+                                   Is that ok?" />
+                    </h:panelGroup>
+
+                    <p:separator />
+
+                    <p:commandButton value="Yes"
+                                     action="#{acquireResource.goToSaveRes()}"
+                                     update="@form"
+                                     oncomplete="PF('saveConfirmDlg').hide()" />
+
+                    <p:commandButton value="No"
+                                     type="button"
+                                     style="margin-left:10px"
+                                     onclick="PF('saveConfirmDlg').hide()" />
+                </p:dialog>
+
             </h:form>
         </div>
     </ui:define>    

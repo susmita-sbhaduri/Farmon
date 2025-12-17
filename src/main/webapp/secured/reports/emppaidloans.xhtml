@@ -8,11 +8,11 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <h4>Details of active loans of employees.</h4>
+        <h4>Details of paid loans of employees.</h4>
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
         
         <f:metadata>
-            <f:viewAction action="#{empLoanDetails.fillValues()}" />
+            <f:viewAction action="#{empPaidLoans.fillValues()}" />
         </f:metadata>
         <div class="card">
             
@@ -26,7 +26,7 @@
                                         fileName="Emploans"/>
                     </p:commandButton>
                 </div>
-                <p:dataTable id="loanexp" var="loanexp" value="#{empLoanDetails.loanrecords}">                    
+                <p:dataTable id="loanexp" var="loanexp" value="#{empPaidLoans.loanrecords}">                    
                    
                     <p:column headerText="Employee Name">
                         <h:outputText value="#{loanexp.empid}" />
@@ -36,12 +36,12 @@
                     </p:column>
                     <p:column headerText="Amount(Rs)">
                         <h:outputText value="#{loanexp.total}" />
-                    </p:column>
-                    <p:column headerText="Outstanding(Rs.)">
-                        <h:outputText value="#{loanexp.outstanding}" />
-                    </p:column>
-                    <p:column headerText="Date">
+                    </p:column>                    
+                    <p:column headerText="Start Date">
                         <h:outputText value="#{loanexp.sdate}" />
+                    </p:column>
+                    <p:column headerText="End Date">
+                        <h:outputText value="#{loanexp.edate}" />
                     </p:column>
                 </p:dataTable>
                 

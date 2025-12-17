@@ -7,12 +7,10 @@ package org.bhaduri.machh.reports;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.NamingException;
-import org.farmon.farmondto.EmpExpDTO;
 import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.EmpExpDTO;
 import org.farmon.farmondto.EmployeeDTO;
 import org.farmon.farmondto.FarmonDTO;
 
@@ -20,21 +18,20 @@ import org.farmon.farmondto.FarmonDTO;
  *
  * @author sb
  */
-@Named(value = "empLoanDetails")
+@Named(value = "empPaidLoans")
 @ViewScoped
-public class EmpLoanDetails implements Serializable {
+public class EmpPaidLoans implements Serializable {
     List<EmpExpDTO> loanrecords = new ArrayList<>();
+
     /**
-     * Creates a new instance of EmpLoanDetails
+     * Creates a new instance of EmpPaidLoans
      */
-    public EmpLoanDetails() {
+    public EmpPaidLoans() {
     }
-    public void fillValues(){
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    public void fillValues() {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-//        MasterDataServices masterDataService = new MasterDataServices(); 
-        farmondto = clientService.callEmpActiveLoanService(farmondto);
+        farmondto = clientService.callEmpPaidLoanService(farmondto);
         List<EmpExpDTO> loanList = farmondto.getEmpexplist();
         EmpExpDTO record = new EmpExpDTO();
         EmployeeDTO emprecord = new EmployeeDTO();
@@ -47,8 +44,9 @@ public class EmpLoanDetails implements Serializable {
            record.setEmpid(empName);
            record.setId("LOAN");
            record.setTotal(loanList.get(i).getTotal());
-           record.setOutstanding(loanList.get(i).getOutstanding());
+//           record.setOutstanding(loanList.get(i).getOutstanding());
            record.setSdate(loanList.get(i).getSdate());
+           record.setEdate(loanList.get(i).getEdate());
            loanrecords.add(record);
            
            farmondto.setEmpexprec(loanList.get(i));
@@ -60,8 +58,9 @@ public class EmpLoanDetails implements Serializable {
                record.setEmpid("");
                record.setId("REPAYMENT");
                record.setTotal(paybackList.get(j).getTotal());
-               record.setOutstanding("");
+//               record.setOutstanding("");
                record.setSdate(paybackList.get(j).getSdate());
+               record.setEdate("--");
                loanrecords.add(record);               
            }
            record = new EmpExpDTO();

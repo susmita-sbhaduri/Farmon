@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.*;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
+import org.primefaces.PrimeFaces;
 /**
  *
  * @author sb
@@ -49,6 +50,7 @@ public class AcquireResource implements Serializable {
 //    private String cropwtunit;
     private String comments;
     private List<ShopResDTO> selectedShopResLst;
+    private String calcAmt;
 //    private boolean cropwtReadonly = true; // default as readonly
 
     public AcquireResource() {
@@ -116,35 +118,35 @@ public class AcquireResource implements Serializable {
         unit = farmondto.getFarmresourcerec().getUnit();
     }
 
-    public String goToReviewRes() {
+    public void goToReviewRes() {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         if (selectedShop == null || selectedShop.trim().isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Select one shop.");
             f.addMessage("shopid", message);
-            return null;
+            return;
         }
         
         if(rate<=0){
            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Provide a non-zero rate.");
             f.addMessage("rate", message); 
-            return null;
+            return;
         }
         
         if (amount <= 0) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Provide non-zero purchase amount.");
             f.addMessage("amount", message);
-            return null;
+            return;
         }
         
         if (purchaseDt == null) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Purchase Date is a mandatory field.");
             f.addMessage("pdate", message);
-            return null;
+            return;
         }
 //        if(rescat.equals("Crop")){
 //            if (cropwt == 0) {
@@ -156,13 +158,16 @@ public class AcquireResource implements Serializable {
 //        }
         
         float calculatedAmount = rate*amount;
-        message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Total cost for "+selectedShopRes.getResourceName()
-                +" for shop "+selectedShopRes.getShopName(),
-                    "=Rs."+String.format("%.2f", calculatedAmount));
+//        message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Total cost for "+selectedShopRes.getResourceName()
+//                +" for shop "+selectedShopRes.getShopName(),
+//                    "=Rs."+String.format("%.2f", calculatedAmount));
         
-        f.addMessage(null, message);
+        calcAmt = String.format("%.2f", calculatedAmount);
+//        f.addMessage(null, message);
 //        saveDisabled = false; // Enable the save button
-        return null;
+//        return null;
+        // all checks passed -> open dialog via JS API
+        PrimeFaces.current().executeScript("PF('saveConfirmDlg').show();");
     }
 
     public String goToSaveRes() {
@@ -506,4 +511,14 @@ public class AcquireResource implements Serializable {
     public void setSelectedShopResLst(List<ShopResDTO> selectedShopResLst) {
         this.selectedShopResLst = selectedShopResLst;
     }
+
+    public String getCalcAmt() {
+        return calcAmt;
+    }
+
+    public void setCalcAmt(String calcAmt) {
+        this.calcAmt = calcAmt;
+    }
+    
+    
 }
