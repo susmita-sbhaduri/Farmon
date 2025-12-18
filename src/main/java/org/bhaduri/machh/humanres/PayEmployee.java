@@ -99,17 +99,17 @@ public class PayEmployee implements Serializable {
         // there is loan and user has entered payback, user can just enter the payback and not
         // salary but Payback + Salary > employee salary
         
-        if (readOnlyCondition == false) {
-            if (payback > 0) {
-                //Payback + Salary cannot be greater than salary as payback will be deducted from salary
-                if ((payback + salary) > Float.parseFloat(empRec.getSalary())) {
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "Payback + Salary cannot be greater than salary");
-                    f.addMessage(null, message);
-                    return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
-                }
-            }
-        }
+//        if (readOnlyCondition == false) {
+//            if (payback > 0) {
+//                //Payback + Salary cannot be greater than salary as payback will be deducted from salary
+//                if ((payback + salary) > Float.parseFloat(empRec.getSalary())) {
+//                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+//                            "Payback + Salary cannot be greater than salary");
+//                    f.addMessage(null, message);
+//                    return "/secured/humanresource/payemployee?faces-redirect=true&selectedEmp=" + selectedEmp;
+//                }
+//            }
+//        }
         if (salary > 0) {
             // salary entered is more than the salary of the employee in the employee table
             if (salary > Float.parseFloat(empRec.getSalary())) {

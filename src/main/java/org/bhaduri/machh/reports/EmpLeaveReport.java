@@ -10,9 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
-import org.farmon.farmondto.EmpExpDTO;
 import org.farmon.farmondto.EmpLeaveDTO;
-import org.farmon.farmondto.EmployeeDTO;
 import org.farmon.farmondto.FarmonDTO;
 
 /**
@@ -34,14 +32,10 @@ public class EmpLeaveReport implements Serializable {
         farmondto = clientService.callGetEmpLeavesService(farmondto);
         List<EmpLeaveDTO> leaves = farmondto.getEmpleavelist();
         EmpLeaveDTO record = new EmpLeaveDTO();
-        EmployeeDTO emprecord = new EmployeeDTO();
         int flag = 0;
         for (int i = 0; i < leaves.size()-1; i++) {
-            if (flag == 0) {
-                emprecord.setId(leaves.get(i).getEmpid());
-                farmondto.setEmprec(emprecord);
-                farmondto = clientService.callEmpNameforIdService(farmondto);
-                record.setEmpname(farmondto.getEmprec().getName());
+            if (flag == 0) {                
+                record.setEmpname(leaves.get(i).getEmpname());
                 record.setLeavedate(leaves.get(i).getLeavedate());
                 record.setComments(leaves.get(i).getComments());
             } else {
@@ -54,6 +48,15 @@ public class EmpLeaveReport implements Serializable {
             } else flag = 0;
             leaverecords.add(record);
             record = new EmpLeaveDTO();
+        }
+        if (flag == 0) {           
+            record.setEmpname(leaves.get(leaves.size() - 1).getEmpname());
+            record.setLeavedate(leaves.get(leaves.size() - 1).getLeavedate());
+            record.setComments(leaves.get(leaves.size() - 1).getComments());
+        } else {
+            record.setEmpname("");
+            record.setLeavedate(leaves.get(leaves.size() - 1).getLeavedate());
+            record.setComments(leaves.get(leaves.size() - 1).getComments());
         }
         
     }

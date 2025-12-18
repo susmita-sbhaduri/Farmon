@@ -79,14 +79,16 @@
                         <p:datePicker id="paydate" value="#{payEmployee.paydate}" pattern="dd MMM yyyy"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
+                        <p:commandButton styleClass="blue-button"                                         
                                          value="Pay"
                                          action="#{payEmployee.payEmp()}" >                        
                         </p:commandButton>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/humanresource/maintainemp" />
+                        <p:button icon="pi pi-times" 
+                                  value="Cancel" 
+                                  outcome="/secured/humanresource/maintainemp"                                   
+                        />
                     </div>
                 </div>
             </h:form>

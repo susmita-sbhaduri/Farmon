@@ -11,7 +11,6 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.naming.NamingException;
 import org.farmon.farmondto.EmployeeDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
@@ -63,12 +62,12 @@ public class EmployeeAdd implements Serializable {
             return redirectUrl;
         }
         
-        if (salary == 0) {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                    "Salary number is mandatory field.");
-            f.addMessage("empsal", message);
-            return redirectUrl;
-        }
+//        if (salary == 0) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Salary number is mandatory field.");
+//            f.addMessage("empsal", message);
+//            return redirectUrl;
+//        }
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         farmondto = clientService.callMaxEmpIdService(farmondto);
