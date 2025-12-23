@@ -28,7 +28,6 @@
                                 
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
                                          value="Edit"
                                          action="#{maintainResource.editRes()}" >
                             <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />
@@ -36,7 +35,6 @@
                     </p:column>
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
                                          value="Delete"
                                          action="#{maintainResource.deleteRes()}"
                                          disabled="#{not maintainResource.resEditable[existingres.resourceId]}"
@@ -46,7 +44,6 @@
                     </p:column>
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
                                          value="Acquire"
                                          action="#{maintainResource.acquireRes()}" >
                             <f:setPropertyActionListener value="#{existingres}" target="#{maintainResource.selectedRes}" />

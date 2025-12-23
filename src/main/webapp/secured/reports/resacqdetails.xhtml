@@ -36,9 +36,9 @@
                         <h:outputText value="#{resacq.acqDt}" />
                     </p:column>
                     <p:column headerText="Resource Acquired">
-                        <h:outputText value="#{resacq.acqAmt}" />
+                        <h:outputText value="#{resacq.acqAmt} #{resacq.unit}" />
                     </p:column>
-                    <p:column headerText="Resource Cost">
+                    <p:column headerText="Resource Cost(Rs.)">
                         <h:outputText value="#{resacq.cost}" />
                     </p:column>
                 </p:dataTable>

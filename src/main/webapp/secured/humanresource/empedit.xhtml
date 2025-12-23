@@ -29,16 +29,19 @@
                         <h:outputText value="#{editEmp.name}" style="font-weight:bold;"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Address"/>
+                        <h:outputLabel for="empaddr" value="Address"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{editEmp.address}" style="font-weight:bold;"/>
+                        <h:inputText id="empaddr" value="#{editEmp.address}" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Contact No." />
+                        <p:outputLabel for="empph" value="Contact No." />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{editEmp.phno}" style="font-weight:bold;"/>
+                        <p:inputText id="empph" value="#{editEmp.phno}" maxlength="10">
+                            <p:keyFilter regEx="/[0-9]/" />
+                            <f:validateRegex pattern="\d{10}" />
+                        </p:inputText>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:outputLabel for="empsal" value="Salary(Rs.)" />
@@ -64,8 +67,7 @@
                         <p:datePicker id="edate" value="#{editEmp.edate}" pattern="yyyy-MM-dd"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
+                        <p:commandButton styleClass="blue-button"                                       
                                          value="Save"
                                          action="#{editEmp.goToSaveEmp()}" >                        
                         </p:commandButton>

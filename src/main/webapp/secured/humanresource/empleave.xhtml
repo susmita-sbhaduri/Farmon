@@ -42,12 +42,14 @@
                         <p:outputLabel for="comments" value="Reason" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="comments" value="#{empLeave.comments}" />
+
+                        <p:inputTextarea id="comments" 
+                                         value="#{empLeave.comments}"
+                                         rows="4"
+                                         autoResize="true" />
                     </div>
-                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
+                        <p:commandButton styleClass="blue-button"
                                          value="Save"
                                          action="#{empLeave.saveEmpLeave()}" >                        
                         </p:commandButton>

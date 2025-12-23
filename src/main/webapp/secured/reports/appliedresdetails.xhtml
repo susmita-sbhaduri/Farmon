@@ -44,30 +44,7 @@
                             <h:outputText id="unit" value="#{appliedResDetails.unit}" style="font-weight:bold;"/>
                         </p:outputPanel>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Resource Category" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputPanel id="rescatPanel">
-                            <h:outputText value="#{appliedResDetails.rescat}" style="font-weight:bold;"/>
-                        </p:outputPanel>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Initial Amount(Crop) if applicable" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6"> 
-                        <p:outputPanel id="iniamtPanel">
-                            <h:outputText value="#{appliedResDetails.cropwt}" style="font-weight:bold;"/>
-                        </p:outputPanel>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Crop Amount Unit" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputPanel id="cropamtPanel">
-                            <h:outputText value="#{appliedResDetails.cropwtunit}" style="font-weight:bold;"/>
-                        </p:outputPanel>
-                    </div>
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="sdate" value="Start Date" />
                     </div>
@@ -83,7 +60,6 @@
                     
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
                                          value="Resource Details"
                                          action="#{appliedResDetails.resourceDetails()}" >                                     
                         </p:commandButton>

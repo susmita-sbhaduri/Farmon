@@ -10,16 +10,25 @@
     <ui:define name="content">
         <h4>Stock of Resource.</h4>
         <p:growl id="growl" showDetail="true" />
-        <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
-        &nbsp;&nbsp;&nbsp;
-        
+       
         <f:metadata>
             <f:viewAction action="#{resourceStock.fillResourceValues()}" />
         </f:metadata>
 
         <div class="card">            
-            <h:form id="resourcegrid" style="text-align: center">                
-                <p:dataTable var="existingres" value="#{resourceStock.existingresources}" 
+            <h:form id="resourcegrid" style="text-align: center">  
+                <div style="text-align: left;">
+                    <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+                    &nbsp;&nbsp;&nbsp;
+                    <p:commandButton value="Export as CSV" ajax="false">
+                        <p:dataExporter type="csv" 
+                                        target="resourcegrid:existingres" 
+                                        fileName="ResourceStk"/>
+                    </p:commandButton>
+                    &nbsp;&nbsp;&nbsp;                    
+                </div>
+                <p:dataTable id="existingres" var="existingres" 
+                             value="#{resourceStock.existingresources}" 
                              reflow="true">
                     <p:column headerText="Resource Name">
                         <h:outputText value="#{existingres.resourceName}" />

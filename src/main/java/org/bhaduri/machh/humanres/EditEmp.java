@@ -65,16 +65,31 @@ public class EditEmp implements Serializable {
         f.getExternalContext().getFlash().setKeepMessages(true);
         String redirectUrl = "/secured/humanresource/maintainemp?faces-redirect=true";
         
-        if (salary == 0) {
+//        if (salary == 0) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Salary is mandatory field.");
+//            f.addMessage("empsal", message);
+//            return redirectUrl;
+//        }
+        
+        if (address == null || address.trim().isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                    "Salary is mandatory field.");
-            f.addMessage("empsal", message);
+                    "Address is mandatory field.");
+            f.addMessage("empaddr", message);
+            return redirectUrl;
+        }
+        
+        if (phno == null || phno.trim().isEmpty()) {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                    "Contact number is mandatory field.");
+            f.addMessage("empph", message);
             return redirectUrl;
         }
         
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();       
-        
+        empRec.setAddress(address);
+        empRec.setPhno(phno);
         empRec.setSalary(String.format("%.2f",salary));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         empRec.setSdate(sdf.format(sdate));

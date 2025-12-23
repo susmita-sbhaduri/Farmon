@@ -31,9 +31,9 @@ public class AppliedResDetails implements Serializable {
     private List<FarmresourceDTO> availableresources;
     private int selectedIndexRes;
     private String unit;
-    private String rescat;
-    private String cropwt;
-    private String cropwtunit;
+//    private String rescat;
+//    private String cropwt;
+//    private String cropwtunit;
     private boolean messageShown = false;
 
     public String fillValues() throws IOException {
@@ -109,16 +109,16 @@ public class AppliedResDetails implements Serializable {
         farmondto.setFarmresourcerec(farmresrec);
         farmondto = clientService.callResnameForIdService(farmondto);
         unit = farmondto.getFarmresourcerec().getUnit();
-        if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
-            rescat = "Crop";
-            cropwt = farmondto.getFarmresourcerec().getCropweight();
-            cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
-
-        } else {
-            rescat = "Other";
-            cropwt = "";
-            cropwtunit = "";
-        }
+//        if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
+//            rescat = "Crop";
+//            cropwt = farmondto.getFarmresourcerec().getCropweight();
+//            cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
+//
+//        } else {
+//            rescat = "Other";
+//            cropwt = "";
+//            cropwtunit = "";
+//        }
     }
 
     public String resourceDetails() {
@@ -179,31 +179,7 @@ public class AppliedResDetails implements Serializable {
     public void setUnit(String unit) {
         this.unit = unit;
     }
-
-    public String getRescat() {
-        return rescat;
-    }
-
-    public void setRescat(String rescat) {
-        this.rescat = rescat;
-    }
-
-    public String getCropwt() {
-        return cropwt;
-    }
-
-    public void setCropwt(String cropwt) {
-        this.cropwt = cropwt;
-    }
-
-    public String getCropwtunit() {
-        return cropwtunit;
-    }
-
-    public void setCropwtunit(String cropwtunit) {
-        this.cropwtunit = cropwtunit;
-    }
-
+    
     public boolean isMessageShown() {
         return messageShown;
     }

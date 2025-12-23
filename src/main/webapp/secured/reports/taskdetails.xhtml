@@ -12,10 +12,7 @@
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         &nbsp;&nbsp;&nbsp;
-        <p:button value="Cancel" outcome="/secured/taskplan/openschedule"/>
-        &nbsp;&nbsp;&nbsp;
-
-
+        
         <div class="card">
             <h:form id="appresform" style="text-align: left">
                 <div class="ui-g">
@@ -34,8 +31,7 @@
                     </div>
 
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
+                        <p:commandButton styleClass="blue-button"
                                          value="Task Details"
                                          action="#{taskDetails.goToTaskListDetails()}" >                                     
                         </p:commandButton>

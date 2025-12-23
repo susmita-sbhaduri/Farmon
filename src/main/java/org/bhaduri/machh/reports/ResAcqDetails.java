@@ -27,7 +27,7 @@ public class ResAcqDetails implements Serializable {
      */
     public ResAcqDetails() {
     }
-    public void fillValues() throws ParseException {
+    public void fillValues() {
 //        Date startDate;
 //        Date endDate;
 //        String pattern = "yyyy-MM-dd";
