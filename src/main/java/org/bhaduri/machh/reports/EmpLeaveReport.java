@@ -61,6 +61,7 @@ public class EmpLeaveReport implements Serializable {
                 record.setLeavedate(leaves.get(leaves.size() - 1).getLeavedate());
                 record.setComments(leaves.get(leaves.size() - 1).getComments());
             }
+            leaverecords.add(record);
         }
         
         
