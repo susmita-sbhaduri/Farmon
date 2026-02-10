@@ -42,12 +42,10 @@ public class TaskAdd implements Serializable {
     private float amtapplied;
     private float appliedcost;
     private String comments;
-    private boolean resReadonly = false; // default not readonly
-    private boolean costReadonly = false;
-    private boolean commReadonly = false;    
-//    private String rescat;
-//    private String cropwt;
-//    private String cropwtunit;
+    private boolean resVisible = true; 
+    private boolean labCostVisible = true;
+    private boolean labCommVisible = true;
+    
     /**
      * Creates a new instance of TaskAdd
      */
@@ -74,9 +72,9 @@ public class TaskAdd implements Serializable {
         amount = farmondto.getFarmresourcerec().getAvailableAmt();
 //        by default resource is selected , so readonly fields are accordingly initialised
         if (selectedTaskType.equals("res")) {
-            resReadonly = false;
-            costReadonly = true;
-            commReadonly = true;
+            resVisible = true;
+            labCostVisible = false;
+            labCommVisible = false;
         }
 
     }
@@ -84,29 +82,23 @@ public class TaskAdd implements Serializable {
     public void onTaskTypeSelect() {
 //        System.out.println("No crop categories are found." + selectedShop);
         if (selectedTaskType.equals("labhar")) {
-            resReadonly = true;
-            costReadonly = false;
-            commReadonly = false;
+            resVisible = false;
+            labCostVisible = true;
+            labCommVisible = true;
             amount = "NA";
             unit = "Rs.";
-//            rescat = "NA";
-//            cropwt = "NA";
-//            cropwtunit = "NA";
         }
         if (selectedTaskType.equals("lab")) {
-            resReadonly = true;
-            costReadonly = true;
-            commReadonly = false;
+            resVisible = false;
+            labCostVisible = true;
+            labCommVisible = true;
             amount = "NA";
             unit = "NA";
-//            rescat = "NA";
-//            cropwt = "NA";
-//            cropwtunit = "NA";
         }
         if (selectedTaskType.equals("res")) {
-            resReadonly = false;
-            costReadonly = true;
-            commReadonly = true;
+            resVisible = true;
+            labCostVisible = false;
+            labCommVisible = false;
         }
     }
     
@@ -323,28 +315,31 @@ public class TaskAdd implements Serializable {
         this.comments = comments;
     }
 
-    public boolean isResReadonly() {
-        return resReadonly;
+    public boolean isResVisible() {
+        return resVisible;
     }
 
-    public void setResReadonly(boolean resReadonly) {
-        this.resReadonly = resReadonly;
+    public void setResVisible(boolean resVisible) {
+        this.resVisible = resVisible;
+    }    
+
+    public boolean isLabCostVisible() {
+        return labCostVisible;
     }
 
-    public boolean isCostReadonly() {
-        return costReadonly;
+    public void setLabCostVisible(boolean labCostVisible) {
+        this.labCostVisible = labCostVisible;
     }
 
-    public void setCostReadonly(boolean costReadonly) {
-        this.costReadonly = costReadonly;
+    public boolean isLabCommVisible() {
+        return labCommVisible;
     }
 
-    public boolean isCommReadonly() {
-        return commReadonly;
+    public void setLabCommVisible(boolean labCommVisible) {
+        this.labCommVisible = labCommVisible;
     }
 
-    public void setCommReadonly(boolean commReadonly) {
-        this.commReadonly = commReadonly;
-    }
-
+    
+    
+    
 }
