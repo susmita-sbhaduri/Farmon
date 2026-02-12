@@ -59,7 +59,7 @@
                                                itemLabel="#{res.resourceName}" 
                                                itemValue="#{taskAdd.availableresources.indexOf(res)}"/>
                                 <p:ajax event="change" listener="#{taskAdd.onResourceSelect}" 
-                                        update="unitPanel amountPanel" 
+                                        update="unitPanel amountWrapper" 
                                         process="@this"/>
                             </p:selectOneMenu>
                         </div>
@@ -76,15 +76,16 @@
                                            itemValue="#{taskAdd.activeharvests.indexOf(harvest)}"/>
                         </p:selectOneMenu>
                     </div>
-                    
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Available Amount" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputPanel id="amountPanel">
-                            <h:outputText value="#{taskAdd.amount}" style="font-weight:bold;"/>
+                    <p:outputPanel id="amountWrapper" styleClass="ui-g-12 ui-g-nopad">
+                        <p:outputPanel rendered="#{taskAdd.amountVisible}" styleClass="ui-g-nopad">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <h:outputLabel value="Available Amount" />
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{taskAdd.amount}" style="font-weight:bold;"/>
+                            </div>
                         </p:outputPanel>
-                    </div>
+                    </p:outputPanel>
                     <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskAdd.resVisible}">
                         <div class="ui-g-12 ui-md-6 ui-lg-6">
                             <p:outputLabel for="amtapplied" value="Resource Amt to be Applied" />

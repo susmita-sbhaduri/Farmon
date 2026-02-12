@@ -51,42 +51,48 @@
 
                         </p:selectOneMenu>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="resourceid" value="Available Resources" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6" >                        
-                        <p:selectOneMenu id="resourceid" 
-                                         value="#{taskEdit.selectedIndexRes}" 
-                                         disabled="#{taskEdit.resReadonly}">
-                            <f:selectItems value="#{taskEdit.availableresources}" 
-                                           var="res"
-                                           itemLabel="#{res.resourceName}" 
-                                           itemValue="#{taskEdit.availableresources.indexOf(res)}"/>
-                            <p:ajax event="change" listener="#{taskEdit.onResourceChange}" 
-                                    update="unitPanel amountPanel rescatPanel iniamtPanel cropamtPanel" 
-                                    process="@this"/>
-                        </p:selectOneMenu>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Available Amount" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputPanel id="amountPanel">
-                            <h:outputText value="#{taskEdit.amount}" style="font-weight:bold;"/>
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskEdit.resVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputLabel for="resourceid" value="Available Resources" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6" >                        
+                            <p:selectOneMenu id="resourceid" 
+                                             value="#{taskEdit.selectedIndexRes}" 
+                                             disabled="#{taskEdit.resReadonly}">
+                                <f:selectItems value="#{taskEdit.availableresources}" 
+                                               var="res"
+                                               itemLabel="#{res.resourceName}" 
+                                               itemValue="#{taskEdit.availableresources.indexOf(res)}"/>
+                                <p:ajax event="change" listener="#{taskEdit.onResourceChange}" 
+                                        update="unitPanel amountWrapper" 
+                                        process="@this"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </p:outputPanel>    
+                    <p:outputPanel id="amountWrapper" styleClass="ui-g-12 ui-g-nopad">
+                        <p:outputPanel rendered="#{taskEdit.amountVisible}" styleClass="ui-g-nopad">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <h:outputLabel value="Available Amount" />
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{taskEdit.amount}" style="font-weight:bold;"/>
+                            </div>
                         </p:outputPanel>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel for="amtapplied" value="Resource Amt to be Applied" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:inputText id="amtapplied" 
-                                     value="#{taskEdit.amtapplied}"
-                                     readonly="#{taskEdit.resReadonly}" >
-                            <f:convertNumber pattern="#0.00" />
-                            <p:keyFilter regEx="/[\d\.]/" />
+                    </p:outputPanel>
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskEdit.resVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:outputLabel for="amtapplied" value="Resource Amt to be Applied" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:inputText id="amtapplied" 
+                                         value="#{taskEdit.amtapplied}"
+                                         readonly="#{taskEdit.resReadonly}" >
+                                <f:convertNumber pattern="#0.00" />
+                                <p:keyFilter regEx="/[\d\.]/" />
 
-                        </p:inputText>
-                    </div>
+                            </p:inputText>
+                        </div>
+                    </p:outputPanel>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="unit" value="Unit" />
                     </div>
@@ -95,52 +101,32 @@
                             <h:outputText id="unit" value="#{taskEdit.unit}" style="font-weight:bold;"/>
                         </p:outputPanel>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel for="appliedcost" value="Cost to be Applied" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:inputText id="appliedcost" 
-                                     value="#{taskEdit.appliedcost}"
-                                     readonly="#{taskEdit.costReadonly}" >
-                            <f:convertNumber pattern="#0.00" />
-                            <p:keyFilter regEx="/[\d\.]/" />
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskEdit.labCostVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:outputLabel for="appliedcost" value="Cost to be Applied" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:inputText id="appliedcost" 
+                                         value="#{taskEdit.appliedcost}"
+                                         readonly="#{taskEdit.costReadonly}" >
+                                <f:convertNumber pattern="#0.00" />
+                                <p:keyFilter regEx="/[\d\.]/" />
 
-                        </p:inputText>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Resource Category" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputPanel id="rescatPanel">
-                            <h:outputText value="#{taskEdit.rescat}" style="font-weight:bold;"/>
-                        </p:outputPanel>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Initial Amount(Crop) if applicable" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6"> 
-                        <p:outputPanel id="iniamtPanel">
-                            <h:outputText value="#{taskEdit.cropwt}" style="font-weight:bold;"/>
-                        </p:outputPanel>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Crop Amount Unit" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputPanel id="cropamtPanel">
-                            <h:outputText value="#{taskEdit.cropwtunit}" style="font-weight:bold;"/>
-                        </p:outputPanel>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Comments" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">                        
-                        <p:inputText id="comments" 
-                                     value="#{taskEdit.comments}"
-                                     readonly="#{taskEdit.commReadonly}" >                           
+                            </p:inputText>
+                        </div>
+                    </p:outputPanel>
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskEdit.labCommVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputLabel value="Comments" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">                        
+                            <p:inputText id="comments" 
+                                         value="#{taskEdit.comments}"
+                                         readonly="#{taskEdit.commReadonly}" >                           
 
-                        </p:inputText>
-                    </div>
+                            </p:inputText>
+                        </div>
+                    </p:outputPanel>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          icon="fa fa-edit" 

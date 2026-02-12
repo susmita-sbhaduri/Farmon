@@ -45,6 +45,7 @@ public class TaskAdd implements Serializable {
     private boolean resVisible = true; 
     private boolean labCostVisible = true;
     private boolean labCommVisible = true;
+    private boolean amountVisible = true;
     
     /**
      * Creates a new instance of TaskAdd
@@ -70,7 +71,7 @@ public class TaskAdd implements Serializable {
         
         unit = farmondto.getFarmresourcerec().getUnit();
         amount = farmondto.getFarmresourcerec().getAvailableAmt();
-//        by default resource is selected , so readonly fields are accordingly initialised
+//        by default resource is selected , so labour related fields are accordingly hidden
         if (selectedTaskType.equals("res")) {
             resVisible = true;
             labCostVisible = false;
@@ -85,20 +86,33 @@ public class TaskAdd implements Serializable {
             resVisible = false;
             labCostVisible = true;
             labCommVisible = true;
-            amount = "NA";
+            amountVisible = false;
+//            amount = "NA";
             unit = "Rs.";
         }
         if (selectedTaskType.equals("lab")) {
             resVisible = false;
-            labCostVisible = true;
+            labCostVisible = false;
             labCommVisible = true;
-            amount = "NA";
+            amountVisible = false;
+//            amount = "NA";
             unit = "NA";
         }
         if (selectedTaskType.equals("res")) {
             resVisible = true;
             labCostVisible = false;
             labCommVisible = false;
+            amountVisible = true;
+            FarmonDTO farmondto = new FarmonDTO();
+            FarmonClient clientService = new FarmonClient();
+            FarmresourceDTO farmresrec = new FarmresourceDTO();
+
+            farmresrec.setResourceId(availableresources.get(selectedIndexRes).getResourceId());
+            farmondto.setFarmresourcerec(farmresrec);
+            farmondto = clientService.callResnameForIdService(farmondto);
+
+            unit = farmondto.getFarmresourcerec().getUnit();
+            amount = farmondto.getFarmresourcerec().getAvailableAmt();
         }
     }
     
@@ -339,7 +353,12 @@ public class TaskAdd implements Serializable {
         this.labCommVisible = labCommVisible;
     }
 
-    
-    
-    
+    public boolean isAmountVisible() {
+        return amountVisible;
+    }
+
+    public void setAmountVisible(boolean amountVisible) {
+        this.amountVisible = amountVisible;
+    }
+
 }

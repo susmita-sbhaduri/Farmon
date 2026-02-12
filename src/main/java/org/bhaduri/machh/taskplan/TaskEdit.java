@@ -45,9 +45,10 @@ public class TaskEdit implements Serializable {
     private boolean resReadonly = false; // default not readonly
     private boolean costReadonly = false;
     private boolean commReadonly = false;
-    private String rescat;
-    private String cropwt;
-    private String cropwtunit;
+    private boolean resVisible = true; 
+    private boolean labCostVisible = true;
+    private boolean labCommVisible = true;
+    private boolean amountVisible = true;
     /**
      * Creates a new instance of TaskEdit
      */
@@ -86,33 +87,28 @@ public class TaskEdit implements Serializable {
 //        }
         
         if (taskType.equals("LABHRVST")) {
-            resReadonly = true;
-            costReadonly = false;
-            commReadonly = false;
+            resVisible = false;
+            labCostVisible = true;
+            labCommVisible = true;
+            amountVisible = false;
             taskType = "Labour(to be paid)";
-            unit = "Rs.";
-            amount = "NA";
-            rescat = "NA";
-            cropwt = "NA";
-            cropwtunit = "NA";
+            unit = "Rs.";           
             comments = taskRecord.getComments();
         }
         if (taskType.equals("LAB")) {
-            resReadonly = true;
-            costReadonly = true;
-            commReadonly = false;
+            resVisible = false;
+            labCostVisible = false;
+            labCommVisible = true;
+            amountVisible = false;
             taskType = "Labour";
             unit = "NA";
-            amount = "NA";
-            rescat = "NA";
-            cropwt = "NA";
-            cropwtunit = "NA";
             comments = taskRecord.getComments();
         }
         if (taskType.equals("RES")) {
-            resReadonly = false;
-            costReadonly = true;
-            commReadonly = true;
+            resVisible = true;
+            labCostVisible = false;
+            labCommVisible = false;
+            amountVisible = true;
             taskType = "Resource";
             
             farmondto = clientService.callNonzeroresListService(farmondto);
@@ -132,15 +128,15 @@ public class TaskEdit implements Serializable {
             
             unit = farmondto.getFarmresourcerec().getUnit();
             amount = farmondto.getFarmresourcerec().getAvailableAmt();
-            if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
-                rescat = "Crop";
-                cropwt = farmondto.getFarmresourcerec().getCropweight();
-                cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
-            } else {
-                rescat = "Other";
-                cropwt = "";
-                cropwtunit = "";
-            }
+//            if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
+//                rescat = "Crop";
+//                cropwt = farmondto.getFarmresourcerec().getCropweight();
+//                cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
+//            } else {
+//                rescat = "Other";
+//                cropwt = "";
+//                cropwtunit = "";
+//            }
         }
         if (taskRecord.getAppliedAmount()==null)
             amtapplied = 0;
@@ -163,16 +159,16 @@ public class TaskEdit implements Serializable {
         unit = farmondto.getFarmresourcerec().getUnit();
         amount = farmondto.getFarmresourcerec().getAvailableAmt();
         amtapplied = 0;
-        if(farmondto.getFarmresourcerec().getCropwtunit()!=null){
-            rescat = "Crop";
-            cropwt = farmondto.getFarmresourcerec().getCropweight();
-            cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
-            
-        } else{ 
-            rescat = "Other";
-            cropwt = "";
-            cropwtunit = "";
-        }
+//        if(farmondto.getFarmresourcerec().getCropwtunit()!=null){
+//            rescat = "Crop";
+//            cropwt = farmondto.getFarmresourcerec().getCropweight();
+//            cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
+//            
+//        } else{ 
+//            rescat = "Other";
+//            cropwt = "";
+//            cropwtunit = "";
+//        }
     }
     
     public String saveTask() {
@@ -382,31 +378,7 @@ public class TaskEdit implements Serializable {
     public void setCostReadonly(boolean costReadonly) {
         this.costReadonly = costReadonly;
     }
-
-    public String getRescat() {
-        return rescat;
-    }
-
-    public void setRescat(String rescat) {
-        this.rescat = rescat;
-    }
-
-    public String getCropwt() {
-        return cropwt;
-    }
-
-    public void setCropwt(String cropwt) {
-        this.cropwt = cropwt;
-    }
-
-    public String getCropwtunit() {
-        return cropwtunit;
-    }
-
-    public void setCropwtunit(String cropwtunit) {
-        this.cropwtunit = cropwtunit;
-    }
-
+    
     public String getAmount() {
         return amount;
     }
@@ -429,6 +401,38 @@ public class TaskEdit implements Serializable {
 
     public void setCommReadonly(boolean commReadonly) {
         this.commReadonly = commReadonly;
+    }
+
+    public boolean isResVisible() {
+        return resVisible;
+    }
+
+    public void setResVisible(boolean resVisible) {
+        this.resVisible = resVisible;
+    }
+
+    public boolean isLabCostVisible() {
+        return labCostVisible;
+    }
+
+    public void setLabCostVisible(boolean labCostVisible) {
+        this.labCostVisible = labCostVisible;
+    }
+
+    public boolean isLabCommVisible() {
+        return labCommVisible;
+    }
+
+    public void setLabCommVisible(boolean labCommVisible) {
+        this.labCommVisible = labCommVisible;
+    }
+
+    public boolean isAmountVisible() {
+        return amountVisible;
+    }
+
+    public void setAmountVisible(boolean amountVisible) {
+        this.amountVisible = amountVisible;
     }
     
     
