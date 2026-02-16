@@ -75,7 +75,27 @@ public class EmpLoan implements Serializable {
         }
     }
     public void calculateOutstanding(){
-        outstanding = String.format("%.2f", totalLoan);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        EmpExpDTO empLoanRec = new EmpExpDTO();
+        empLoanRec.setEmpid(selectedEmp);
+        empLoanRec.setExpcategory("LOAN");
+        farmondto.setEmpexprec(empLoanRec);
+        farmondto = clientService.callActiveEmpExpService(farmondto);
+        empLoanRec = farmondto.getEmpexprec();
+        if (empLoanRec == null) {
+            outstanding = String.format("%.2f", totalLoan);
+        } else {
+            float updOutstanding = 0;
+            if (totalLoan > Float.parseFloat(empLoanRec.getTotal())) {
+                updOutstanding = Float.parseFloat(empLoanRec.getOutstanding());
+                updOutstanding = updOutstanding + (totalLoan
+                        - Float.parseFloat(empLoanRec.getTotal()));
+                outstanding = String.format("%.2f", updOutstanding);
+            } else {
+                outstanding = empLoanRec.getOutstanding();
+            }
+        }
     }
     
     public String saveDetails(){
@@ -89,11 +109,26 @@ public class EmpLoan implements Serializable {
         
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
+        EmpExpDTO empLoanRec = new EmpExpDTO();
+        empLoanRec.setEmpid(selectedEmp);
+        empLoanRec.setExpcategory("LOAN");
+        farmondto.setEmpexprec(empLoanRec);
+        farmondto = clientService.callActiveEmpExpService(farmondto);
+        empLoanRec = farmondto.getEmpexprec();
         
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         
-        if (newRecord && (Float.parseFloat(outstanding) == totalLoan)
-                && (totalLoan > 0)) {
+        if (!newRecord && totalLoan < Float.parseFloat(empLoanRec.getTotal())) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                    "Loan amont cannot be decreased");
+            f.addMessage(null, message);
+            return "/secured/humanresource/emploan?faces-redirect=true&selectedEmp=" + selectedEmp;
+        }
+        
+//        if (newRecord && (Float.parseFloat(outstanding) == totalLoan)
+//                && (totalLoan > 0)) {
+        if (newRecord || totalLoan > Float.parseFloat(empLoanRec.getTotal()))
+        {
             
             if (sdate == null) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
@@ -114,24 +149,27 @@ public class EmpLoan implements Serializable {
             expenseRec.setDate(sdf.format(sdate));
             expenseRec.setExpenseRefId(selectedEmp); //######empid as ref id
             expenseRec.setExpenseType("LOAN");
-            expenseRec.setExpenditure(String.format("%.2f", totalLoan));
+            if(newRecord){
+               expenseRec.setExpenditure(String.format("%.2f", totalLoan)); 
+            } else {
+               expenseRec.setExpenditure(String.format("%.2f", totalLoan
+               - Float.parseFloat(empLoanRec.getTotal())));
+            }
             expenseRec.setCommString("LOAN");
             
-            //Construction of empexpense record
-            EmpExpDTO empexpRec = new EmpExpDTO();
-            farmondto = clientService.callMaxEmpExpIdService(farmondto);
-            int empexpid = Integer.parseInt(farmondto.getEmpexprec().getId());
-            if (empexpid == 0) {
-                empexpRec.setId("1");
-            } else {
-                empexpRec.setId(String.valueOf(empexpid + 1));
+            //Construction of empexpense record for adding the first loan
+            if(!newRecord) {
+                float updOutstanding = 0;
+                updOutstanding = Float.parseFloat(empLoanRec.getOutstanding());
+                updOutstanding = updOutstanding + (totalLoan-
+                    Float.parseFloat(empLoanRec.getTotal()));
+                empLoanRec.setEmpid(selectedEmp);
+                empLoanRec.setExpcategory("LOAN");                
+                empLoanRec.setSdate(sdf.format(sdate));
+                empLoanRec.setTotal(String.format("%.2f", totalLoan));
+                empLoanRec.setOutstanding(String.format("%.2f", updOutstanding));
             }
-            empexpRec.setTotal(String.format("%.2f", totalLoan));
-            empexpRec.setOutstanding(outstanding);
-            empexpRec.setExpcategory("LOAN");
-            empexpRec.setSdate(sdf.format(sdate));
-            empexpRec.setEmpid(selectedEmp);
-
+            //Database operations
             farmondto.setExpenserec(expenseRec);
             farmondto = clientService.callAddExpService(farmondto);
             int expres = farmondto.getResponses().getFarmon_ADD_RES();
@@ -149,20 +187,43 @@ public class EmpLoan implements Serializable {
                     f.addMessage(null, message);
                 }
             }
+            int insupdempexp;
             if (sqlFlag == 1) {
-                farmondto.setEmpexprec(empexpRec);
-                farmondto = clientService.callAddEmpExpService(farmondto);
-                int insempexp = farmondto.getResponses().getFarmon_ADD_RES();
-                if (insempexp == SUCCESS) {                    
+                if (newRecord) {
+                    //Construction of empexpense record for adding the first loan
+                    EmpExpDTO empexpRec = new EmpExpDTO();
+                    farmondto = clientService.callMaxEmpExpIdService(farmondto);
+                    int empexpid = Integer.parseInt(farmondto.getEmpexprec().getId());
+                    if (empexpid == 0) {
+                        empexpRec.setId("1");
+                    } else {
+                        empexpRec.setId(String.valueOf(empexpid + 1));
+                    }
+                    empexpRec.setTotal(String.format("%.2f", totalLoan));
+                    empexpRec.setOutstanding(outstanding);
+                    empexpRec.setExpcategory("LOAN");
+                    empexpRec.setSdate(sdf.format(sdate));
+                    empexpRec.setEmpid(selectedEmp);
+                    farmondto.setEmpexprec(empexpRec);
+                    farmondto = clientService.callAddEmpExpService(farmondto);
+                    insupdempexp = farmondto.getResponses().getFarmon_ADD_RES();
+                } else {
+                    //adding loan amount to the existing record
+                    farmondto.setEmpexprec(empLoanRec);
+                    farmondto = clientService.callEditEmpExpService(farmondto);
+                    insupdempexp = farmondto.getResponses().getFarmon_EDIT_RES();
+                }
+                
+                if (insupdempexp == SUCCESS) {                    
                     sqlFlag = sqlFlag + 1;
                 } else {
-                    if (insempexp == DB_DUPLICATE) {
+                    if (insupdempexp == DB_DUPLICATE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                                 "Duplicate record error for empexpense table");
                         f.addMessage(null, message);
 
                     }
-                    if (insempexp == DB_SEVERE) {
+                    if (insupdempexp == DB_SEVERE) {
                         message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                                 "Failure on insert in empexpense table");
                         f.addMessage(null, message);

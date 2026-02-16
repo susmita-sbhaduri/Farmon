@@ -10,20 +10,16 @@
         <div class="sidebar-scroll-content">
             <div class="logo">
                 <p:link outcome="/secured/userhome">
-                    <p:graphicImage name="images/#{guestPreferences.menuColor eq 'light' ? 'omega-black.svg' : 'omega-white.svg'}" library="omega-layout" width="113"/>
+                    <p:graphicImage name="images/#{guestPreferences.menuColor eq 'light' ? 'FarmonMenu-Green.png' : 'FarmonMenu-Yellow.png'}" library="omega-layout" width="113"/>
                 </p:link>
             </div>
             <div class="profile">
                 <p:graphicImage name="images/profile.png" library="omega-layout" />
                 <a id="profile-button" href="#">
                     <span class="username">#{loginController.username}</span>
-                    <i class="pi pi-fw pi-cog"/>
+                    
                 </a>
-                <ul>
-                    <li><a href="#"><i class="pi pi-fw pi-sliders-h"/><span>Account</span></a></li>
-                    <li><a href="#"><i class="pi pi-fw pi-bell"/><span>Notifications</span><span class="menu-badge">2</span></a></li>
-                    <li><a href="#"><i class="pi pi-fw pi-sign-out"/><span>Logout</span></a></li>
-                </ul>
+
             </div>
             <div class="menu">
                 <po:menu widgetVar="OmegaMenuWidget">
@@ -38,10 +34,10 @@
                         <p:menuitem id="m_harvesedit" value="Edit Harvests" icon="pi pi-fw pi-id-card" outcome="/secured/harvest/harvestlist"/>
                     </p:submenu>
 
-                    <p:submenu id="m_taskdetails" label="Task Details" icon="pi pi-fw pi-star">
+                    
                         <!--<p:menuitem id="m_taskplan" value="Task Planning" icon="pi pi-fw pi-id-card" outcome="/secured/taskplan/tasklist"/>-->
                         <p:menuitem id="m_taskschedule" value="Schedule" icon="pi pi-fw pi-id-card" outcome="/secured/taskplan/openschedule"/>
-                    </p:submenu>
+                    
 
                     <p:submenu id="m_reports" label="Reports" icon="pi pi-fw pi-star">
                         <p:submenu id="m_res" label="Resources" icon="pi pi-fw pi-star">

@@ -18,7 +18,9 @@
     <h:body styleClass="login-body">
     
         <div id="login-wrapper">
-            <p:graphicImage name="images/login-logo.png" library="omega-layout" />
+            <p:link outcome="/landing.xhtml">
+            <p:graphicImage name="images/login-logo.png" width="100" library="omega-layout" />
+            </p:link>
             
             <div id="login-container">
                 <span class="title">Farm-on</span>
@@ -44,7 +46,7 @@
                 </h:form>
             </div>
             
-            <div class="login-footer">PrimeFaces Omega</div>
+            <div class="login-footer">FarmOn :  Start Farming</div>
         </div>
 
         <h:outputStylesheet name="css/primeicons.css" library="omega-layout"/>

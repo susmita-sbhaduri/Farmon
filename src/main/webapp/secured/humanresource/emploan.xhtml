@@ -27,8 +27,7 @@
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:inputText id="loan" 
-                                     value="#{empLoan.totalLoan}"
-                                     readonly="#{empLoan.readOnlyCondition}">
+                                     value="#{empLoan.totalLoan}">
                             <f:convertNumber pattern="#0.00" />
                             <p:keyFilter regEx="/[\d\.]/" /> 
                             <p:ajax event="change"
@@ -51,8 +50,7 @@
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
-                                         value="Save"
-                                         disabled="#{empLoan.readOnlyCondition eq true}"
+                                         value="Save"                                         
                                          action="#{empLoan.saveDetails()}" >                        
                         </p:commandButton>
                     </div>

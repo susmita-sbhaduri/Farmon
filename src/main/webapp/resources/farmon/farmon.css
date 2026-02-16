@@ -1,0 +1,15 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 16, 2026, 3:38:04 PM
+    Author     : sb
+*/
+
+.welcomecard {
+    /* Tries Comic Sans MS first. If not found, tries generic cursive */
+    font-family: 'Comic Sans MS', cursive, sans-serif !important;
+    /* Optional: make it a bit bigger so it's easier to read */
+    font-size: 5rem;
+}
