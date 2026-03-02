@@ -20,18 +20,14 @@
                 <div style="text-align: left;">
                     <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
                     &nbsp;&nbsp;&nbsp;
-                    <p:commandButton value="Export as CSV" ajax="false">
-                        <p:dataExporter type="csv" 
-                                        target="sensorgrid:sensordata" 
-                                        fileName="SensorData"/>
-                    </p:commandButton>
+                    <p:button outcome="/secured/reports/sensordatareport" value="Refresh" id="h_buttonrefresh"/>
                     &nbsp;&nbsp;&nbsp;                    
                 </div>
                 <p:dataTable id="sensordata" var="sensordata" 
                              value="#{sensorDataReport.sensordatalist}" 
                              reflow="true">
                     <p:column headerText="Parameter">
-                        <h:outputText value="#{sensordata.parameter}" />
+                        <h:outputText value="#{sensordata.idsensor}" />
                     </p:column>
                     <p:column headerText="Value">
                         <h:outputText value="#{sensordata.data}" />

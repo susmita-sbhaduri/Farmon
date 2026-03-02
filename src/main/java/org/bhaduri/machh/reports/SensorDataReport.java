@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
-import org.farmon.farmondto.SensorDbDTO;
+import org.farmon.farmondto.SensorDataDTO;
 
 /**
  *
@@ -19,7 +19,7 @@ import org.farmon.farmondto.SensorDbDTO;
 @Named(value = "sensorDataReport")
 @ViewScoped
 public class SensorDataReport implements Serializable {
-    List<SensorDbDTO> sensordatalist;
+    List<SensorDataDTO> sensordatalist;
     /**
      * Creates a new instance of SensorDataReport
      */
@@ -32,11 +32,11 @@ public class SensorDataReport implements Serializable {
         sensordatalist = farmondto.getSensordatalist(); 
     }
 
-    public List<SensorDbDTO> getSensordatalist() {
+    public List<SensorDataDTO> getSensordatalist() {
         return sensordatalist;
     }
 
-    public void setSensordatalist(List<SensorDbDTO> sensordatalist) {
+    public void setSensordatalist(List<SensorDataDTO> sensordatalist) {
         this.sensordatalist = sensordatalist;
     }
     
