@@ -77,15 +77,7 @@ public class TaskEdit implements Serializable {
             }
         }
         
-//        farmondto = clientService.callNonzeroresListService(farmondto);
-//        availableresources = farmondto.getFarmresourcelist();
-//        for (int i = 0; i < availableresources.size(); i++) {            
-//            if (availableresources.get(i).getResourceId().equals(taskRecord.getResourceId())) {
-//                selectedIndexRes = i;
-//                break;
-//            }
-//        }
-        
+       
         if (taskType.equals("LABHRVST")) {
             resVisible = false;
             labCostVisible = true;
@@ -128,15 +120,6 @@ public class TaskEdit implements Serializable {
             
             unit = farmondto.getFarmresourcerec().getUnit();
             amount = farmondto.getFarmresourcerec().getAvailableAmt();
-//            if (farmondto.getFarmresourcerec().getCropwtunit() != null) {
-//                rescat = "Crop";
-//                cropwt = farmondto.getFarmresourcerec().getCropweight();
-//                cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
-//            } else {
-//                rescat = "Other";
-//                cropwt = "";
-//                cropwtunit = "";
-//            }
         }
         if (taskRecord.getAppliedAmount()==null)
             amtapplied = 0;
@@ -159,16 +142,6 @@ public class TaskEdit implements Serializable {
         unit = farmondto.getFarmresourcerec().getUnit();
         amount = farmondto.getFarmresourcerec().getAvailableAmt();
         amtapplied = 0;
-//        if(farmondto.getFarmresourcerec().getCropwtunit()!=null){
-//            rescat = "Crop";
-//            cropwt = farmondto.getFarmresourcerec().getCropweight();
-//            cropwtunit = farmondto.getFarmresourcerec().getCropwtunit();
-//            
-//        } else{ 
-//            rescat = "Other";
-//            cropwt = "";
-//            cropwtunit = "";
-//        }
     }
     
     public String saveTask() {

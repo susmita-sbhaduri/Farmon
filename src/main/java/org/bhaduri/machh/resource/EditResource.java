@@ -62,10 +62,10 @@ public class EditResource implements Serializable {
         shoplist.removeIf(shop -> {
             for (ShopResDTO res : shopreslist) {  // nested loop check
                 if (res.getShopId().equals(shop.getShopId())) {
-                    return true;  // remove this shop
+                    return true;  // remove this shop and exits the loop
                 }
             }
-            return false;
+            return false; // if no match is found then false is returned and nothing is removed
         });
         // Add "none" option at index 0
         ShopDTO noneOption = new ShopDTO();

@@ -152,7 +152,7 @@ public class TaskApply implements Serializable {
                 f.addMessage(null, message);
                 return "/secured/taskplan/taskedit?faces-redirect=true&selectedTask=" + selectedTask;
             }
-            //checking is task applied date is before the resacqdate
+            //checking if task applied date is before the resacqdate
             ResAcquireDTO resacqfores = new ResAcquireDTO();
             resacqfores.setResoureId(taskplanRec.getResourceId());
             farmondto.setResacqrec(resacqfores);
