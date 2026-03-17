@@ -9,59 +9,49 @@
 
     <ui:define name="content">
         <p:growl id="growl" showDetail="true" />
-        <h4>Add New Employee.</h4>
+        <h4>Edit Vendor.</h4>
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
-
+        &nbsp;&nbsp;&nbsp;
+        <p:button value="Cancel" outcome="/secured/shop/maintainshop"/>
+        <f:metadata>
+            <f:viewParam name="selectedShop" value="#{editShop.selectedShop}"></f:viewParam>
+            <f:viewAction action="#{editShop.fillValues()}" />
+        </f:metadata>
 
         <div class="card">
-            <h:form id="empaddform" style="text-align: left">
+            <h:form id="shopeditform" style="text-align: left">
                 <div class="ui-g">
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="empname" value="Name" />
+                        <h:outputLabel for="shopname" value="Name" />                     
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6"> 
+                        <h:outputText value="#{editShop.name}" style="font-weight:bold;"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="empname" value="#{employeeAdd.name}"/>   
+                        <h:outputLabel for="shopaddr" value="Address"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="empaddr" value="Address"/>
+                        <h:inputText id="shopaddr" value="#{editShop.address}" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="empaddr" value="#{employeeAdd.address}" />
+                        <p:outputLabel for="shopph" value="Contact No." />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel for="empph" value="Contact No." />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:inputText id="empph" value="#{employeeAdd.phno}" maxlength="10">
+                        <p:inputText id="shopph" value="#{editShop.phno}" maxlength="10">
                             <p:keyFilter regEx="/[0-9]/" />
                             <f:validateRegex pattern="^$|^\d{10}$" />
                         </p:inputText>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel for="empsal" value="Salary(Rs.)" />
+                        <h:outputLabel for="atime" value="Availability Time" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:inputText id="empsal" value="#{employeeAdd.salary}">
-                            <f:convertNumber pattern="#0.00" />
-                            <p:keyFilter regEx="/[\d\.]/" />
-                        </p:inputText>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="sdate" value="Start Date" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:datePicker id="sdate" value="#{employeeAdd.sdate}" pattern="yyyy-MM-dd"/>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="edate" value="End Date" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:datePicker id="edate" value="#{employeeAdd.edate}" pattern="yyyy-MM-dd"/>
+                        <h:inputText id="atime" value="#{editShop.atime}" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Save"
-                                         action="#{employeeAdd.goToSaveEmp()}" >                        
+                                         action="#{editShop.goToSaveShop()}">                        
                         </p:commandButton>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">

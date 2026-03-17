@@ -12,7 +12,7 @@
         <p:growl id="growl" showDetail="true" />
         
         &nbsp;&nbsp;&nbsp;
-        <p:button value="Add" outcome="/secured/resource/addinventory"/>
+        <p:button value="Add" outcome="/secured/shop/addshop"/>
         
         <f:metadata>
             <f:viewAction action="#{maintainShop.fillShopValues()}" />
@@ -29,7 +29,7 @@
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          value="Edit"
-                                         action="#{maintainShop.editRes()}" >
+                                         action="#{maintainShop.editShop()}" >
                             <f:setPropertyActionListener value="#{existingshop}" target="#{maintainShop.selectedShop}" />
                         </p:commandButton>
                     </p:column>

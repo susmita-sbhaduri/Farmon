@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
-import org.farmon.farmondto.FarmresourceDTO;
-import org.farmon.farmondto.ResAcquireDTO;
 import org.farmon.farmondto.ShopDTO;
 import org.farmon.farmondto.ShopResDTO;
 
@@ -61,7 +59,7 @@ public class MaintainShop implements Serializable {
     }
     
     public String editShop() {
-        String redirectUrl = "/secured/resource/editresource?faces-redirect=true&selectedRes=" + selectedShop.getShopId();
+        String redirectUrl = "/secured/shop/editshop?faces-redirect=true&selectedShop=" + selectedShop.getShopId();
         return redirectUrl;
 
     }
