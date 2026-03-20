@@ -20,20 +20,19 @@ import org.farmon.farmondto.ShopDTO;
  *
  * @author sb
  */
-@Named(value = "editShop")
+@Named(value = "deleteShop")
 @ViewScoped
-public class EditShop implements Serializable {
+public class DeleteShop implements Serializable {
     private String selectedShop;
     private String name;
     private String address;
     private String phno;
     private String atime;
     private ShopDTO shopRec;
-    
     /**
-     * Creates a new instance of EditShop
+     * Creates a new instance of DeleteShop
      */
-    public EditShop() {
+    public DeleteShop() {
     }
     public void fillValues() {
         FarmonDTO farmondto = new FarmonDTO();
@@ -48,46 +47,29 @@ public class EditShop implements Serializable {
         phno = shopRec.getContact();
         atime = shopRec.getAvailabilityTime();
     }
-    public String goToSaveShop() {
+    
+    public String goToDeleteShop() {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
         String redirectUrl = "/secured/shop/maintainshop?faces-redirect=true";
-        
-        if (address == null || address.trim().isEmpty()) {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                    "Vendor address is mandatory field.");
-            f.addMessage(null, message);
-            return redirectUrl;
-        }
-        
-        if (phno == null || phno.trim().isEmpty()) {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                    "Vendor contact number is mandatory field.");
-            f.addMessage(null, message);
-            return redirectUrl;
-        }
-        
         FarmonDTO farmondto = new FarmonDTO();
-        FarmonClient clientService = new FarmonClient();
-        shopRec.setLocation(address);
-        shopRec.setContact(phno);
-        shopRec.setAvailabilityTime(atime);
+        FarmonClient clientService = new FarmonClient();        
         farmondto.setShoprec(shopRec);
-        farmondto = clientService.callEditShopService(farmondto);
-        int shopeditres = farmondto.getResponses().getFarmon_EDIT_RES();
-        if (shopeditres == SUCCESS) {
+        farmondto = clientService.callDelShopService(farmondto);
+        int shopdelres = farmondto.getResponses().getFarmon_DEL_RES();
+        if (shopdelres == SUCCESS) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                    "Shop updated successfully");
+                    "Shop deleted successfully");
             f.addMessage(null, message);
             return redirectUrl;
         } else {  
-            if (shopeditres == DB_NON_EXISTING) {
+            if (shopdelres == DB_NON_EXISTING) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
                         Integer.toString(DB_NON_EXISTING));
                 f.addMessage(null, message);
             } 
-            if (shopeditres == DB_SEVERE) {
+            if (shopdelres == DB_SEVERE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure", 
                         Integer.toString(DB_SEVERE));
                 f.addMessage(null, message);
@@ -95,6 +77,7 @@ public class EditShop implements Serializable {
         }
         return redirectUrl;
     }
+
     public String getSelectedShop() {
         return selectedShop;
     }
@@ -133,6 +116,14 @@ public class EditShop implements Serializable {
 
     public void setAtime(String atime) {
         this.atime = atime;
+    }
+
+    public ShopDTO getShopRec() {
+        return shopRec;
+    }
+
+    public void setShopRec(ShopDTO shopRec) {
+        this.shopRec = shopRec;
     }
     
     

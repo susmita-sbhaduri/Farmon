@@ -29,7 +29,7 @@ public class PaymentDetails implements Serializable {
     public PaymentDetails() {
     }
     public String fillValues() {
-        String redirectUrl = "/secured/reports/harvestrpts?faces-redirect=true";
+        String redirectUrl = "/secured/reports/emppaymentdtls?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
@@ -41,7 +41,7 @@ public class PaymentDetails implements Serializable {
         empexps = farmondto.getExpenselist();
         if (empexps.isEmpty() || empexps == null) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                    "No applied resource found.");
+                    "No employee expense records found.");
             f.addMessage(null, message);
             return redirectUrl;
         } else {

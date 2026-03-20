@@ -54,7 +54,7 @@ public class MaintainShop implements Serializable {
     }
     
     public String deleteShop() { 
-        String redirectUrl = "/secured/resource/deleteresource?faces-redirect=true&selectedRes="+ selectedShop.getShopId();
+        String redirectUrl = "/secured/shop/deleteshop?faces-redirect=true&selectedShop="+ selectedShop.getShopId();
         return redirectUrl;
     }
     
