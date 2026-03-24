@@ -33,8 +33,6 @@
                     <p:column headerText="Task Type" >
                         <h:outputText value="#{task.taskType eq 'RES' ? 'Resource' : (task.taskType eq 'LABHRVST' ? 'Labour(paid)': 
                                                (task.taskType eq 'LAB' ? 'Labour' : ''))}" />
-<!--                        <h:outputText value="#{task.taskType}" 
-                                      style="#{resacq.resName eq 'Total' ? 'font-weight:bold;' : ''}"/>-->
                     </p:column>
                     <p:column headerText="Task Name">
                         <h:outputText value="#{task.taskName}" />
@@ -42,9 +40,8 @@
                     <p:column headerText="Task Date">
                         <h:outputText value="#{task.taskDt}" />
                     </p:column>
-                    <p:column headerText="Harvest(Site-Crop Category-Cropname)">
-                        <h:outputText value="#{task.harvestDto.siteName}-#{task.harvestDto.cropCategory}-
-                                           #{task.harvestDto.cropName}" />
+                    <p:column headerText="Harvest(Site-Harvestname)">
+                        <h:outputText value="#{task.harvestDto.siteName}-#{task.harvestDto.harvestName}" />
                     </p:column>
                     <p:column headerText="Resource Name">
                         <h:outputText value="#{task.resourceName}" />

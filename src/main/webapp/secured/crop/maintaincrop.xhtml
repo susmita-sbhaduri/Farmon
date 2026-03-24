@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <h4>Crop List.</h4>
+        <p:growl id="growl" showDetail="true" />
+        <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+        &nbsp;&nbsp;&nbsp;
+        <p:button value="Add" outcome="/secured/shop/addcrop"/>
+        
+        <f:metadata>
+            <f:viewAction action="#{maintainCrop.fillValues()}" />
+        </f:metadata>
+
+        <div class="card">            
+            <h:form id="cropgrid" style="text-align: center">                
+                <p:dataTable var="crop" value="#{maintainCrop.crops}" reflow="true">
+                    
+                    <p:column headerText="Crop Name">
+                        <h:outputText value="#{crop.cropName}" />
+                    </p:column>
+                       
+                    
+                    <p:column>
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Edit"
+                                         action="#{maintainCrop.editCrop()}" >
+                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Activate"
+                                         action="#{maintainCrop.activateCrop()}" >
+                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Delete"
+                                         action="#{maintainCrop.deleteCrop()}" >
+                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
+                        </p:commandButton>
+                    </p:column>
+                    
+                </p:dataTable>
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
+

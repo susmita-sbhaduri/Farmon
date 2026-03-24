@@ -29,8 +29,7 @@
                         <p:selectOneMenu id="harvestid" value="#{hrvstReport.selectedIndexHarvest}">
                             <f:selectItems value="#{hrvstReport.activeharvests}" 
                                            var="hrvst"
-                                           itemLabel="#{hrvst.siteName}-#{hrvst.cropCategory}-
-                                           #{hrvst.cropName}" 
+                                           itemLabel="#{hrvst.siteName}-#{hrvst.harvestName}" 
                                            itemValue="#{hrvstReport.activeharvests.indexOf(hrvst)}"/>                        
                         </p:selectOneMenu>
                     </div>

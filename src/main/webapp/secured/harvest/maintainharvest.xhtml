@@ -12,26 +12,35 @@
         <p:growl id="growl" showDetail="true" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         &nbsp;&nbsp;&nbsp;
+        <!--<p:button value="Add" outcome="/secured/shop/addharvest"/>-->
         
         <f:metadata>
-            <f:viewAction action="#{harvestList.fillValues()}" />
+            <f:viewAction action="#{maintainHarvest.fillValues()}" />
         </f:metadata>
 
         <div class="card">            
             <h:form id="harvestgrid" style="text-align: center">                
-                <p:dataTable var="harvest" value="#{harvestList.harvests}" reflow="true">
+                <p:dataTable var="harvest" value="#{maintainHarvest.harvests}" reflow="true">
                     
                     <p:column headerText="Site Name">
                         <h:outputText value="#{harvest.siteName}" />
                     </p:column>
-                    <p:column headerText="Crop Name">
-                        <h:outputText value="#{harvest.cropName}" />
+                    <p:column headerText="Harvest Name">
+                        <h:outputText value="#{harvest.harvestName}" />
                     </p:column>   
+                    
                     <p:column>
-                        <p:commandButton icon="pi pi-info-circle"
-                                         value="Edit Details"
-                                         action="#{harvestList.goHarvestDetails()}" >
-                            <f:setPropertyActionListener value="#{harvest}" target="#{harvestList.selectedHarvest}" />    
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Edit"
+                                         action="#{maintainHarvest.editHarvest()}" >
+                            <f:setPropertyActionListener value="#{harvest}" target="#{maintainHarvest.selectedHarvest}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Delete"
+                                         action="#{maintainHarvest.deleteHarvest()}" >
+                            <f:setPropertyActionListener value="#{harvest}" target="#{maintainHarvest.selectedHarvest}" />
                         </p:commandButton>
                     </p:column>
                     

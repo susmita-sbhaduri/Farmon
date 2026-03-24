@@ -39,8 +39,7 @@ public class TaskApply implements Serializable {
     private String taskName;
     private String taskType;
     private String site;
-    private String cropcat;
-    private String cropname;
+    private String harvestName;
     private String resname;
     private String amount;
     private String unit;
@@ -49,6 +48,9 @@ public class TaskApply implements Serializable {
     private String appliedcost;
     private String comments;
     private float resCropAppliedCost=0;
+    private boolean resVisible = true; 
+    private boolean labCostVisible = true;
+    private boolean labCommVisible = true;
     /**
      * Creates a new instance of TaskApply
      */
@@ -62,7 +64,6 @@ public class TaskApply implements Serializable {
         farmondto.setTaskplanrec(taskplanRec);
         
         farmondto = clientService.callTaskplanIdService(farmondto);
-//        MasterDataServices masterDataService = new MasterDataServices();
         taskplanRec = farmondto.getTaskplanrec();
         
         taskName = taskplanRec.getTaskName();
@@ -73,8 +74,7 @@ public class TaskApply implements Serializable {
         
         harvestRecord = farmondto.getHarvestrecord();
         site = harvestRecord.getSiteName();
-        cropcat = harvestRecord.getCropCategory();
-        cropname = harvestRecord.getCropName();
+        harvestName = harvestRecord.getHarvestName();
         if (taskplanRec.getTaskType().equals("RES")) {
             taskType = "Resource";
             FarmresourceDTO resourceRec = new FarmresourceDTO();
@@ -87,26 +87,27 @@ public class TaskApply implements Serializable {
             amount = resourceRec.getAvailableAmt();
             unit = resourceRec.getUnit();
             amtapplied = taskplanRec.getAppliedAmount();
-            appliedcost = "";
-            comments = "";
+            resVisible = true; 
+            labCostVisible = false;
+            labCommVisible = false;
         }
         if (taskplanRec.getTaskType().equals("LABHRVST")) {
             taskType = "Labour(to be paid)";
             appliedcost = taskplanRec.getAppliedAmtCost();
             comments = taskplanRec.getComments();
-            resname = "";
-            amount = "";
             unit = "Rs.";
-            amtapplied = "";
+            resVisible = false; 
+            labCostVisible = true;
+            labCommVisible = true;
         }
         if (taskplanRec.getTaskType().equals("LAB")) {
-            taskType = "Labour";
-            appliedcost = "";
+            taskType = "Labour";            
             comments = taskplanRec.getComments();
-            resname = "";
-            amount = "";
             unit = "";
             amtapplied = "";
+            resVisible = false; 
+            labCostVisible = false;
+            labCommVisible = true;
         }
         
         DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -126,7 +127,6 @@ public class TaskApply implements Serializable {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         int sqlFlag = 0;
-//        MasterDataServices masterDataService = new MasterDataServices();
         
         //Fetching taskplan record
         TaskPlanDTO taskplanRec = new TaskPlanDTO();
@@ -546,21 +546,15 @@ public class TaskApply implements Serializable {
         this.site = site;
     }
 
-    public String getCropcat() {
-        return cropcat;
+    public String getHarvestName() {
+        return harvestName;
     }
 
-    public void setCropcat(String cropcat) {
-        this.cropcat = cropcat;
+    public void setHarvestName(String harvestName) {
+        this.harvestName = harvestName;
     }
 
-    public String getCropname() {
-        return cropname;
-    }
-
-    public void setCropname(String cropname) {
-        this.cropname = cropname;
-    }
+    
 
     public String getResname() {
         return resname;
@@ -640,6 +634,30 @@ public class TaskApply implements Serializable {
 
     public void setTaskType(String taskType) {
         this.taskType = taskType;
+    }
+
+    public boolean isResVisible() {
+        return resVisible;
+    }
+
+    public void setResVisible(boolean resVisible) {
+        this.resVisible = resVisible;
+    }
+
+    public boolean isLabCostVisible() {
+        return labCostVisible;
+    }
+
+    public void setLabCostVisible(boolean labCostVisible) {
+        this.labCostVisible = labCostVisible;
+    }
+
+    public boolean isLabCommVisible() {
+        return labCommVisible;
+    }
+
+    public void setLabCommVisible(boolean labCommVisible) {
+        this.labCommVisible = labCommVisible;
     }
     
     

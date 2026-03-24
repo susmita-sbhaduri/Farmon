@@ -27,18 +27,18 @@ public class TaskView implements Serializable {
     private String taskName;
     private String taskType;
     private String site;
-    private String cropcat;
-    private String cropname;
+    private String harvestName;
     private String resname;
     private String amount;
     private String unit;
     private String amtapplied;
     private String taskDt;
-    private String rescat;
-    private String cropwt;
-    private String cropwtunit;
     private String appliedcost;
     private String comments;
+    private boolean resVisible = true; 
+    private boolean labCostVisible = true;
+    private boolean labCommVisible = true;
+    private boolean amountVisible = true;
     public TaskView() {
     }
     public void fillValues(){
@@ -61,12 +61,9 @@ public class TaskView implements Serializable {
         
 //        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(taskplanRec.getHarvestId());
         site = harvestRecord.getSiteName();
-        cropcat = harvestRecord.getCropCategory();
-        cropname = harvestRecord.getCropName();
+        harvestName = harvestRecord.getHarvestName();
         if (taskplanRec.getTaskType().equals("RES")) {
             taskType = "Resource";
-//            FarmresourceDTO resourceRec = masterDataService
-//                    .getResourceNameForId(Integer.parseInt(taskplanRec.getResourceId()));
             
             FarmresourceDTO resourceRec = new FarmresourceDTO();
             resourceRec.setResourceId(taskplanRec.getResourceId());
@@ -79,43 +76,29 @@ public class TaskView implements Serializable {
             amount = resourceRec.getAvailableAmt();
             unit = resourceRec.getUnit();
             amtapplied = taskplanRec.getAppliedAmount();
-            appliedcost = "";
-            comments = "";
-//            appliedcost = "NA";
-//            comments = "NA";
-            if (resourceRec.getCropwtunit() != null) {
-                rescat = "Crop";
-                cropwt = resourceRec.getCropweight();
-                cropwtunit = resourceRec.getCropwtunit();
-            } else {
-                rescat = "Other";
-                cropwt = "";
-                cropwtunit = "";
-            }
+            resVisible = true;
+            amountVisible = true;            
+            labCostVisible = false;
+            labCommVisible = false;
+
         }
         if (taskplanRec.getTaskType().equals("LABHRVST")) {
             taskType = "Labour(to be paid)";
             appliedcost = taskplanRec.getAppliedAmtCost();
             comments = taskplanRec.getComments();
-            resname = "";
-            amount = "";
             unit = "Rs.";
-            amtapplied = "";
-            rescat = "";
-            cropwt = "";
-            cropwtunit = "";
+            resVisible = false;
+            amountVisible = false;            
+            labCostVisible = true;
+            labCommVisible = true;
         }
         if (taskplanRec.getTaskType().equals("LAB")) {
             taskType = "Labour";
-            appliedcost = "";
             comments = taskplanRec.getComments();
-            resname = "";
-            amount = "";
-            unit = "";
-            amtapplied = "";
-            rescat = "";
-            cropwt = "";
-            cropwtunit = "";
+            resVisible = false;
+            amountVisible = false;            
+            labCostVisible = false;
+            labCommVisible = true;
         }
         
         DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -144,6 +127,16 @@ public class TaskView implements Serializable {
         return taskType;
     }
 
+    public String getHarvestName() {
+        return harvestName;
+    }
+
+    public void setHarvestName(String harvestName) {
+        this.harvestName = harvestName;
+    }
+    
+    
+
     public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
@@ -154,22 +147,6 @@ public class TaskView implements Serializable {
 
     public void setSite(String site) {
         this.site = site;
-    }
-
-    public String getCropcat() {
-        return cropcat;
-    }
-
-    public void setCropcat(String cropcat) {
-        this.cropcat = cropcat;
-    }
-
-    public String getCropname() {
-        return cropname;
-    }
-
-    public void setCropname(String cropname) {
-        this.cropname = cropname;
     }
 
     public String getResname() {
@@ -212,31 +189,6 @@ public class TaskView implements Serializable {
         this.taskDt = taskDt;
     }
 
-    
-    public String getRescat() {
-        return rescat;
-    }
-
-    public void setRescat(String rescat) {
-        this.rescat = rescat;
-    }
-
-    public String getCropwt() {
-        return cropwt;
-    }
-
-    public void setCropwt(String cropwt) {
-        this.cropwt = cropwt;
-    }
-
-    public String getCropwtunit() {
-        return cropwtunit;
-    }
-
-    public void setCropwtunit(String cropwtunit) {
-        this.cropwtunit = cropwtunit;
-    }
-
     public String getAppliedcost() {
         return appliedcost;
     }
@@ -251,6 +203,38 @@ public class TaskView implements Serializable {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public boolean isResVisible() {
+        return resVisible;
+    }
+
+    public void setResVisible(boolean resVisible) {
+        this.resVisible = resVisible;
+    }
+
+    public boolean isLabCostVisible() {
+        return labCostVisible;
+    }
+
+    public void setLabCostVisible(boolean labCostVisible) {
+        this.labCostVisible = labCostVisible;
+    }
+
+    public boolean isLabCommVisible() {
+        return labCommVisible;
+    }
+
+    public void setLabCommVisible(boolean labCommVisible) {
+        this.labCommVisible = labCommVisible;
+    }
+
+    public boolean isAmountVisible() {
+        return amountVisible;
+    }
+
+    public void setAmountVisible(boolean amountVisible) {
+        this.amountVisible = amountVisible;
     }
     
 }

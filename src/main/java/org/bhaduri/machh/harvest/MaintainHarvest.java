@@ -9,25 +9,29 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.naming.NamingException;
-import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
+import org.farmon.farmondto.HarvestDTO;
 
 /**
  *
  * @author sb
  */
-@Named(value = "harvestList")
+@Named(value = "maintainHarvest")
 @ViewScoped
-public class HarvestList implements Serializable {
+public class MaintainHarvest implements Serializable {
     private HarvestDTO selectedHarvest;
     List<HarvestDTO> harvests;
-    
-    public HarvestList() {
+    private Map<String, Boolean> shopEditable = new HashMap<>();
+    /**
+     * Creates a new instance of MaintainHarvest
+     */
+    public MaintainHarvest() {
     }
-    
     public String fillValues() throws NamingException {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
@@ -47,11 +51,10 @@ public class HarvestList implements Serializable {
         } else 
             return null;        
     }
-    public String editHarvest(){
+    public String goHarvestDetails(){
         String redirectUrl = "/secured/harvest/harvestdetails?faces-redirect=true&selectedHarvest=" + selectedHarvest.getHarvestid();
         return redirectUrl;
     }
-
     public HarvestDTO getSelectedHarvest() {
         return selectedHarvest;
     }

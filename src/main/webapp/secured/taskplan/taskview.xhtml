@@ -43,73 +43,61 @@
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6"><h:outputText value="#{taskView.site}" style="font-weight:bold;"/>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6"><h:outputLabel value="Crop Category" />
+                    <div class="ui-g-12 ui-md-6 ui-lg-6"><h:outputLabel value="Harvest Name" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6"><h:outputText value="#{taskView.cropcat}" style="font-weight:bold;"/>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6"><h:outputLabel value="Crop Name" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6"><h:outputText value="#{taskView.cropname}" style="font-weight:bold;"/>
-                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6"><h:outputText value="#{taskView.harvestName}" style="font-weight:bold;"/>
+                    </div> 
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskView.resVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputLabel value="Resource to be applied" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6" >                        
+                            <h:outputText value="#{taskView.resname}" style="font-weight:bold;"/>
+                        </div>
+                    </p:outputPanel>                    
                     
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="resid" value="Resource to be applied" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{taskView.resname}" style="font-weight:bold;"/>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Available Resource Amount" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{taskView.amount}" style="font-weight:bold;"/>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel value="Amount Applied" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{taskView.amtapplied}" style="font-weight:bold;"/>
-                    </div>
+                    <p:outputPanel id="amountWrapper" styleClass="ui-g-12 ui-g-nopad">
+                        <p:outputPanel rendered="#{taskView.amountVisible}" styleClass="ui-g-nopad">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <h:outputLabel value="Available Resource Amount" />
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{taskView.amount}" style="font-weight:bold;"/>
+                            </div>
+                        </p:outputPanel>
+                    </p:outputPanel>
+                    
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskView.resVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:outputLabel value="Amount Applied" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{taskView.amtapplied}" style="font-weight:bold;"/>
+                        </div>
+                    </p:outputPanel>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel value="Unit" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputText value="#{taskView.unit}" style="font-weight:bold;"/>
                     </div>
-
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Resource Category" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{taskView.rescat}" style="font-weight:bold;"/> 
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Initial Amount(Crop) if applicable" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">                        
-                        <h:outputText value="#{taskView.cropwt}" style="font-weight:bold;"/>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Crop Amount Unit" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{taskView.cropwtunit}" style="font-weight:bold;"/>
-                    </div>
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskView.labCostVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputLabel value="Labour Cost(if applicable)" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{taskView.appliedcost}" style="font-weight:bold;"/>
+                        </div>
+                    </p:outputPanel>
+                    <p:outputPanel styleClass="ui-g-12 ui-g-nopad" rendered="#{taskView.labCommVisible}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputLabel value="Comments" />
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{taskView.comments}" style="font-weight:bold;"/>
+                        </div>
+                    </p:outputPanel>
                     
-
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="appliedcost" value="Labour Cost(if applicable)" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{taskView.appliedcost}" style="font-weight:bold;"/>                        
-                    </div>
-                    
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="comments" value="Comments" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{taskView.comments}" style="font-weight:bold;"/>                        
-                    </div>
                     
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:button icon="pi pi-times" value="OK" outcome="/secured/taskplan/openschedule" />
