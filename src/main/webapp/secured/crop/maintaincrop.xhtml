@@ -37,14 +37,18 @@
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          value="Activate"
-                                         action="#{maintainCrop.activateCrop()}" >
+                                         action="#{maintainCrop.activateCrop()}" 
+                                         disabled="#{not maintainCrop.cropActivatable[crop.cropId]}"
+                                         >
                             <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
                         </p:commandButton>
                     </p:column>
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          value="Delete"
-                                         action="#{maintainCrop.deleteCrop()}" >
+                                         action="#{maintainCrop.deleteCrop()}" 
+                                         disabled="#{not maintainCrop.cropDeletable[crop.cropId]}"
+                                         >
                             <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
                         </p:commandButton>
                     </p:column>

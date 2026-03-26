@@ -7,12 +7,13 @@ package org.bhaduri.farmon.crop;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.FarmonDTO;
-import org.farmon.farmondto.ShopDTO;
-import org.farmon.farmondto.ShopResDTO;
+import org.farmon.farmondto.InventoryDTO;
 
 /**
  *
@@ -23,6 +24,8 @@ import org.farmon.farmondto.ShopResDTO;
 public class MaintainCrop implements Serializable {
     private CropDTO selectedCrop;
     List<CropDTO> crops;
+    private Map<String, Boolean> cropDeletable = new HashMap<>();
+    private Map<String, Boolean> cropActivatable = new HashMap<>();
     /**
      * Creates a new instance of MaintainCrop
      */
@@ -33,22 +36,27 @@ public class MaintainCrop implements Serializable {
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();        
         farmondto = clientService.callCropListService(farmondto);
-        crops = farmondto.getCroplist();     
-        
-        farmondto = clientService.callDisShopPerResService(farmondto);
-        List<ShopResDTO> shopreslist = farmondto.getShopreslist();
-        
-//      Shops which are ALREADY in shopres cannot be deleted
-        
-        for (ShopDTO shop : shoplist) {
-            boolean deletable = true;
-            for (ShopResDTO shopres : shopreslist) {
-                if (shopres.getShopId().equals(shop.getShopId())) {
-                     deletable =false;
-                     break;
-                }
-            }            
-            shopEditable.put(shop.getShopId(), deletable);
+        crops = farmondto.getCroplist(); 
+        for (CropDTO crop : crops) {
+            boolean activatable = false;
+            if(crop.getEndDate()!=null){
+                activatable = true;
+                cropActivatable.put(crop.getCropId(), activatable);
+            }
+        }
+//      Crops which have stock in inventory cannot be deleted
+        CropDTO cropforstock = new CropDTO();
+        List<InventoryDTO> inventorylist;
+        for (CropDTO crop : crops) {
+            boolean deletable = false;
+            cropforstock.setCropId(crop.getCropId());
+            farmondto.setCroprec(crop);
+            farmondto = clientService.callNonzeroInvForCropService(farmondto);
+            inventorylist = farmondto.getInventorylist();
+            if(inventorylist.isEmpty()){
+                deletable = true;
+            }                      
+            cropDeletable.put(crop.getCropId(), deletable);
         }
     }
     public CropDTO getSelectedCrop() {
@@ -65,6 +73,22 @@ public class MaintainCrop implements Serializable {
 
     public void setCrops(List<CropDTO> crops) {
         this.crops = crops;
+    }
+
+    public Map<String, Boolean> getCropDeletable() {
+        return cropDeletable;
+    }
+
+    public void setCropDeletable(Map<String, Boolean> cropDeletable) {
+        this.cropDeletable = cropDeletable;
+    }
+
+    public Map<String, Boolean> getCropActivatable() {
+        return cropActivatable;
+    }
+
+    public void setCropActivatable(Map<String, Boolean> cropActivatable) {
+        this.cropActivatable = cropActivatable;
     }
     
 }
