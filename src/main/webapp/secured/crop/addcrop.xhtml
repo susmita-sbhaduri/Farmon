@@ -9,48 +9,49 @@
 
      <ui:define name="content">
         <p:growl id="growl" showDetail="true" />
-        <h4>Add New Resource and Link to Existing Shop.</h4>
-        
-        
+        <h4>Add New Crop.</h4>
         <f:metadata>            
-            <f:viewAction action="#{resourceAdd.fillExistingDetails()}" />
+            <f:viewAction action="#{addCrop.fillValues()}" />
         </f:metadata>
         
         <div class="card">
-            <h:form id="resaddform" style="text-align: left">
+            <h:form id="cropaddform" style="text-align: left">
                 <div class="ui-g">
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="resname" value="Resource Name"/>
+                        <h:outputLabel for="cropname" value="Crop Name"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="resname" value="#{resourceAdd.resname}" />
+                        <h:inputText id="cropname" value="#{addCrop.cropname}" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:outputLabel for="shopid" value="Shop Names" />
+                        <p:outputLabel for="harvests" value="Site-Harvest Name" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:selectOneMenu id="shopid" value="#{resourceAdd.selectedIndex}" >
-                            <f:selectItems value="#{resourceAdd.shoplist}" var="shop" 
-                                           itemValue="#{resourceAdd.shoplist.indexOf(shop)}" 
-                                           itemLabel="#{shop.shopName}" />
-                        </p:selectOneMenu>
+                        <p:selectManyCheckbox id="harvests" value="#{addCrop.selectedHarvestIds}"
+                                              layout="responsive"
+                                              columns="3">
+                            <f:selectItems value="#{addCrop.activeHarvests}" 
+                                           var="harvest" 
+                                           itemLabel="#{harvest.siteName}-#{harvest.harvestName}" 
+                                           itemValue="#{harvest.harvestid}" />
+                        </p:selectManyCheckbox>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="unit" value="Unit"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="unit" value="#{resourceAdd.unit}" />
+                        <h:inputText id="unit" value="#{addCrop.unit}" />
                     </div>
 
                         
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Save"
-                                         action="#{resourceAdd.goToSaveRes()}" >                        
+                                         action="#{addCrop.goToSaveCrop()}" >                        
                         </p:commandButton>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/resource/maintainresource" />
+                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/maintaincrop" />
                     </div>
                 </div>
             </h:form>
