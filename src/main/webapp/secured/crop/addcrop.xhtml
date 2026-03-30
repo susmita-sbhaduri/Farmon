@@ -34,6 +34,7 @@
                                            var="harvest" 
                                            itemLabel="#{harvest.siteName}-#{harvest.harvestName}" 
                                            itemValue="#{harvest.harvestid}" />
+                            <f:converter converterId="jakarta.faces.Integer" />
                         </p:selectManyCheckbox>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
@@ -42,7 +43,12 @@
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:inputText id="unit" value="#{addCrop.unit}" />
                     </div>
-
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="sdate" value="Start Date" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:datePicker id="sdate" value="#{addCrop.sdate}" pattern="yyyy-MM-dd"/>
+                    </div>
                         
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 

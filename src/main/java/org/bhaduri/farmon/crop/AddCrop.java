@@ -9,6 +9,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
 import org.farmon.farmonclient.FarmonClient;
@@ -17,10 +19,8 @@ import org.farmon.farmondto.FarmonDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
-import org.farmon.farmondto.FarmresourceDTO;
 import org.farmon.farmondto.HarvestDTO;
-import org.farmon.farmondto.ShopDTO;
-import org.farmon.farmondto.ShopResDTO;
+import org.farmon.farmondto.InventoryDTO;
 
 /**
  *
@@ -33,6 +33,7 @@ public class AddCrop implements Serializable {
     List<HarvestDTO> activeHarvests;
     private String cropname;
     private String unit;
+    private Date sdate = new Date();
     /**
      * Creates a new instance of AddCrop
      */
@@ -62,7 +63,7 @@ public class AddCrop implements Serializable {
         String redirectUrl = "/secured/crop/addcrop?faces-redirect=true";
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient(); 
-        
+        int sqlFlag = 0;
         FacesMessage message = null;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
@@ -96,111 +97,76 @@ public class AddCrop implements Serializable {
         }
         croprec.setCropId(String.valueOf(cropid));
         croprec.setCropName(cropname);
-        croprec.setTotalStock("0");
+        croprec.setTotalStock("0.00");
         croprec.setUnit(unit);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        croprec.setStartDate(sdf.format(sdate));
+        farmondto.setCroprec(croprec);
+        farmondto = clientService.callAddCropService(farmondto);
+        int cropaddres = farmondto.getResponses().getFarmon_ADD_RES();
         
-        restopasswithname.setResourceName(resname);
-        farmondto.setFarmresourcerec(restopasswithname);
-        farmondto = clientService.callResidForNameService(farmondto);
-        FarmresourceDTO existingreswithName = farmondto.getFarmresourcerec();
-        if (existingreswithName != null) {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                    "This Resource already exists, go to Edit Resource for this one.");
-            f.addMessage(null, message);
+        if (cropaddres == SUCCESS) {
+            sqlFlag = sqlFlag + 1;
+        } else {
+            if (cropaddres == DB_DUPLICATE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "The crop is already added, crop name =" + cropname);
+                f.addMessage(null, message);
+            }
+            if (cropaddres == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "Failure on adding crop");
+                f.addMessage(null, message);
+            }
             return redirectUrl;
-
         }
-        
-        redirectUrl = "/secured/resource/maintainresource?faces-redirect=true";
-        
-        int resid = -1; //initialisation issue
-        int resres = -1;
-        FarmresourceDTO resAddBean = new FarmresourceDTO();
-        if (existingreswithName == null) { // there is no record in Farmresource with the given resourcename
-            farmondto = clientService.callMaxCropIdService(farmondto);
-            resid = Integer.parseInt(farmondto.getFarmresourcerec().getResourceId());
-            if (resid == 0) {
-                resid = 1;
+        int invflag = 0;
+        InventoryDTO inventoryrec = new InventoryDTO();
+        farmondto = clientService.callMaxInvIdService(farmondto);
+        int invid = Integer.parseInt(farmondto.getInventoryrec().getInventoryId());
+        if (invid == 0) {
+            invid = 1;
+        } else {
+            invid = invid + 1;
+        }
+        int invaddres;
+        for (Integer id : selectedHarvestIds) {
+            inventoryrec.setInventoryId(String.valueOf(invid));
+            inventoryrec.setCropId(String.valueOf(cropid));
+            inventoryrec.setHarvestId(String.valueOf(id));
+            inventoryrec.setCurrentQty("0.00");
+            inventoryrec.setLastupdatedate(sdf.format(sdate));
+            farmondto.setInventoryrec(inventoryrec);
+            farmondto = clientService.callAddInvService(farmondto);
+            invaddres = farmondto.getResponses().getFarmon_ADD_RES();
+            if (invaddres == SUCCESS) {
+                invflag = invflag+1;
+                invid = invid + 1;
+                inventoryrec = new InventoryDTO();
             } else {
-                resid = resid + 1;
-            }
-            resAddBean.setResourceId(String.valueOf(resid));
-            resAddBean.setResourceName(resname);
-            resAddBean.setUnit(unit);
-            resAddBean.setAvailableAmt(String.format("%.2f", 0.00));
-//            if ("crop".equalsIgnoreCase(rescat) && !unitcrop.isEmpty()){
-//                resAddBean.setCropwtunit(unitcrop);
-//            }
-//            if ("other".equalsIgnoreCase(rescat)){
-//                resAddBean.setCropwtunit(null);
-//            }
-            farmondto.setFarmresourcerec(resAddBean);
-            farmondto = clientService.callAddFarmresService(farmondto);
-            resres = farmondto.getResponses().getFarmon_ADD_RES();
-            if (resres == SUCCESS) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                        "Resource added successfully");
+                break;
+            }         
+        }
+        if (selectedHarvestIds.size() == invflag) {
+            sqlFlag = sqlFlag + 1;
+        } else {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                    "Failure on adding crop in the inventory");
+            f.addMessage(null, message);
+            farmondto.setCroprec(croprec);
+            farmondto = clientService.callDelCropService(farmondto);
+            int delres = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delres == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "crop record could not be deleted");
                 f.addMessage(null, message);
-            } else {
-                if (resres == DB_DUPLICATE) {
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "Duplicate record error for farmresource table");
-                    f.addMessage(null, message);
-                }
-                if (resres == DB_SEVERE) {
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "Failure on insert in farmresource table");
-                    f.addMessage(null, message);
-                }
-                return redirectUrl;
             }
-            ShopResDTO resShopUpdBean = new ShopResDTO();
-            farmondto = clientService.callMaxShopResIdService(farmondto);
-            int shopresid = Integer.parseInt(farmondto.getShopresrec().getId());
-            if (shopresid == 0) {
-                shopresid = 1;
-            } else {
-                shopresid = shopresid + 1;
-            }
-            resShopUpdBean.setId(String.valueOf(shopresid));
-            resShopUpdBean.setShopId(selectedShop.getShopId());
-            resShopUpdBean.setShopName(selectedShop.getShopName());
-            resShopUpdBean.setResourceId(String.valueOf(resid));
-            resShopUpdBean.setResourceName(resname);
-
-            resShopUpdBean.setRate(String.format("%.2f", 0.00));
-            resShopUpdBean.setStockPerRate(String.format("%.2f", 0.00));
-            farmondto.setShopresrec(resShopUpdBean);
-            farmondto = clientService.callAddShopresService(farmondto);
-            int shopres = farmondto.getResponses().getFarmon_ADD_RES();
-            if (shopres == SUCCESS) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                        "Shopresource record added successfully");
-                f.addMessage(null, message);
-            } else {
-                if (shopres == DB_DUPLICATE) {
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "Duplicate record error for shopresource table");
-                    f.addMessage(null, message);
-                }
-                if (shopres == DB_SEVERE) {
-                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                            "Failure on insert in shopresource table");
-                    f.addMessage(null, message);
-                }
-                if (resres == SUCCESS) { //farmresource record is added
-                    farmondto.setFarmresourcerec(resAddBean);
-                    farmondto = clientService.callDelFarmresService(farmondto);
-                    int delres = farmondto.getResponses().getFarmon_DEL_RES();
-
-                    if (delres == DB_SEVERE) {
-                        message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
-                                "Farmresource record could not be deleted");
-                        f.addMessage(null, message);
-                    }
-                }
-                return redirectUrl;
-            }
+            return redirectUrl;
+        }
+        if (sqlFlag == 2) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                    "Crop added to inventory successfully.");
+            f.addMessage(null, message);
         }
 
         return redirectUrl;
@@ -234,6 +200,14 @@ public class AddCrop implements Serializable {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public Date getSdate() {
+        return sdate;
+    }
+
+    public void setSdate(Date sdate) {
+        this.sdate = sdate;
     }
     
 }
