@@ -33,8 +33,6 @@ import org.primefaces.PrimeFaces;
 @Named(value = "acquireResource")
 @ViewScoped
 public class AcquireResource implements Serializable {
-
-//    private boolean saveDisabled = true;
     private String selectedRes;
     private String selectedResName;
     private String selectedShop;
@@ -45,13 +43,9 @@ public class AcquireResource implements Serializable {
     private ShopResDTO selectedShopRes;
     private float amount;
     private Date purchaseDt;
-//    private String rescat;
-//    private float cropwt;
-//    private String cropwtunit;
     private String comments;
     private List<ShopResDTO> selectedShopResLst;
     private String calcAmt;
-//    private boolean cropwtReadonly = true; // default as readonly
 
     public AcquireResource() {
     }

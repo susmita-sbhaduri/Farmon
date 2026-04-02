@@ -7,13 +7,13 @@
                 xmlns:f="jakarta.faces.core"
                 xmlns:h="jakarta.faces.html">
 
-     <ui:define name="content">
+    <ui:define name="content">
         <p:growl id="growl" showDetail="true" />
         <h4>Add New Crop.</h4>
         <f:metadata>            
             <f:viewAction action="#{addCrop.fillValues()}" />
         </f:metadata>
-        
+
         <div class="card">
             <h:form id="cropaddform" style="text-align: left">
                 <div class="ui-g">
@@ -38,18 +38,39 @@
                         </p:selectManyCheckbox>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="unit" value="Unit"/>
+                        <h:outputLabel value="Enter Products and Units" />
                     </div>
+
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="unit" value="#{addCrop.unit}" />
+                        <p:dataTable id="producttable" value="#{addCrop.entries}" var="entry" 
+                                     rowIndexVar="rowIndex" style="font-size: 10px;">
+
+                            <p:column headerText="Product">
+                                <p:inputText value="#{entry.productName}">
+                                    <p:ajax event="change" 
+                                            listener="#{addCrop.onInputChanged(rowIndex)}" 
+                                            update="@form:producttable" />
+                                </p:inputText> 
+                            </p:column>
+
+                            <p:column headerText="Unit">
+                                <p:inputText value="#{entry.unit}">
+                                    <p:ajax event="change" 
+                                            listener="#{addCrop.onInputChanged(rowIndex)}" 
+                                            update="@form:producttable" />
+                                </p:inputText>
+                            </p:column>
+
+                        </p:dataTable>
                     </div>
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="sdate" value="Start Date" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:datePicker id="sdate" value="#{addCrop.sdate}" pattern="yyyy-MM-dd"/>
                     </div>
-                        
+
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Save"

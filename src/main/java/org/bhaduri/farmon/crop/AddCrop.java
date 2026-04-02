@@ -10,11 +10,13 @@ import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
+import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
@@ -31,8 +33,8 @@ import org.farmon.farmondto.InventoryDTO;
 public class AddCrop implements Serializable {
     private List<Integer> selectedHarvestIds;
     List<HarvestDTO> activeHarvests;
-    private String cropname;
-    private String unit;
+    private List<CropProductDTO> entries;
+    private String cropname;    
     private Date sdate = new Date();
     /**
      * Creates a new instance of AddCrop
@@ -45,11 +47,18 @@ public class AddCrop implements Serializable {
         farmondto = clientService.callActiveHarvestListService(farmondto);
         
         activeHarvests = farmondto.getHarvestlist();
+        entries = new ArrayList<>();
+        // Add the initial empty pair of textboxes
+        entries.add(new CropProductDTO());
+       
         String redirectUrl = "/secured/userhome?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        
+//        message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Both products and corresponding units are mandatory.",
+//                    "Both products and corresponding units are mandatory."); 
+//        f.addMessage(null, message);
+            
         if(activeHarvests==null){
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
                     "No active harvests.");
@@ -58,7 +67,21 @@ public class AddCrop implements Serializable {
         } else 
             return null;        
     }
-    
+    // Ajax listener fired when an input value changes
+    public void onInputChanged(int rowIndex) {       
+            
+        if (rowIndex == entries.size() - 1) {
+            CropProductDTO lastEntry = entries.get(rowIndex);
+            
+            // If the user typed something in either box, add a new blank row
+            boolean isProdFilled = lastEntry.getProductName() != null && !lastEntry.getProductName().trim().isEmpty();
+            boolean isUnitFilled = lastEntry.getUnit() != null && !lastEntry.getUnit().trim().isEmpty();
+            
+            if (isProdFilled || isUnitFilled) {
+                entries.add(new CropProductDTO());
+            } 
+        }
+    }
     public String goToSaveCrop() {
         String redirectUrl = "/secured/crop/addcrop?faces-redirect=true";
         FarmonDTO farmondto= new FarmonDTO();
@@ -80,13 +103,20 @@ public class AddCrop implements Serializable {
             f.addMessage("cropname", message);
             return redirectUrl;
         }
+        for (int i = 0; i < entries.size(); i++) {
+            CropProductDTO entry = entries.get(i);
+            boolean isProdFilled = entry.getProductName() != null && !entry.getProductName().trim().isEmpty();
+            boolean isUnitFilled = entry.getUnit() != null && !entry.getUnit().trim().isEmpty();
 
-        if (unit.isBlank()) {
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Unit cannot be empty.",
-                    "Unit cannot be empty.");
-            f.addMessage("unit", message);
-            return redirectUrl;
-        } 
+            // If it's a half-filled row, block the save and show a message
+            if ((isProdFilled && !isUnitFilled) || (!isProdFilled && isUnitFilled)) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "Both products and corresponding units are mandatory.");
+                f.addMessage(null, message);
+                return redirectUrl;
+            }
+        }
+        
         CropDTO croprec = new CropDTO();
         farmondto = clientService.callMaxCropIdService(farmondto);
         int cropid = Integer.parseInt(farmondto.getCroprec().getCropId());
@@ -98,7 +128,7 @@ public class AddCrop implements Serializable {
         croprec.setCropId(String.valueOf(cropid));
         croprec.setCropName(cropname);
         croprec.setTotalStock("0.00");
-        croprec.setUnit(unit);
+        
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         croprec.setStartDate(sdf.format(sdate));
         farmondto.setCroprec(croprec);
@@ -120,6 +150,21 @@ public class AddCrop implements Serializable {
             }
             return redirectUrl;
         }
+        
+        int cropprodflag = 0;
+        CropProductDTO cropprodrec = new CropProductDTO();
+        farmondto = clientService.callMaxInvIdService(farmondto);
+        int invid = Integer.parseInt(farmondto.getInventoryrec().getInventoryId());
+        if (invid == 0) {
+            invid = 1;
+        } else {
+            invid = invid + 1;
+        }
+        for (int i = 0; i < entries.size(); i++) {
+            CropProductDTO entry = entries.get(i);
+            
+        }
+        
         int invflag = 0;
         InventoryDTO inventoryrec = new InventoryDTO();
         farmondto = clientService.callMaxInvIdService(farmondto);
@@ -194,20 +239,20 @@ public class AddCrop implements Serializable {
         this.cropname = cropname;
     }
 
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
     public Date getSdate() {
         return sdate;
     }
 
     public void setSdate(Date sdate) {
         this.sdate = sdate;
+    }
+
+    public List<CropProductDTO> getEntries() {
+        return entries;
+    }
+
+    public void setEntries(List<CropProductDTO> entries) {
+        this.entries = entries;
     }
     
 }

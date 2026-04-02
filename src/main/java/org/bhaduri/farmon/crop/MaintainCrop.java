@@ -59,6 +59,11 @@ public class MaintainCrop implements Serializable {
             cropDeletable.put(crop.getCropId(), deletable);
         }
     }
+    
+    public String addStock() {        
+        String redirectUrl = "/secured/crop/addstock?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
+        return redirectUrl;
+    }
     public CropDTO getSelectedCrop() {
         return selectedCrop;
     }

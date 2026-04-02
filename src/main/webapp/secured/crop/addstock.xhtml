@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"                                
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+     <ui:define name="content">
+        <p:growl id="growl" showDetail="true" />
+        <h4>Add Stock of the Crop.</h4>
+        <f:metadata>
+            <f:viewParam name="selectedCrop" value="#{addStock.selectedCrop}"></f:viewParam>
+            <f:viewAction action="#{addStock.fillValues()}" />
+        </f:metadata>
+        
+        <div class="card">
+            <h:form id="stockaddform" style="text-align: left">
+                <h5 style="text-align: center;">
+                    #{addStock.selectedCropName}
+                </h5> 
+                <div class="ui-g">                    
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="harvestid" value="Site and Harvest" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:selectOneRadio id="harvestid" value="#{addStock.selectedHarvest}"
+                                          layout="pageDirection">
+                            <f:selectItems value="#{addStock.harvestForCrop}" 
+                                           var="harvest"
+                                           itemLabel="#{harvest.siteName}-#{harvest.harvestName}" 
+                                           itemValue="#{harvest.harvestid}"/>                            
+                        </p:selectOneRadio>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="unit" value="Crop Unit"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:inputText id="unit" value="#{addStock.unit}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="quantity" value="Stock Quantity" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:inputText id="quantity" value="#{addStock.quantity}">
+                            <f:convertNumber pattern="#0.00" />
+                            <p:keyFilter regEx="/[\d\.]/" />
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="sdate" value="Stock Date" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:datePicker id="sdate" value="#{addStock.sdate}" pattern="yyyy-MM-dd"/>
+                    </div>
+                        
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Save"
+                                         actionListener="#{addStock.goToReviewRes}"
+                                         update="@form growl" >                        
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/maintaincrop" />
+                    </div>
+                </div>
+                <!-- Confirmation dialog (same form) -->
+                <p:dialog id="saveConfirmDlg"
+                          widgetVar="saveConfirmDlg"
+                          header="Confirmation"
+                          modal="true"
+                          closable="false"
+                          resizable="false">
+                    <h:panelGroup id="confirmPanel">
+                        <h:outputText
+                            value="Total stock for #{addStock.selectedCropName} 
+                            for the Site-Harvest #{harvest.siteName}-#{harvest.harvestName}=#{addStock.quantity} #{addStock.unit}.
+                                   Is that ok?" />
+                    </h:panelGroup>
+
+                    <p:separator />
+
+                    <p:commandButton value="Yes"
+                                     action="#{addStock.goToSaveRes()}"
+                                     update="@form"
+                                     oncomplete="PF('saveConfirmDlg').hide()" />
+
+                    <p:commandButton value="No"
+                                     type="button"
+                                     style="margin-left:10px"
+                                     onclick="PF('saveConfirmDlg').hide()" />
+                </p:dialog>
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
+
