@@ -78,12 +78,12 @@ public class DeleteResource implements Serializable {
         } else {
             if (response == DB_NON_EXISTING) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                         "Task does not exist.");
+                         "Resource does not exist.");
                 f.addMessage(null, message);
             }
             if (response == DB_SEVERE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                         "Failure on adding task");
+                         "Failure on adding resource");
                 f.addMessage(null, message);
             }
 

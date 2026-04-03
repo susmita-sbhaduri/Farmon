@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.naming.NamingException;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
@@ -116,6 +117,11 @@ public class AddCrop implements Serializable {
                 return redirectUrl;
             }
         }
+        // Filter out any rows where BOTH fields are empty
+        List<CropProductDTO> validEntries = entries.stream()
+                .filter(e -> (e.getProductName() != null && !e.getProductName().trim().isEmpty()) 
+                          || (e.getUnit() != null && !e.getUnit().trim().isEmpty()))
+                .collect(Collectors.toList());
         
         CropDTO croprec = new CropDTO();
         farmondto = clientService.callMaxCropIdService(farmondto);
@@ -152,17 +158,52 @@ public class AddCrop implements Serializable {
         }
         
         int cropprodflag = 0;
+        int productId =0;
         CropProductDTO cropprodrec = new CropProductDTO();
-        farmondto = clientService.callMaxInvIdService(farmondto);
-        int invid = Integer.parseInt(farmondto.getInventoryrec().getInventoryId());
-        if (invid == 0) {
-            invid = 1;
+        farmondto = clientService.callMaxCropprodIdService(farmondto);
+        int cropprodid = Integer.parseInt(farmondto.getCropprodrec().getId());
+        if (cropprodid == 0) {
+            cropprodid = 1;
         } else {
-            invid = invid + 1;
+            cropprodid = cropprodid + 1;
         }
-        for (int i = 0; i < entries.size(); i++) {
-            CropProductDTO entry = entries.get(i);
-            
+        int cropprodaddres;
+        for (int i = 0; i < validEntries.size(); i++) {
+            CropProductDTO entry = validEntries.get(i);
+            cropprodrec.setId(String.valueOf(cropprodid));
+            cropprodrec.setCropId(String.valueOf(cropid));
+            productId = productId +1;
+            cropprodrec.setProductId(String.valueOf(productId));
+            cropprodrec.setProductName(entry.getProductName());
+            cropprodrec.setTotalstock("0.00");
+            cropprodrec.setUnit(entry.getUnit());
+            farmondto.setCropprodrec(cropprodrec);
+            farmondto = clientService.callAddCropProdService(farmondto);
+            cropprodaddres = farmondto.getResponses().getFarmon_ADD_RES();
+            if (cropprodaddres == SUCCESS) {
+                cropprodflag = cropprodflag+1;
+                cropprodid = cropprodid + 1;
+                cropprodrec = new CropProductDTO();
+            } else {
+                break;
+            }
+        }
+        
+        if (validEntries.size() == cropprodflag) {
+            sqlFlag = sqlFlag + 1;
+        } else {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                    "Failure on adding product");
+            f.addMessage(null, message);
+            farmondto.setCroprec(croprec);
+            farmondto = clientService.callDelCropService(farmondto);
+            int delres = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delres == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "crop record could not be deleted");
+                f.addMessage(null, message);
+            }
+            return redirectUrl;
         }
         
         int invflag = 0;
@@ -175,28 +216,38 @@ public class AddCrop implements Serializable {
             invid = invid + 1;
         }
         int invaddres;
+        int cropprodcount = 0;
+        productId = 0;
         for (Integer id : selectedHarvestIds) {
-            inventoryrec.setInventoryId(String.valueOf(invid));
-            inventoryrec.setCropId(String.valueOf(cropid));
-            inventoryrec.setHarvestId(String.valueOf(id));
-            inventoryrec.setCurrentQty("0.00");
-            inventoryrec.setLastupdatedate(sdf.format(sdate));
-            farmondto.setInventoryrec(inventoryrec);
-            farmondto = clientService.callAddInvService(farmondto);
-            invaddres = farmondto.getResponses().getFarmon_ADD_RES();
-            if (invaddres == SUCCESS) {
-                invflag = invflag+1;
-                invid = invid + 1;
-                inventoryrec = new InventoryDTO();
-            } else {
+            for (int i = 0; i < validEntries.size(); i++) {
+                inventoryrec.setInventoryId(String.valueOf(invid));
+                inventoryrec.setCropId(String.valueOf(cropid));
+                productId = productId+1;
+                inventoryrec.setProductId(String.valueOf(productId));
+                inventoryrec.setHarvestId(String.valueOf(id));
+                inventoryrec.setCurrentQty("0.00");
+                inventoryrec.setLastupdatedate(sdf.format(sdate));
+                farmondto.setInventoryrec(inventoryrec);
+                farmondto = clientService.callAddInvService(farmondto);
+                invaddres = farmondto.getResponses().getFarmon_ADD_RES();
+                if (invaddres == SUCCESS) {
+                    invflag = invflag + 1;
+                    invid = invid + 1;
+                    inventoryrec = new InventoryDTO();
+                    cropprodcount = cropprodcount+1;
+                } else {
+                    break;
+                }                
+            }
+            if(cropprodcount < validEntries.size()){
                 break;
-            }         
+            }
         }
-        if (selectedHarvestIds.size() == invflag) {
+        if ((selectedHarvestIds.size()*validEntries.size()) == invflag) {
             sqlFlag = sqlFlag + 1;
         } else {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                    "Failure on adding crop in the inventory");
+                    "Failure on adding product in the inventory");
             f.addMessage(null, message);
             farmondto.setCroprec(croprec);
             farmondto = clientService.callDelCropService(farmondto);
@@ -206,9 +257,10 @@ public class AddCrop implements Serializable {
                         "crop record could not be deleted");
                 f.addMessage(null, message);
             }
+            
             return redirectUrl;
         }
-        if (sqlFlag == 2) {
+        if (sqlFlag == 3) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Crop added to inventory successfully.");
             f.addMessage(null, message);
