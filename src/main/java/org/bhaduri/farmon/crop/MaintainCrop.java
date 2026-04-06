@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
+import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
-import org.farmon.farmondto.InventoryDTO;
 
 /**
  *
@@ -46,14 +46,14 @@ public class MaintainCrop implements Serializable {
         }
 //      Crops which have stock in inventory cannot be deleted
         CropDTO cropforstock = new CropDTO();
-        List<InventoryDTO> inventorylist;
+        List<CropProductDTO> cropprodlist;
         for (CropDTO crop : crops) {
             boolean deletable = false;
             cropforstock.setCropId(crop.getCropId());
             farmondto.setCroprec(crop);
-            farmondto = clientService.callNonzeroInvForCropService(farmondto);
-            inventorylist = farmondto.getInventorylist();
-            if(inventorylist.isEmpty()){
+            farmondto = clientService.callNonzeroProdForCropService(farmondto);
+            cropprodlist = farmondto.getCropprodlist();
+            if(cropprodlist.isEmpty()){
                 deletable = true;
             }                      
             cropDeletable.put(crop.getCropId(), deletable);
@@ -62,6 +62,11 @@ public class MaintainCrop implements Serializable {
     
     public String addStock() {        
         String redirectUrl = "/secured/crop/addstock?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
+        return redirectUrl;
+    }
+    
+    public String deleteCrop() {        
+        String redirectUrl = "/secured/crop/deletecrop?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
         return redirectUrl;
     }
     public CropDTO getSelectedCrop() {

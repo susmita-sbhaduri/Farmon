@@ -35,7 +35,8 @@ public class AddCrop implements Serializable {
     private List<Integer> selectedHarvestIds;
     List<HarvestDTO> activeHarvests;
     private List<CropProductDTO> entries;
-    private String cropname;    
+    private String cropname;  
+    private float totalcount;
     private Date sdate = new Date();
     /**
      * Creates a new instance of AddCrop
@@ -117,6 +118,12 @@ public class AddCrop implements Serializable {
                 return redirectUrl;
             }
         }
+        if (totalcount==0) {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Count is mandatory.",
+                    "Count is mandatory.");
+            f.addMessage("count", message);
+            return redirectUrl;
+        }
         // Filter out any rows where BOTH fields are empty
         List<CropProductDTO> validEntries = entries.stream()
                 .filter(e -> (e.getProductName() != null && !e.getProductName().trim().isEmpty()) 
@@ -133,7 +140,7 @@ public class AddCrop implements Serializable {
         }
         croprec.setCropId(String.valueOf(cropid));
         croprec.setCropName(cropname);
-        croprec.setTotalStock("0.00");
+        croprec.setTotalStock(String.format("%.2f", totalcount));
         
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         croprec.setStartDate(sdf.format(sdate));
@@ -203,6 +210,15 @@ public class AddCrop implements Serializable {
                         "crop record could not be deleted");
                 f.addMessage(null, message);
             }
+            cropprodrec.setCropId(String.valueOf(cropid));
+            farmondto.setCropprodrec(cropprodrec);  
+            farmondto = clientService.callDelCropprodCropidService(farmondto);
+            int delrescropprod = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delrescropprod == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "cropproduct record could not be deleted");
+                f.addMessage(null, message);
+            }
             return redirectUrl;
         }
         
@@ -216,9 +232,11 @@ public class AddCrop implements Serializable {
             invid = invid + 1;
         }
         int invaddres;
-        int cropprodcount = 0;
-        productId = 0;
+        int cropprodcount;
+        
         for (Integer id : selectedHarvestIds) {
+            cropprodcount = 0;
+            productId = 0;
             for (int i = 0; i < validEntries.size(); i++) {
                 inventoryrec.setInventoryId(String.valueOf(invid));
                 inventoryrec.setCropId(String.valueOf(cropid));
@@ -257,7 +275,25 @@ public class AddCrop implements Serializable {
                         "crop record could not be deleted");
                 f.addMessage(null, message);
             }
+            cropprodrec.setCropId(String.valueOf(cropid));
+            farmondto.setCropprodrec(cropprodrec);  
+            farmondto = clientService.callDelCropprodCropidService(farmondto);
+            int delrescropprod = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delrescropprod == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "cropproduct record could not be deleted");
+                f.addMessage(null, message);
+            }
             
+            inventoryrec.setCropId(String.valueOf(cropid));
+            farmondto.setInventoryrec(inventoryrec);
+            farmondto = clientService.callDelInventoryForCropidService(farmondto);
+            int delresinv = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delresinv == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "inventory record could not be deleted");
+                f.addMessage(null, message);
+            }
             return redirectUrl;
         }
         if (sqlFlag == 3) {
@@ -291,6 +327,14 @@ public class AddCrop implements Serializable {
         this.cropname = cropname;
     }
 
+    public float getTotalcount() {
+        return totalcount;
+    }
+
+    public void setTotalcount(float totalcount) {
+        this.totalcount = totalcount;
+    }
+    
     public Date getSdate() {
         return sdate;
     }
