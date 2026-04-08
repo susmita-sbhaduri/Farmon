@@ -24,6 +24,7 @@ import org.farmon.farmondto.FarmonDTO;
 public class MaintainCrop implements Serializable {
     private CropDTO selectedCrop;
     List<CropDTO> crops;
+    private Map<String, Boolean> cropAddable = new HashMap<>();
     private Map<String, Boolean> cropDeletable = new HashMap<>();
     private Map<String, Boolean> cropActivatable = new HashMap<>();
     /**
@@ -39,12 +40,16 @@ public class MaintainCrop implements Serializable {
         crops = farmondto.getCroplist(); 
         for (CropDTO crop : crops) {
             boolean activatable = false;
+            boolean addactivatable = false;
             if(crop.getEndDate()!=null){
                 activatable = true;
                 cropActivatable.put(crop.getCropId(), activatable);
+            } else {
+                addactivatable = true;
+                cropAddable.put(crop.getCropId(), addactivatable);
             }
         }
-//      Crops which have stock in inventory cannot be deleted
+//      Crops which have stock in cropproduct cannot be deleted
         CropDTO cropforstock = new CropDTO();
         List<CropProductDTO> cropprodlist;
         for (CropDTO crop : crops) {
@@ -58,6 +63,8 @@ public class MaintainCrop implements Serializable {
             }                      
             cropDeletable.put(crop.getCropId(), deletable);
         }
+        
+       
     }
     
     public String addStock() {        
@@ -100,5 +107,15 @@ public class MaintainCrop implements Serializable {
     public void setCropActivatable(Map<String, Boolean> cropActivatable) {
         this.cropActivatable = cropActivatable;
     }
+
+    public Map<String, Boolean> getCropAddable() {
+        return cropAddable;
+    }
+
+    public void setCropAddable(Map<String, Boolean> cropAddable) {
+        this.cropAddable = cropAddable;
+    }
+
+    
     
 }

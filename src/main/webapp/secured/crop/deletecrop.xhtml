@@ -32,9 +32,12 @@
                     </div>                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:dataTable var="harvest" value="#{deleteCrop.cropharvests}" style="font-size: 10px;">
-                            <p:column headerText="Name">
+                            <p:column headerText="Site">
+                                #{harvest.siteName} 
+                            </p:column>   
+                            <p:column headerText="Harvest">
                                 #{harvest.harvestName} 
-                            </p:column>                            
+                            </p:column>
                         </p:dataTable>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
@@ -61,12 +64,18 @@
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputText value="#{deleteCrop.sdate}" style="font-weight:bold;"/>
-                    </div>                       
+                    </div>     
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="edate" value="End Date" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:datePicker id="edate" value="#{deleteCrop.edate}" pattern="yyyy-MM-dd"/>
+                    </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          icon="fa fa-edit" 
                                          value="Delete"
-                                         action="#{deleteCrop.deleteRes()}" >                        
+                                         action="#{deleteCrop.deleteCrop()}" >                        
                         </p:commandButton>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">

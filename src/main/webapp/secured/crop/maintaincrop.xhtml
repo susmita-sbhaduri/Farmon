@@ -28,7 +28,16 @@
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          value="Add Stock"
-                                         action="#{maintainCrop.addStock()}" >
+                                         action="#{maintainCrop.addStock()}" 
+                                         disabled="#{not maintainCrop.cropAddable[crop.cropId]}">
+                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Update Last Stock"
+                                         action="#{maintainCrop.updStock()}" 
+                                         disabled="#{not maintainCrop.cropAddable[crop.cropId]}">
                             <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
                         </p:commandButton>
                     </p:column>

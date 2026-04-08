@@ -4,18 +4,23 @@
  */
 package org.bhaduri.farmon.crop;
 
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
-import org.farmon.farmondto.FarmresourceDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InventoryDTO;
-import org.farmon.farmondto.ShopResDTO;
 
 /**
  *
@@ -31,6 +36,7 @@ public class DeleteCrop implements Serializable {
     private List<CropProductDTO> cropproducts;
     private String count;
     private String sdate;
+    private Date edate = new Date();
     /**
      * Creates a new instance of DeleteCrop
      */
@@ -53,8 +59,59 @@ public class DeleteCrop implements Serializable {
         farmondto = clientService.callInvHarForCropService(farmondto);
         cropharvests = farmondto.getHarvestlist();
         
+        CropProductDTO cropprodrec = new CropProductDTO();
+        cropprodrec.setCropId(selectedCrop);
+        farmondto.setCropprodrec(cropprodrec);
+        farmondto = clientService.callCropprodLstCropidService(farmondto);
+        cropproducts = farmondto.getCropprodlist();
     }
 
+    public String deleteCrop() {
+        
+        String redirectUrl = "/secured/crop/maintaincrop?faces-redirect=true";
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true);
+        if (edate==null) {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "End date is mandatory.",
+                    "End date is mandatory.");
+            f.addMessage("edate", message);
+            return redirectUrl;
+        }        
+        
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        croprec = new CropDTO();
+        croprec.setCropId(selectedCrop);
+        farmondto.setCroprec(croprec);
+        farmondto = clientService.callCropRecService(farmondto);
+        farmondto.getCroprec().setEndDate(sdf.format(edate));
+        farmondto = clientService.callEditCropService(farmondto);
+        
+        int response = farmondto.getResponses().getFarmon_EDIT_RES();
+        if (response == SUCCESS) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                    "Crop is deleted successfully");
+            f.addMessage(null, message);
+           
+        } else {
+            if (response == DB_NON_EXISTING) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                         "Crop does not exist.");
+                f.addMessage(null, message);
+            }
+            if (response == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                         "Failure on deleting crop");
+                f.addMessage(null, message);
+            }
+
+        }
+        return redirectUrl;
+        
+    }
+    
     public CropDTO getCroprec() {
         return croprec;
     }
@@ -109,6 +166,14 @@ public class DeleteCrop implements Serializable {
 
     public void setSdate(String sdate) {
         this.sdate = sdate;
+    }
+
+    public Date getEdate() {
+        return edate;
+    }
+
+    public void setEdate(Date edate) {
+        this.edate = edate;
     }
     
 }

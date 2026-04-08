@@ -13,10 +13,12 @@ import java.util.Date;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
+import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InventoryDTO;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -30,6 +32,8 @@ public class AddStock implements Serializable {
     private String selectedCropName;
     private HarvestDTO selectedHarvest;
     private List<HarvestDTO> harvestForCrop;
+    private List<CropProductDTO> cropproducts;
+    private CropProductDTO selectedProduct;
     private String unit;
     private float quantity;
     private Date sdate;
@@ -53,6 +57,25 @@ public class AddStock implements Serializable {
         farmondto = clientService.callInvHarForCropService(farmondto);
         harvestForCrop = farmondto.getHarvestlist();
         
+        CropProductDTO cropprodrec = new CropProductDTO();
+        cropprodrec.setCropId(selectedCrop);
+        farmondto.setCropprodrec(cropprodrec);
+        farmondto = clientService.callCropprodLstCropidService(farmondto);
+        cropproducts = farmondto.getCropprodlist();
+        
+    }
+    
+    public void onRowSelect(SelectEvent<CropProductDTO> event) {
+        CropProductDTO newlySelected = event.getObject();
+
+        // Loop through the entire list of products
+        for (CropProductDTO product : cropproducts) {
+            // If the product in the loop is NOT the one they just clicked...
+            if (!product.getId().equals(newlySelected.getId())) {
+                // Clear out any amount they might have typed previously
+                product.setTotalstock(null); // Use "" if prodAmount is a String instead of Integer/Double
+            }
+        }
     }
     public void goToReviewRes() {
 //        FacesMessage message;
@@ -144,6 +167,22 @@ public class AddStock implements Serializable {
 
     public void setSdate(Date sdate) {
         this.sdate = sdate;
+    }
+
+    public List<CropProductDTO> getCropproducts() {
+        return cropproducts;
+    }
+
+    public void setCropproducts(List<CropProductDTO> cropproducts) {
+        this.cropproducts = cropproducts;
+    }
+
+    public CropProductDTO getSelectedProduct() {
+        return selectedProduct;
+    }
+
+    public void setSelectedProduct(CropProductDTO selectedProduct) {
+        this.selectedProduct = selectedProduct;
     }
     
 }
