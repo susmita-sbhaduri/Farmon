@@ -56,8 +56,7 @@
                                 <p:inputText value="#{prodlist.totalstock}" 
                                              disabled="#{addStock.selectedProduct == null 
                                                          or addStock.selectedProduct.id != prodlist.id}" 
-                                             size="10">
-                                    <f:convertNumber pattern="#0.00" />
+                                             size="10">                                    
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
@@ -68,21 +67,7 @@
 
                         </p:dataTable>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="unit" value="Crop Unit"/>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:inputText id="unit" value="#{addStock.unit}" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="quantity" value="Stock Quantity" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:inputText id="quantity" value="#{addStock.quantity}">
-                            <f:convertNumber pattern="#0.00" />
-                            <p:keyFilter regEx="/[\d\.]/" />
-                        </p:inputText>
-                    </div>
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="sdate" value="Stock Date" />
                     </div>
@@ -92,8 +77,8 @@
 
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
-                                         value="Save"
-                                         actionListener="#{addStock.goToReviewRes}"
+                                         value="Add"
+                                         actionListener="#{addStock.goToAddStock}"
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>

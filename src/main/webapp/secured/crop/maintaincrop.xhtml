@@ -37,7 +37,7 @@
                         <p:commandButton styleClass="blue-button" 
                                          value="Update Last Stock"
                                          action="#{maintainCrop.updStock()}" 
-                                         disabled="#{not maintainCrop.cropAddable[crop.cropId]}">
+                                         disabled="#{maintainCrop.cropNotUpdatable[crop.cropId]}">
                             <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
                         </p:commandButton>
                     </p:column>

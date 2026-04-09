@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.naming.NamingException;
 import org.farmon.farmonclient.FarmonClient;
@@ -47,8 +48,18 @@ public class AddCrop implements Serializable {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         farmondto = clientService.callActiveHarvestListService(farmondto);
-        
+//        List<HarvestDTO> activeharvestlst = farmondto.getHarvestlist();
         activeHarvests = farmondto.getHarvestlist();
+       
+        farmondto = clientService.callDistinctHarInvService(farmondto);
+        List<HarvestDTO> existingharvests = farmondto.getHarvestlist();
+        
+        if (activeHarvests != null && existingharvests != null) {
+            Set<String> existingIds = existingharvests.stream()
+                                       .map(HarvestDTO::getHarvestid)
+                                       .collect(Collectors.toSet());
+            activeHarvests.removeIf(harvest -> existingIds.contains(harvest.getHarvestid()));
+        }
         entries = new ArrayList<>();
         // Add the initial empty pair of textboxes
         entries.add(new CropProductDTO());

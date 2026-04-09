@@ -25,6 +25,7 @@ public class MaintainCrop implements Serializable {
     private CropDTO selectedCrop;
     List<CropDTO> crops;
     private Map<String, Boolean> cropAddable = new HashMap<>();
+    private Map<String, Boolean> cropNotUpdatable = new HashMap<>();
     private Map<String, Boolean> cropDeletable = new HashMap<>();
     private Map<String, Boolean> cropActivatable = new HashMap<>();
     /**
@@ -41,9 +42,12 @@ public class MaintainCrop implements Serializable {
         for (CropDTO crop : crops) {
             boolean activatable = false;
             boolean addactivatable = false;
+            boolean notupdatable = false;
             if(crop.getEndDate()!=null){
                 activatable = true;
                 cropActivatable.put(crop.getCropId(), activatable);
+                notupdatable = true;
+                cropNotUpdatable.put(crop.getCropId(), notupdatable);
             } else {
                 addactivatable = true;
                 cropAddable.put(crop.getCropId(), addactivatable);
@@ -54,14 +58,17 @@ public class MaintainCrop implements Serializable {
         List<CropProductDTO> cropprodlist;
         for (CropDTO crop : crops) {
             boolean deletable = false;
+            boolean notupdatable = false;
             cropforstock.setCropId(crop.getCropId());
             farmondto.setCroprec(crop);
             farmondto = clientService.callNonzeroProdForCropService(farmondto);
             cropprodlist = farmondto.getCropprodlist();
             if(cropprodlist.isEmpty()){
                 deletable = true;
-            }                      
+                notupdatable = true;
+            }                     
             cropDeletable.put(crop.getCropId(), deletable);
+            cropNotUpdatable.put(crop.getCropId(), notupdatable);
         }
         
        
@@ -116,6 +123,12 @@ public class MaintainCrop implements Serializable {
         this.cropAddable = cropAddable;
     }
 
-    
+    public Map<String, Boolean> getCropNotUpdatable() {
+        return cropNotUpdatable;
+    }
+
+    public void setCropNotUpdatable(Map<String, Boolean> cropNotUpdatable) {
+        this.cropNotUpdatable = cropNotUpdatable;
+    }   
     
 }
