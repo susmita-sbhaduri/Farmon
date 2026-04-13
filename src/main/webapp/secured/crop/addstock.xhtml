@@ -75,43 +75,25 @@
                         <p:datePicker id="sdate" value="#{addStock.sdate}" pattern="yyyy-MM-dd"/>
                     </div>
 
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <p:commandButton styleClass="blue-button" 
                                          value="Add"
                                          actionListener="#{addStock.goToAddStock}"
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/maintaincrop" />
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Add Again"
+                                         action="#{addStock.goToAddAgainStock}"
+                                         process="@this" >                        
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:button icon="pi pi-times" value="Done" outcome="/secured/crop/maintaincrop" />
                     </div>
                 </div>
-                <!-- Confirmation dialog (same form) -->
-                <p:dialog id="saveConfirmDlg"
-                          widgetVar="saveConfirmDlg"
-                          header="Confirmation"
-                          modal="true"
-                          closable="false"
-                          resizable="false">
-                    <h:panelGroup id="confirmPanel">
-                        <h:outputText
-                            value="Total stock for #{addStock.selectedCropName} 
-                            for the Site-Harvest #{harvest.siteName}-#{harvest.harvestName}=#{addStock.quantity} #{addStock.unit}.
-                            Is that ok?" />
-                    </h:panelGroup>
-
-                    <p:separator />
-
-                    <p:commandButton value="Yes"
-                                     action="#{addStock.goToSaveRes()}"
-                                     update="@form"
-                                     oncomplete="PF('saveConfirmDlg').hide()" />
-
-                    <p:commandButton value="No"
-                                     type="button"
-                                     style="margin-left:10px"
-                                     onclick="PF('saveConfirmDlg').hide()" />
-                </p:dialog>
+                
             </h:form>
         </div>
     </ui:define>

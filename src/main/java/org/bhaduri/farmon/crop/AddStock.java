@@ -16,6 +16,7 @@ import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
@@ -34,7 +35,7 @@ public class AddStock implements Serializable {
 
     private String selectedCrop;
     private String selectedCropName;
-    private HarvestDTO selectedHarvest;
+    private String selectedHarvest;
     private List<HarvestDTO> harvestForCrop;
     private List<CropProductDTO> cropproducts;
     private CropProductDTO selectedProduct;    
@@ -65,7 +66,11 @@ public class AddStock implements Serializable {
         farmondto.setCropprodrec(cropprodrec);
         farmondto = clientService.callCropprodLstCropidService(farmondto);
         cropproducts = farmondto.getCropprodlist();
-        
+        if (cropproducts != null) {
+        for (CropProductDTO product : cropproducts) {
+            product.setTotalstock(""); // Note: Use "" if totalstock is still a String
+        }
+    }
     }
     
     public void onRowSelect(SelectEvent<CropProductDTO> event) {
@@ -80,54 +85,20 @@ public class AddStock implements Serializable {
             }
         }
     }
-    public void goToReviewRes() {
-//        FacesMessage message;
-//        FacesContext f = FacesContext.getCurrentInstance();
-//        if (selectedShop == null || selectedShop.trim().isEmpty()) {
-//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-//                    "Select one shop.");
-//            f.addMessage("shopid", message);
-//            return;
-//        }
-//        
-//        if(rate<=0){
-//           message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-//                    "Provide a non-zero rate.");
-//            f.addMessage("rate", message); 
-//            return;
-//        }
-//        
-//        if (amount <= 0) {
-//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-//                    "Provide non-zero purchase amount.");
-//            f.addMessage("amount", message);
-//            return;
-//        }
-//        
-//        if (purchaseDt == null) {
-//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-//                    "Purchase Date is a mandatory field.");
-//            f.addMessage("pdate", message);
-//            return;
-//        }
-//        
-//        float calculatedAmount = rate*amount;
-//        
-//        calcAmt = String.format("%.2f", calculatedAmount);
-//        PrimeFaces.current().executeScript("PF('saveConfirmDlg').show();");
-    }
+    
     
     public String goToAddStock() {
         
         String redirectUrl = "/secured/crop/maintaincrop?faces-redirect=true";
+        int sqlFlag = 0;
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
              
-        if (selectedHarvest == null) {
+        if (selectedHarvest == null||selectedHarvest.trim().isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Select one site and harvest.");
-            f.addMessage("harvestid", message);
+            f.addMessage(null, message);
             return redirectUrl;
         }
         
@@ -158,10 +129,28 @@ public class AddStock implements Serializable {
         inventoryrec.setInventoryId(String.valueOf(invid));
         inventoryrec.setCropId(selectedCrop);
         inventoryrec.setProductId(selectedProduct.getProductId());
-        inventoryrec.setHarvestId(selectedHarvest.getHarvestid());
+        inventoryrec.setHarvestId(selectedHarvest);
         inventoryrec.setCurrentQty(selectedProduct.getTotalstock());
         inventoryrec.setLastupdatedate(sdf.format(sdate));
         
+        farmondto.setInventoryrec(inventoryrec);
+        farmondto = clientService.callAddInvService(farmondto);
+        int invaddres = farmondto.getResponses().getFarmon_ADD_RES();
+        if (invaddres == SUCCESS) {
+            sqlFlag = sqlFlag + 1;
+        } else {
+            if (invaddres == DB_DUPLICATE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "The product is already added, product name =" + selectedProduct.getProductName());
+                f.addMessage(null, message);
+            }
+            if (invaddres == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "Failure on adding stock");
+                f.addMessage(null, message);
+            }
+            return redirectUrl;
+        }
         CropProductDTO cropprodrec = new CropProductDTO();
         cropprodrec.setCropId(selectedCrop);
         cropprodrec.setProductId(selectedProduct.getProductId());
@@ -170,30 +159,49 @@ public class AddStock implements Serializable {
         farmondto = clientService.callCropprodForCropProdService(farmondto);
         cropprodrec = farmondto.getCropprodrec();
         
-        
-        farmondto = clientService.callEditCropService(farmondto);
+        float appliedQuantity = Float.parseFloat(cropprodrec.getTotalstock());
+        appliedQuantity = appliedQuantity+Float.parseFloat(selectedProduct.getTotalstock());
+        cropprodrec.setTotalstock(String.format("%.2f", appliedQuantity));
+        farmondto.setCropprodrec(cropprodrec);        
+        farmondto = clientService.callEditCropProdService(farmondto);
         
         int response = farmondto.getResponses().getFarmon_EDIT_RES();
         if (response == SUCCESS) {
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                    "Crop is deleted successfully");
-            f.addMessage(null, message);
+            sqlFlag = sqlFlag + 1;            
            
         } else {
             if (response == DB_NON_EXISTING) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                         "Crop does not exist.");
+                         "Cropproduct does not exist.");
                 f.addMessage(null, message);
             }
             if (response == DB_SEVERE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                         "Failure on deleting crop");
+                         "Failure on editing cropproduct");
                 f.addMessage(null, message);
             }
-
+            farmondto.setInventoryrec(inventoryrec); 
+            farmondto = clientService.callDelInventoryRecService(farmondto);
+            int delinv = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delinv == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Inventory record could not be deleted");
+                f.addMessage(null, message);
+            }
+            return redirectUrl;
+        }
+        if (sqlFlag == 2) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                    "Stock added to inventory successfully.");
+            f.addMessage(null, message);
         }
         return redirectUrl;
         
+    }
+    
+    public String goToAddAgainStock() {        
+        String redirectUrl = "/secured/crop/addstock?faces-redirect=true&selectedCrop="+ selectedCrop;
+        return redirectUrl;
     }
 
     public String getSelectedCrop() {
@@ -212,13 +220,15 @@ public class AddStock implements Serializable {
         this.selectedCropName = selectedCropName;
     }
 
-    public HarvestDTO getSelectedHarvest() {
+    public String getSelectedHarvest() {
         return selectedHarvest;
     }
 
-    public void setSelectedHarvest(HarvestDTO selectedHarvest) {
+    public void setSelectedHarvest(String selectedHarvest) {
         this.selectedHarvest = selectedHarvest;
     }
+
+    
 
     public List<HarvestDTO> getHarvestForCrop() {
         return harvestForCrop;
