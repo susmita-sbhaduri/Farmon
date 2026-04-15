@@ -44,33 +44,33 @@ public class AddStock implements Serializable {
     
     public AddStock() {
     }
-    public void fillValues(){
-        FarmonDTO farmondto= new FarmonDTO();
+    public void fillValues() {
+        FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         CropDTO croprec = new CropDTO();
         croprec.setCropId(selectedCrop);
         farmondto.setCroprec(croprec);
-        farmondto = clientService.callCropRecService(farmondto); 
+        farmondto = clientService.callCropRecService(farmondto);
         croprec = farmondto.getCroprec();
         selectedCropName = croprec.getCropName();
 //        unit = croprec.getUnit();
-        
+
         InventoryDTO invrec = new InventoryDTO();
         invrec.setCropId(selectedCrop);
         farmondto.setInventoryrec(invrec);
         farmondto = clientService.callInvHarForCropService(farmondto);
         harvestForCrop = farmondto.getHarvestlist();
-        
+
         CropProductDTO cropprodrec = new CropProductDTO();
         cropprodrec.setCropId(selectedCrop);
         farmondto.setCropprodrec(cropprodrec);
         farmondto = clientService.callCropprodLstCropidService(farmondto);
         cropproducts = farmondto.getCropprodlist();
         if (cropproducts != null) {
-        for (CropProductDTO product : cropproducts) {
-            product.setTotalstock(""); // Note: Use "" if totalstock is still a String
+            for (CropProductDTO product : cropproducts) {
+                product.setTotalstock(""); // Note: Use "" if totalstock is still a String
+            }
         }
-    }
     }
     
     public void onRowSelect(SelectEvent<CropProductDTO> event) {

@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+               xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" />
+        <h4>Edit Last Stock for the Crop.</h4>
+        <f:metadata>
+            <f:viewParam name="selectedCrop" value="#{editStock.selectedCrop}"></f:viewParam>
+            <f:viewAction action="#{editStock.fillValues()}" />
+        </f:metadata>
+
+        <div class="card">
+            <h:form id="stockeditform" style="text-align: left">
+                <h5 style="text-align: center;">
+                    #{addStock.selectedCropName}
+                </h5> 
+                <div class="ui-g">                    
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="harvestid" value="Site and Harvest" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{editStock.harvestForCrop.siteName}-
+                                      #{editStock.harvestForCrop.harvestName}" style="font-weight:bold;"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="productid" value="Product Details" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:dataTable id="productTable" var="prodlist" 
+                                     value="#{editStock.cropproducts}"                                      
+                                     rowKey="#{prodlist.id}" 
+                                     style="font-size: 10px;">
+
+                            <p:ajax event="rowSelect" 
+                                    listener="#{addStock.onRowSelect}" 
+                                    update="productTable" />                            
+
+                            <p:column headerText="Product Name">
+                                <h:outputText value="#{prodlist.productName}" /> 
+                            </p:column>
+
+                            <p:column headerText="Amount">
+                                <p:inputText value="#{prodlist.totalstock}" 
+                                             disabled="#{addStock.selectedProduct == null 
+                                                         or addStock.selectedProduct.id != prodlist.id}" 
+                                             size="10">                                    
+                                    <p:keyFilter regEx="/[\d\.]/" />
+                                </p:inputText>
+                            </p:column>
+
+                            <p:column headerText="Unit">
+                                <h:outputText value="#{prodlist.unit}" /> 
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+                    
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="sdate" value="Stock Date" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:datePicker id="sdate" value="#{addStock.sdate}" pattern="yyyy-MM-dd"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Add"
+                                         actionListener="#{addStock.goToAddStock}"
+                                         update="@form growl" >                        
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Add Again"
+                                         action="#{addStock.goToAddAgainStock}"
+                                         process="@this" >                        
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:button icon="pi pi-times" value="Done" outcome="/secured/crop/maintaincrop" />
+                    </div>
+                </div>
+                
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
+
+
