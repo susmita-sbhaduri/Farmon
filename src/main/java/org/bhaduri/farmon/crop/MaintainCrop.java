@@ -78,7 +78,10 @@ public class MaintainCrop implements Serializable {
         String redirectUrl = "/secured/crop/addstock?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
         return redirectUrl;
     }
-    
+    public String updStock() {        
+        String redirectUrl = "/secured/crop/editstock?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
+        return redirectUrl;
+    }
     public String deleteCrop() {        
         String redirectUrl = "/secured/crop/deletecrop?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
         return redirectUrl;

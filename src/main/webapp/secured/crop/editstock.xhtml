@@ -18,7 +18,7 @@
         <div class="card">
             <h:form id="stockeditform" style="text-align: left">
                 <h5 style="text-align: center;">
-                    #{addStock.selectedCropName}
+                    #{editStock.selectedCropName}
                 </h5> 
                 <div class="ui-g">                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
@@ -28,62 +28,48 @@
                         <h:outputText value="#{editStock.harvestForCrop.siteName}-
                                       #{editStock.harvestForCrop.harvestName}" style="font-weight:bold;"/>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <h:outputLabel for="productid" value="Product Details" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:dataTable id="productTable" var="prodlist" 
-                                     value="#{editStock.cropproducts}"                                      
-                                     rowKey="#{prodlist.id}" 
+                    <div class="ui-g-12 ui-md-6 ui-lg-9">
+                        <p:dataTable id="productTable" var="invprodlist" 
+                                     value="#{editStock.inventories}"                                      
+                                     rowKey="#{invprodlist.inventoryId}" 
                                      style="font-size: 10px;">
 
-                            <p:ajax event="rowSelect" 
-                                    listener="#{addStock.onRowSelect}" 
-                                    update="productTable" />                            
-
                             <p:column headerText="Product Name">
-                                <h:outputText value="#{prodlist.productName}" /> 
+                                <h:outputText value="#{invprodlist.productName}" /> 
                             </p:column>
 
                             <p:column headerText="Amount">
-                                <p:inputText value="#{prodlist.totalstock}" 
-                                             disabled="#{addStock.selectedProduct == null 
-                                                         or addStock.selectedProduct.id != prodlist.id}" 
-                                             size="10">                                    
+                                <p:inputText value="#{invprodlist.currentQty}" size="10">                                    
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
-
+                            
                             <p:column headerText="Unit">
-                                <h:outputText value="#{prodlist.unit}" /> 
+                                <h:outputText value="#{invprodlist.productUnit}" /> 
+                            </p:column>
+
+                            <p:column headerText="Date">
+                                <p:datePicker id="sdate" value="#{invprodlist.lastupdatedate}" pattern="yyyy-MM-dd"/>
                             </p:column>
 
                         </p:dataTable>
                     </div>
                     
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="sdate" value="Stock Date" />
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:datePicker id="sdate" value="#{addStock.sdate}" pattern="yyyy-MM-dd"/>
-                    </div>
+                    
 
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
-                                         value="Add"
-                                         actionListener="#{addStock.goToAddStock}"
+                                         value="Edit"
+                                         actionListener="#{editStock.goToEditStock}"
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:commandButton styleClass="blue-button" 
-                                         value="Add Again"
-                                         action="#{addStock.goToAddAgainStock}"
-                                         process="@this" >                        
-                        </p:commandButton>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:button icon="pi pi-times" value="Done" outcome="/secured/crop/maintaincrop" />
+                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/maintaincrop" />
                     </div>
                 </div>
                 
