@@ -52,7 +52,7 @@
                             </p:column>
 
                             <p:column headerText="Date">
-                                <p:datePicker id="sdate" value="#{invprodlist.lastupdatedate}" pattern="yyyy-MM-dd"/>
+                                <p:inputText value="#{invprodlist.lastupdatedate}" type="date"/>
                             </p:column>
 
                         </p:dataTable>
@@ -62,7 +62,7 @@
 
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
-                                         value="Edit"
+                                         value="Save"
                                          actionListener="#{editStock.goToEditStock}"
                                          update="@form growl" >                        
                         </p:commandButton>

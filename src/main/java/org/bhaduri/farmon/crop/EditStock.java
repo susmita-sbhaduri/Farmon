@@ -39,6 +39,7 @@ public class EditStock implements Serializable {
     private HarvestDTO harvestForCrop;
     private List<CropProductDTO> cropproducts;
     private List<InvDetails> inventories;
+    private List<String> existingAmounts;
     
     public EditStock() {
     }
@@ -66,6 +67,7 @@ public class EditStock implements Serializable {
         if (cropproducts != null) {
             InvDetails invdetailsrec;
             inventories = new ArrayList<>();
+            existingAmounts = new ArrayList<>();
             for (CropProductDTO product : cropproducts) {
                 invdetailsrec = new InvDetails();
                 invdetailsrec.setCropId(selectedCrop);
@@ -75,6 +77,7 @@ public class EditStock implements Serializable {
                 farmondto = clientService.callLatestInvForCropService(farmondto);
                 invdetailsrec = farmondto.getInvdetailsrec();
                 inventories.add(invdetailsrec);
+                existingAmounts.add(invdetailsrec.getCurrentQty());
             }
         }
     }
@@ -86,96 +89,52 @@ public class EditStock implements Serializable {
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        InventoryDTO inventoryrec;   
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        InventoryDTO inventoryrec; 
+        CropProductDTO cropprodrec;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        for (InvDetails inventory : inventories) {
+        int inveditres;
+        int invrec = 0;
+        String oldAmount;
+        for (int i = 0; i < inventories.size(); i++) {
+            InvDetails inventory = inventories.get(i);
+            oldAmount = existingAmounts.get(i);
+            
             inventoryrec = new InventoryDTO();
+            cropprodrec = new CropProductDTO();
             inventoryrec.setInventoryId(inventory.getInventoryId());
             inventoryrec.setCropId(inventory.getCropId());
             inventoryrec.setProductId(inventory.getProductId());
             inventoryrec.setHarvestId(inventory.getHarvestId());
             inventoryrec.setCurrentQty(inventory.getCurrentQty());
-            inventoryrec.setLastupdatedate(sdf.format(inventory.getLastupdatedate()));
+            inventoryrec.setLastupdatedate(inventory.getLastupdatedate());
             farmondto.setInventoryrec(inventoryrec);
-            farmondto = clientService.callLatestInvForCropService(farmondto);
-            invdetailsrec = farmondto.getInvdetailsrec();
-            inventories.add(invdetailsrec);
+            farmondto = clientService.callEditInvService(farmondto);
+            inveditres = farmondto.getResponses().getFarmon_EDIT_RES();
+            if (inveditres == SUCCESS) {                
+                cropprodrec.setCropId(inventory.getCropId());
+                cropprodrec.setProductId(inventory.getProductId());
+                farmondto.setCropprodrec(cropprodrec);
+                farmondto.setCropprodrec(cropprodrec);
+                farmondto = clientService.callCropprodForCropProdService(farmondto);
+                cropprodrec = farmondto.getCropprodrec();
+
+                float quantity = Float.parseFloat(cropprodrec.getTotalstock());                
+                quantity = quantity - Float.parseFloat(oldAmount)+Float.parseFloat(inventory.getCurrentQty());
+                cropprodrec.setTotalstock(String.format("%.2f", quantity));
+                farmondto.setCropprodrec(cropprodrec);
+                farmondto = clientService.callEditCropProdService(farmondto);
+                int response = farmondto.getResponses().getFarmon_EDIT_RES();
+                if (response == SUCCESS) {
+                    invrec = invrec + 1;
+                } else {
+                    break;
+                }
+            }
         }
-        FarmonDTO farmondto= new FarmonDTO();
-        FarmonClient clientService = new FarmonClient();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        InventoryDTO inventoryrec = new InventoryDTO();
-        farmondto = clientService.callMaxInvIdService(farmondto);
-        int invid = Integer.parseInt(farmondto.getInventoryrec().getInventoryId());
-        if (invid == 0) {
-            invid = 1;
-        } else {
-            invid = invid + 1;
-        }
-        inventoryrec.setInventoryId(String.valueOf(invid));
-        inventoryrec.setCropId(selectedCrop);
-        inventoryrec.setProductId(selectedProduct.getProductId());
-        inventoryrec.setHarvestId(selectedHarvest);
-        inventoryrec.setCurrentQty(selectedProduct.getTotalstock());
-        inventoryrec.setLastupdatedate(sdf.format(sdate));
         
-        farmondto.setInventoryrec(inventoryrec);
-        farmondto = clientService.callAddInvService(farmondto);
-        int invaddres = farmondto.getResponses().getFarmon_ADD_RES();
-        if (invaddres == SUCCESS) {
-            sqlFlag = sqlFlag + 1;
-        } else {
-            if (invaddres == DB_DUPLICATE) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                        "The product is already added, product name =" + selectedProduct.getProductName());
-                f.addMessage(null, message);
-            }
-            if (invaddres == DB_SEVERE) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                        "Failure on adding stock");
-                f.addMessage(null, message);
-            }
-            return redirectUrl;
-        }
-        CropProductDTO cropprodrec = new CropProductDTO();
-        cropprodrec.setCropId(selectedCrop);
-        cropprodrec.setProductId(selectedProduct.getProductId());
         
-        farmondto.setCropprodrec(cropprodrec);
-        farmondto = clientService.callCropprodForCropProdService(farmondto);
-        cropprodrec = farmondto.getCropprodrec();
-        
-        float appliedQuantity = Float.parseFloat(cropprodrec.getTotalstock());
-        appliedQuantity = appliedQuantity+Float.parseFloat(selectedProduct.getTotalstock());
-        cropprodrec.setTotalstock(String.format("%.2f", appliedQuantity));
-        farmondto.setCropprodrec(cropprodrec);        
-        farmondto = clientService.callEditCropProdService(farmondto);
-        
-        int response = farmondto.getResponses().getFarmon_EDIT_RES();
-        if (response == SUCCESS) {
-            sqlFlag = sqlFlag + 1;            
-           
-        } else {
-            if (response == DB_NON_EXISTING) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                         "Cropproduct does not exist.");
-                f.addMessage(null, message);
-            }
-            if (response == DB_SEVERE) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                         "Failure on editing cropproduct");
-                f.addMessage(null, message);
-            }
-            farmondto.setInventoryrec(inventoryrec); 
-            farmondto = clientService.callDelInventoryRecService(farmondto);
-            int delinv = farmondto.getResponses().getFarmon_DEL_RES();
-            if (delinv == DB_SEVERE) {
-                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                        "Inventory record could not be deleted");
-                f.addMessage(null, message);
-            }
-            return redirectUrl;
-        }
         if (sqlFlag == 2) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
                     "Stock added to inventory successfully.");
@@ -231,6 +190,14 @@ public class EditStock implements Serializable {
 
     public void setInventories(List<InvDetails> inventories) {
         this.inventories = inventories;
+    }
+
+    public List<String> getExistingAmounts() {
+        return existingAmounts;
+    }
+
+    public void setExistingAmounts(List<String> existingAmounts) {
+        this.existingAmounts = existingAmounts;
     }
     
     
