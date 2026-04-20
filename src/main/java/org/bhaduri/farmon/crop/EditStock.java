@@ -76,8 +76,10 @@ public class EditStock implements Serializable {
                 farmondto.setInvdetailsrec(invdetailsrec);
                 farmondto = clientService.callLatestInvForCropService(farmondto);
                 invdetailsrec = farmondto.getInvdetailsrec();
-                inventories.add(invdetailsrec);
-                existingAmounts.add(invdetailsrec.getCurrentQty());
+                if(invdetailsrec!=null){
+                    inventories.add(invdetailsrec);
+                    existingAmounts.add(invdetailsrec.getCurrentQty());
+                }
             }
         }
     }
@@ -116,7 +118,6 @@ public class EditStock implements Serializable {
                 cropprodrec.setCropId(inventory.getCropId());
                 cropprodrec.setProductId(inventory.getProductId());
                 farmondto.setCropprodrec(cropprodrec);
-                farmondto.setCropprodrec(cropprodrec);
                 farmondto = clientService.callCropprodForCropProdService(farmondto);
                 cropprodrec = farmondto.getCropprodrec();
 
@@ -134,10 +135,12 @@ public class EditStock implements Serializable {
             }
         }
         
-        
-        if (sqlFlag == 2) {
+        if(invrec == inventories.size()){
+            sqlFlag = sqlFlag+1;
+        } 
+        if (sqlFlag == 1) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                    "Stock added to inventory successfully.");
+                    "Last Stock updated in inventory successfully.");
             f.addMessage(null, message);
         }
         return redirectUrl;
