@@ -14,50 +14,33 @@
         &nbsp;&nbsp;&nbsp;       
         
         <f:metadata>
-            <f:viewAction action="#{maintainCrop.fillValues()}" />
+            <f:viewAction action="#{maintainSales.fillValues()}" />
         </f:metadata>
 
         <div class="card">            
             <h:form id="cropgrid" style="text-align: center">                
-                <p:dataTable var="crop" value="#{maintainCrop.crops}" reflow="true">
+                <p:dataTable var="crop" value="#{maintainSales.crops}" reflow="true">
                     
                     <p:column headerText="Crop Name">
                         <h:outputText value="#{crop.cropName}" />
                     </p:column>
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
-                                         value="Add Stock"
-                                         action="#{maintainCrop.addStock()}" 
-                                         disabled="#{not maintainCrop.cropAddable[crop.cropId]}">
-                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
+                                         value="Add Sales"
+                                         action="#{maintainSales.addSales()}" 
+                                         disabled="#{not maintainSales.salesAddable[crop.cropId]}">
+                            <f:setPropertyActionListener value="#{crop}" target="#{maintainSales.selectedCrop}" />
                         </p:commandButton>
                     </p:column>
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
-                                         value="Update Last Stock"
-                                         action="#{maintainCrop.updStock()}" 
-                                         disabled="#{maintainCrop.cropNotUpdatable[crop.cropId]}">
-                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
+                                         value="Update Last Sales"
+                                         action="#{maintainSales.updSales()}" 
+                                         disabled="#{not maintainSales.salesAddable[crop.cropId]}">
+                            <f:setPropertyActionListener value="#{crop}" target="#{maintainSales.selectedCrop}" />
                         </p:commandButton>
                     </p:column>
-                    <p:column>
-                        <p:commandButton styleClass="blue-button" 
-                                         value="Activate"
-                                         action="#{maintainCrop.activateCrop()}" 
-                                         disabled="#{not maintainCrop.cropActivatable[crop.cropId]}"
-                                         >
-                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
-                        </p:commandButton>
-                    </p:column>
-                    <p:column>
-                        <p:commandButton styleClass="blue-button" 
-                                         value="Delete"
-                                         action="#{maintainCrop.deleteCrop()}" 
-                                         disabled="#{not maintainCrop.cropDeletable[crop.cropId]}"
-                                         >
-                            <f:setPropertyActionListener value="#{crop}" target="#{maintainCrop.selectedCrop}" />
-                        </p:commandButton>
-                    </p:column>
+                    
                     
                 </p:dataTable>
             </h:form>

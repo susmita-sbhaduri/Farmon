@@ -41,17 +41,17 @@ public class MaintainCrop implements Serializable {
         crops = farmondto.getCroplist(); 
         for (CropDTO crop : crops) {
             boolean activatable = false;
-            boolean addactivatable = false;
+            boolean addable = false;
             boolean notupdatable = false;
             if(crop.getEndDate()!=null){
-                activatable = true;
-                cropActivatable.put(crop.getCropId(), activatable);
-                notupdatable = true;
-                cropNotUpdatable.put(crop.getCropId(), notupdatable);
+                activatable = true;                
+                notupdatable = true;                
             } else {
-                addactivatable = true;
-                cropAddable.put(crop.getCropId(), addactivatable);
+                addable = true;                
             }
+            cropActivatable.put(crop.getCropId(), activatable);
+            cropNotUpdatable.put(crop.getCropId(), notupdatable);
+            cropAddable.put(crop.getCropId(), addable);
         }
 //      Crops which have stock in cropproduct cannot be deleted
         CropDTO cropforstock = new CropDTO();
