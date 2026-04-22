@@ -5,7 +5,6 @@
 package org.bhaduri.farmon.crop;
 
 import jakarta.inject.Named;
-import jakarta.enterprise.context.Dependent;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -17,9 +16,6 @@ import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
-import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
-import static org.farmon.farmondto.FarmonResponseCodes.DB_NON_EXISTING;
-import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InvDetails;

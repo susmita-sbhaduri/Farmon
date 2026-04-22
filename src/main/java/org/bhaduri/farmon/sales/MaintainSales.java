@@ -34,7 +34,7 @@ public class MaintainSales implements Serializable {
         farmondto = clientService.callActiveCropLstService(farmondto);
         crops = farmondto.getCroplist(); 
         
-//      Crops which have stock in cropproduct cannot be deleted
+//      Active crops which have stock can be sold
         CropDTO cropforstock = new CropDTO();
         List<CropProductDTO> cropprodlist;
         for (CropDTO crop : crops) {
@@ -49,7 +49,10 @@ public class MaintainSales implements Serializable {
             salesAddable.put(crop.getCropId(), addable);
         }
     }
-
+    public String addSales() {        
+        String redirectUrl = "/secured/sales/addsales?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
+        return redirectUrl;
+    }
     public CropDTO getSelectedCrop() {
         return selectedCrop;
     }
