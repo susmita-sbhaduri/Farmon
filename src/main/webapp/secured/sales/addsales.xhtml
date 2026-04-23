@@ -30,7 +30,9 @@
                             <f:selectItems value="#{addSales.harvestForCrop}" 
                                            var="harvest"
                                            itemLabel="#{harvest.siteName}-#{harvest.harvestName}" 
-                                           itemValue="#{harvest.harvestid}"/>                            
+                                           itemValue="#{harvest.harvestid}"/> 
+                            <p:ajax event="valueChange" listener="#{addSales.onSiteHarSelect}" 
+                                    update="productTable"/>
                         </p:selectOneRadio>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
@@ -50,6 +52,10 @@
 
                             <p:column headerText="Product Name">
                                 <h:outputText value="#{prodlist.productname}" /> 
+                            </p:column>
+                            
+                            <p:column headerText="Current Qty">
+                                <h:outputText value="#{prodlist.currentInventoryQty}" /> 
                             </p:column>
 
                             <p:column headerText="Qty sold">
@@ -88,7 +94,7 @@
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <p:commandButton styleClass="blue-button" 
                                          value="Add"
-                                         actionListener="#{addSales.goToAddStock}"
+                                         actionListener="#{addSales.goToAddSales}"
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>

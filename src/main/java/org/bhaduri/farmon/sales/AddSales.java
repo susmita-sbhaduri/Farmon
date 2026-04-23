@@ -4,9 +4,12 @@
  */
 package org.bhaduri.farmon.sales;
 
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,6 +73,7 @@ public class AddSales implements Serializable {
                 salesrec.setProductname(product.getProductName());
                 salesrec.setProdunit(product.getUnit());
                 salesrec.setQuantitySold("");
+                salesrec.setCurrentInventoryQty("");
                 salesrec.setPriceperUnit("");
                 salesrecords.add(salesrec);
             }
@@ -88,7 +92,62 @@ public class AddSales implements Serializable {
             }
         }
     }
-
+    
+    public void onSiteHarSelect() {
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        for (SalesDTO record : salesrecords) {
+            InventoryDTO inventoryrec = new InventoryDTO();
+            inventoryrec.setCropId(selectedCrop);
+            inventoryrec.setProductId(record.getProdId());
+            inventoryrec.setHarvestId(this.selectedHarvest);
+            farmondto.setInventoryrec(inventoryrec);
+            farmondto = clientService.callSumFortHarCropProdService(farmondto);
+            record.setCurrentInventoryQty(farmondto.getInventoryrec().getCurrentQty());
+        }
+    }
+    
+//    public String goToAddSales() {
+        
+//        String redirectUrl = "/secured/sales/maintainsales?faces-redirect=true";
+//        int sqlFlag = 0;
+//        FacesMessage message;
+//        FacesContext f = FacesContext.getCurrentInstance();
+//        f.getExternalContext().getFlash().setKeepMessages(true);
+//             
+//        if (selectedHarvest == null||selectedHarvest.trim().isEmpty()) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Select one site and harvest.");
+//            f.addMessage(null, message);
+//            return redirectUrl;
+//        }
+//        
+//        if (selectedProduct == null) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Select one Product.");
+//            f.addMessage(null, message);
+//            return redirectUrl;
+//        }
+//        
+//        if (selectedProduct.getQuantitySold() == null|| selectedProduct.getQuantitySold().trim().isEmpty()) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Provide a quantity sold for the product selected.");
+//            f.addMessage(null, message);
+//            return redirectUrl;
+//        }
+//        
+//        if (selectedProduct.getPriceperUnit() == null|| selectedProduct.getPriceperUnit().trim().isEmpty()) {
+//            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+//                    "Provide the price per unit for the product selected.");
+//            f.addMessage(null, message);
+//            return redirectUrl;
+//        }
+//        FarmonDTO farmondto= new FarmonDTO();
+//        FarmonClient clientService = new FarmonClient();
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        InventoryDTO inventoryrec = new InventoryDTO();
+//    }
+    
     public String getSelectedCrop() {
         return selectedCrop;
     }
