@@ -22,7 +22,6 @@ import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InventoryDTO;
-import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -199,10 +198,10 @@ public class AddStock implements Serializable {
         
     }
     
-    public String goToAddAgainStock() {        
-        String redirectUrl = "/secured/crop/addstock?faces-redirect=true&selectedCrop="+ selectedCrop;
-        return redirectUrl;
-    }
+//    public String goToAddAgainStock() {        
+//        String redirectUrl = "/secured/crop/addstock?faces-redirect=true&selectedCrop="+ selectedCrop;
+//        return redirectUrl;
+//    }
 
     public String getSelectedCrop() {
         return selectedCrop;

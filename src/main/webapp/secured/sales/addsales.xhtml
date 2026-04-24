@@ -93,18 +93,12 @@
 
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <p:commandButton styleClass="blue-button" 
-                                         value="Add"
+                                         value="Sale"
                                          actionListener="#{addSales.goToAddSales}"
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:commandButton styleClass="blue-button" 
-                                         value="Add Again"
-                                         action="#{addSales.goToAddAgainStock}"
-                                         process="@this" >                        
-                        </p:commandButton>
-                    </div>
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <p:button icon="pi pi-times" value="Done" outcome="/secured/crop/maintaincrop" />
                     </div>

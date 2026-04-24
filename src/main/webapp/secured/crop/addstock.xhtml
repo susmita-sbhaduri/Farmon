@@ -75,21 +75,15 @@
                         <p:datePicker id="sdate" value="#{addStock.sdate}" pattern="yyyy-MM-dd"/>
                     </div>
 
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Add"
                                          actionListener="#{addStock.goToAddStock}"
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:commandButton styleClass="blue-button" 
-                                         value="Add Again"
-                                         action="#{addStock.goToAddAgainStock}"
-                                         process="@this" >                        
-                        </p:commandButton>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                   
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:button icon="pi pi-times" value="Done" outcome="/secured/crop/maintaincrop" />
                     </div>
                 </div>
