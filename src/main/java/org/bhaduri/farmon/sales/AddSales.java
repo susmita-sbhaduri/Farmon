@@ -43,7 +43,7 @@ public class AddSales implements Serializable {
     private List<CropProductDTO> cropproducts;
     private List<SalesDTO> salesrecords;
     private SalesDTO selectedProduct;    
-    private String stock;
+    private String oldcropprodstock;
     private Date sdate = new Date();
     
     public AddSales() {
@@ -102,15 +102,41 @@ public class AddSales implements Serializable {
     public void onSiteHarSelect() {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        for (SalesDTO record : salesrecords) {
-            InventoryDTO inventoryrec = new InventoryDTO();
-            inventoryrec.setCropId(selectedCrop);
-            inventoryrec.setProductId(record.getProdId());
-            inventoryrec.setHarvestId(this.selectedHarvest);
-            farmondto.setInventoryrec(inventoryrec);
-            farmondto = clientService.callSumFortHarCropProdService(farmondto);
-            record.setCurrentInventoryQty(farmondto.getInventoryrec().getCurrentQty());
+         List<SalesDTO> activesalesrecords = new ArrayList<>();
+        if (cropproducts != null) {
+            SalesDTO salesrec;
+            for (CropProductDTO product : cropproducts) {
+                InventoryDTO inventoryrec = new InventoryDTO();
+                inventoryrec.setCropId(selectedCrop);
+                inventoryrec.setProductId(product.getProductId());
+                inventoryrec.setHarvestId(this.selectedHarvest);
+                farmondto.setInventoryrec(inventoryrec);
+                farmondto = clientService.callSumFortHarCropProdService(farmondto);
+                String qtyString = farmondto.getInventoryrec().getCurrentQty();
+                boolean hasStock = false;
+                if (qtyString != null && !qtyString.trim().isEmpty()) {
+                    BigDecimal qty = new BigDecimal(qtyString.trim());
+                    if (qty.compareTo(BigDecimal.ZERO) > 0) {
+                        hasStock = true;
+                    }
+                }
+                if (hasStock) {
+                    salesrec = new SalesDTO();
+                    salesrec.setCropId(selectedCrop);
+                    salesrec.setProdId(product.getProductId());
+                    salesrec.setProductname(product.getProductName());
+                    salesrec.setProdunit(product.getUnit());
+                    salesrec.setQuantitySold("");
+                    salesrec.setCurrentInventoryQty(qtyString);
+                    salesrec.setPriceperUnit("");
+                    activesalesrecords.add(salesrec);
+                }
+            }
         }
+        salesrecords=activesalesrecords;
+        // 7. Safety cleanup: Reset the selected row just in case the row they 
+    // had previously clicked on was just hidden!
+        this.selectedProduct = null;
     }
     
     public String goToAddSales() {
@@ -201,11 +227,11 @@ public class AddSales implements Serializable {
         cropprodrec = farmondto.getCropprodrec();
         
         float appliedQuantity = Float.parseFloat(cropprodrec.getTotalstock());
+        oldcropprodstock = cropprodrec.getTotalstock();
         appliedQuantity = appliedQuantity+Float.parseFloat("-"+selectedProduct.getQuantitySold());
         cropprodrec.setTotalstock(String.format("%.2f", appliedQuantity));
         farmondto.setCropprodrec(cropprodrec);        
-        farmondto = clientService.callEditCropProdService(farmondto);
-        
+        farmondto = clientService.callEditCropProdService(farmondto);        
         int response = farmondto.getResponses().getFarmon_EDIT_RES();
         if (response == SUCCESS) {
             sqlFlag = sqlFlag + 1; 
@@ -228,6 +254,7 @@ public class AddSales implements Serializable {
                         "Inventory record could not be deleted");
                 f.addMessage(null, message);
             }
+            
             return redirectUrl;
         }
         SalesDTO salesrecord = new SalesDTO();
@@ -247,23 +274,40 @@ public class AddSales implements Serializable {
         
         farmondto.setSalesrec(salesrecord);
         farmondto = clientService.callAddSalesService(farmondto);
-        int invaddres = farmondto.getResponses().getFarmon_ADD_RES();
-        if (invaddres == SUCCESS) {
+        int salesaddres = farmondto.getResponses().getFarmon_ADD_RES();
+        if (salesaddres == SUCCESS) {
             sqlFlag = sqlFlag + 1;
         } else {
-            if (invaddres == DB_DUPLICATE) {
+            if (salesaddres == DB_DUPLICATE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                        "The product is already added, product name =" + selectedProduct.getProductname());
+                        "The sales is already added for the product name =" + selectedProduct.getProductname());
                 f.addMessage(null, message);
             }
             if (invaddres == DB_SEVERE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                        "Failure on adding stock");
+                        "Failure on adding sales");
+                f.addMessage(null, message);
+            }
+            farmondto.setInventoryrec(inventoryrec); 
+            farmondto = clientService.callDelInventoryRecService(farmondto);
+            int delinv = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delinv == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Inventory record could not be deleted");
+                f.addMessage(null, message);
+            }
+            cropprodrec.setTotalstock(oldcropprodstock);
+            farmondto.setCropprodrec(cropprodrec);
+            farmondto = clientService.callEditCropProdService(farmondto);        
+            int editcropprod = farmondto.getResponses().getFarmon_EDIT_RES();
+            if (editcropprod == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Cropprod record could not be updated");
                 f.addMessage(null, message);
             }
             return redirectUrl;
         }
-        //        contruction of expense record
+        //contruction of expense record
         ExpenseDTO expenseRec = new ExpenseDTO();
         farmondto = clientService.callMaxExpIdService(farmondto);
         int expenseid = Integer.parseInt(farmondto.getExpenserec().getExpenseId());
@@ -275,11 +319,60 @@ public class AddSales implements Serializable {
         expenseRec.setDate(sdf.format(sdate));
         expenseRec.setExpenseType("SALE");
         float rate = Float.parseFloat("-"+selectedProduct.getPriceperUnit());
-        appliedQuantity = Float.parseFloat(cropprodrec.getTotalstock());
-        expenseRec.setExpenseRefId(resAcquireRec.getAcquireId()); //######resourcecrop acq id
+        appliedQuantity = Float.parseFloat(selectedProduct.getQuantitySold());
+        expenseRec.setExpenseRefId(salesrecord.getSalesId()); //######resourcecrop acq id
         float totalSalesAmt = rate * appliedQuantity;
         expenseRec.setExpenditure(String.format("%.2f", totalSalesAmt));
         expenseRec.setCommString("");
+        farmondto.setExpenserec(expenseRec);
+        farmondto = clientService.callAddExpService(farmondto);
+        int expres = farmondto.getResponses().getFarmon_ADD_RES();
+        if (expres == SUCCESS) {
+            sqlFlag = sqlFlag + 1;
+        } else {
+            if (expres == DB_DUPLICATE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "The expense record is already added for the product name =" + selectedProduct.getProductname());
+                f.addMessage(null, message);
+            }
+            if (invaddres == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                        "Failure on adding expense record.");
+                f.addMessage(null, message);
+            }
+            farmondto.setInventoryrec(inventoryrec); 
+            farmondto = clientService.callDelInventoryRecService(farmondto);
+            int delinv = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delinv == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Inventory record could not be deleted");
+                f.addMessage(null, message);
+            }
+            cropprodrec.setTotalstock(oldcropprodstock);
+            farmondto.setCropprodrec(cropprodrec);
+            farmondto = clientService.callEditCropProdService(farmondto);        
+            int editcropprod = farmondto.getResponses().getFarmon_EDIT_RES();
+            if (editcropprod == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Cropprod record could not be updated");
+                f.addMessage(null, message);
+            }
+            farmondto.setSalesrec(salesrecord); 
+            farmondto = clientService.callDelSalesRecService(farmondto);
+            int delsales = farmondto.getResponses().getFarmon_DEL_RES();
+            if (delsales == DB_SEVERE) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Sales record could not be deleted");
+                f.addMessage(null, message);
+            }
+            return redirectUrl;
+        }
+        if (sqlFlag == 4) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                    "Sales performed successfully.");
+            f.addMessage(null, message);
+        }
+        
         return redirectUrl;
     }
     
@@ -339,12 +432,12 @@ public class AddSales implements Serializable {
         this.selectedProduct = selectedProduct;
     }
 
-    public String getStock() {
-        return stock;
+    public String getOldcropprodstock() {
+        return oldcropprodstock;
     }
 
-    public void setStock(String stock) {
-        this.stock = stock;
+    public void setOldcropprodstock(String oldcropprodstock) {
+        this.oldcropprodstock = oldcropprodstock;
     }
 
     public Date getSdate() {
