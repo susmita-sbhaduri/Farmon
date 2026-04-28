@@ -111,7 +111,7 @@ public class AddSales implements Serializable {
                 inventoryrec.setProductId(product.getProductId());
                 inventoryrec.setHarvestId(this.selectedHarvest);
                 farmondto.setInventoryrec(inventoryrec);
-                farmondto = clientService.callSumFortHarCropProdService(farmondto);
+                farmondto = clientService.callSumForHarCropProdService(farmondto);
                 String qtyString = farmondto.getInventoryrec().getCurrentQty();
                 boolean hasStock = false;
                 if (qtyString != null && !qtyString.trim().isEmpty()) {

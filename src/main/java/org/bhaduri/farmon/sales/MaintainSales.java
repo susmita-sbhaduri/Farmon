@@ -53,6 +53,10 @@ public class MaintainSales implements Serializable {
         String redirectUrl = "/secured/sales/addsales?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
         return redirectUrl;
     }
+    public String updSales() {        
+        String redirectUrl = "/secured/sales/editsales?faces-redirect=true&selectedCrop="+ selectedCrop.getCropId();
+        return redirectUrl;
+    }
     public CropDTO getSelectedCrop() {
         return selectedCrop;
     }
