@@ -43,28 +43,28 @@
                             </p:column>
                             
                             <p:column headerText="Current Qty">
-                                <h:outputText value="#{prodlist.currentInventoryQty}" /> 
+                                <h:outputText value="#{prodlist.currentInventoryQty}" style="width: 110px;"/> 
                             </p:column>
 
                             <p:column headerText="Qty sold">
-                                <p:inputText value="#{prodlist.quantitySold}" size="10">                                    
+                                <p:inputText value="#{prodlist.quantitySold}" size="10" style="width: 110px;">                                    
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
 
                             <p:column headerText="Unit">
-                                <h:outputText value="#{prodlist.produnit}" />
+                                <h:outputText value="#{prodlist.produnit}" style="width: 110px;"/>
                                 
                             </p:column>
                             
                             <p:column headerText="Price(Rs.)/unit">                                
-                                <p:inputText value="#{prodlist.priceperUnit}" size="10"> 
+                                <p:inputText value="#{prodlist.priceperUnit}" size="10" style="width: 110px;"> 
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
                             
                             <p:column headerText="Date">
-                                <p:inputText value="#{prodlist.salesDate}" type="date"/>
+                                <p:inputText value="#{prodlist.salesDate}" type="date" style="width: 110px;"/>
                             </p:column>
                         </p:dataTable>
                     </div>
@@ -78,7 +78,7 @@
                     </div>
                     
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:button icon="pi pi-times" value="cancel" outcome="/secured/sales/maintaincrop" />
+                        <p:button icon="pi pi-times" value="cancel" outcome="/secured/sales/maintainsales" />
                     </div>
                 </div>
                 

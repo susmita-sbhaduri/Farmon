@@ -98,7 +98,6 @@ public class EditStock implements Serializable {
         for (int i = 0; i < inventories.size(); i++) {
             InvDetails inventory = inventories.get(i);
             oldAmount = existingAmounts.get(i);
-            
             inventoryrec = new InventoryDTO();
             cropprodrec = new CropProductDTO();
             inventoryrec.setInventoryId(inventory.getInventoryId());
@@ -106,6 +105,12 @@ public class EditStock implements Serializable {
             inventoryrec.setProductId(inventory.getProductId());
             inventoryrec.setHarvestId(inventory.getHarvestId());
             inventoryrec.setCurrentQty(inventory.getCurrentQty());
+            if (inventory.getCurrentQty() == null || inventory.getCurrentQty().trim().isEmpty()) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Please provide a non-zero amount.");
+                f.addMessage(null, message);
+                return redirectUrl;
+            }
             inventoryrec.setLastupdatedate(inventory.getLastupdatedate());
             farmondto.setInventoryrec(inventoryrec);
             farmondto = clientService.callEditInvService(farmondto);

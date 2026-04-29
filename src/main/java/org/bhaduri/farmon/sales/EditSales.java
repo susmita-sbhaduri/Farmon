@@ -4,16 +4,20 @@
  */
 package org.bhaduri.farmon.sales;
 
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
+import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InvDetails;
 import org.farmon.farmondto.InventoryDTO;
@@ -48,9 +52,9 @@ public class EditSales implements Serializable {
         croprec = farmondto.getCroprec();
         selectedCropName = croprec.getCropName();
 
-        SalesDTO salesrec = new SalesDTO();
-        salesrec.setCropId(selectedCrop);
-        farmondto.setSalesrec(salesrec);
+        SalesDTO salesrecord = new SalesDTO();
+        salesrecord.setCropId(selectedCrop);
+        farmondto.setSalesrec(salesrecord);
         farmondto = clientService.callLastSalesHarForCropService(farmondto);
         harvestForCrop = farmondto.getHarvestrecord();
 
@@ -83,12 +87,74 @@ public class EditSales implements Serializable {
                 salesrec.setCurrentInventoryQty(qtyString);
                 salesrecords.add(salesrec);
                 existingAmounts.add(salesrec.getQuantitySold());
-                existPriceperUnit.add(salesrec.getPriceperUnit());
-                
+                existPriceperUnit.add(salesrec.getPriceperUnit());                
             }
         }
     }
+    
+    public String goToEditSales() {
+        
+        String redirectUrl = "/secured/sales/maintainsales?faces-redirect=true";
+        int sqlFlag = 0;
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true);
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        InventoryDTO inventoryrec; 
+        CropProductDTO cropprodrec;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        int inveditres;
+        int invrec = 0;
+        String oldAmount;
+        for (int i = 0; i < salesrecords.size(); i++) {
+            InvDetails inventory = inventories.get(i);
+            oldAmount = existingAmounts.get(i);
+            
+            inventoryrec = new InventoryDTO();
+            cropprodrec = new CropProductDTO();
+            inventoryrec.setInventoryId(inventory.getInventoryId());
+            inventoryrec.setCropId(inventory.getCropId());
+            inventoryrec.setProductId(inventory.getProductId());
+            inventoryrec.setHarvestId(inventory.getHarvestId());
+            inventoryrec.setCurrentQty(inventory.getCurrentQty());
+            inventoryrec.setLastupdatedate(inventory.getLastupdatedate());
+            farmondto.setInventoryrec(inventoryrec);
+            farmondto = clientService.callEditInvService(farmondto);
+            inveditres = farmondto.getResponses().getFarmon_EDIT_RES();
+            if (inveditres == SUCCESS) {                
+                cropprodrec.setCropId(inventory.getCropId());
+                cropprodrec.setProductId(inventory.getProductId());
+                farmondto.setCropprodrec(cropprodrec);
+                farmondto = clientService.callCropprodForCropProdService(farmondto);
+                cropprodrec = farmondto.getCropprodrec();
 
+                float quantity = Float.parseFloat(cropprodrec.getTotalstock());                
+                quantity = quantity - Float.parseFloat(oldAmount)+Float.parseFloat(inventory.getCurrentQty());
+                cropprodrec.setTotalstock(String.format("%.2f", quantity));
+                farmondto.setCropprodrec(cropprodrec);
+                farmondto = clientService.callEditCropProdService(farmondto);
+                int response = farmondto.getResponses().getFarmon_EDIT_RES();
+                if (response == SUCCESS) {
+                    invrec = invrec + 1;
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        if(invrec == inventories.size()){
+            sqlFlag = sqlFlag+1;
+        } 
+        if (sqlFlag == 1) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                    "Last Stock updated in inventory successfully.");
+            f.addMessage(null, message);
+        }
+        return redirectUrl;
+        
+    }
+    
     public String getSelectedCrop() {
         return selectedCrop;
     }
