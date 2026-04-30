@@ -39,6 +39,7 @@ public class EditSales implements Serializable {
     private List<SalesDTO> salesrecords;
     private List<String> existingAmounts;
     private List<String> existPriceperUnit;
+    private List<String> existUpdDate;
     
     public EditSales() {
     }
@@ -68,6 +69,7 @@ public class EditSales implements Serializable {
             SalesDTO salesrec;
             existingAmounts = new ArrayList<>();
             existPriceperUnit = new ArrayList<>();
+            existUpdDate = new ArrayList<>();
             for (CropProductDTO product : cropproducts) {
                 InventoryDTO inventoryrec = new InventoryDTO();
                 inventoryrec.setCropId(selectedCrop);
@@ -87,7 +89,8 @@ public class EditSales implements Serializable {
                 salesrec.setCurrentInventoryQty(qtyString);
                 salesrecords.add(salesrec);
                 existingAmounts.add(salesrec.getQuantitySold());
-                existPriceperUnit.add(salesrec.getPriceperUnit());                
+                existPriceperUnit.add(salesrec.getPriceperUnit());  
+                existUpdDate.add(salesrec.getSalesDate());
             }
         }
     }
@@ -101,17 +104,53 @@ public class EditSales implements Serializable {
         f.getExternalContext().getFlash().setKeepMessages(true);
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        InventoryDTO inventoryrec; 
+        
+        InventoryDTO invrec;
         CropProductDTO cropprodrec;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         int inveditres;
-        int invrec = 0;
+        int invreccount = 0;
         String oldAmount;
+        String oldPricePerUnit;
+        String oldUpdDate;
         for (int i = 0; i < salesrecords.size(); i++) {
-            InvDetails inventory = inventories.get(i);
+            SalesDTO salesrec = salesrecords.get(i);
             oldAmount = existingAmounts.get(i);
+            oldPricePerUnit = existPriceperUnit.get(i);
+            oldUpdDate = existUpdDate.get(i);
+            if (salesrec.getQuantitySold() == null || salesrec.getQuantitySold().trim().isEmpty()) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Quantity sold cannot be zero.");
+                f.addMessage(null, message);
+                return redirectUrl;
+            }
             
-            inventoryrec = new InventoryDTO();
+            if (salesrec.getPriceperUnit() == null || salesrec.getPriceperUnit().trim().isEmpty()) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Price per unit cannot be zero.");
+                f.addMessage(null, message);
+                return redirectUrl;
+            }
+            
+            invrec = new InventoryDTO();
+            invrec.setCropId(salesrec.getCropId());
+            invrec.setHarvestId(salesrec.getHarvestId());
+            invrec.setProductId(salesrec.getProdId());
+            invrec.setLastupdatedate(oldUpdDate);
+            farmondto.setInventoryrec(invrec);
+            farmondto = clientService.callLastInvForSalesService(farmondto);
+            invrec = farmondto.getInventoryrec();
+            float invcurrqty = Float.parseFloat(invrec.getCurrentQty())*(-1);
+            invrec.setCurrentQty(String.format("%.2f", invcurrqty));
+            invrec.setLastupdatedate(invrec.getLastupdatedate());
+            farmondto.setInventoryrec(invrec);
+            farmondto = clientService.callEditInvService(farmondto);
+            inveditres = farmondto.getResponses().getFarmon_EDIT_RES();
+            if (inveditres == SUCCESS){
+                farmondto.setSalesrec(salesrec);
+                farmondto = clientService.callEditSalesService(farmondto);
+            }
+            
             cropprodrec = new CropProductDTO();
             inventoryrec.setInventoryId(inventory.getInventoryId());
             inventoryrec.setCropId(inventory.getCropId());
