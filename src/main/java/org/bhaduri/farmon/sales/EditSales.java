@@ -16,6 +16,7 @@ import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
+import org.farmon.farmondto.ExpenseDTO;
 import org.farmon.farmondto.FarmonDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
@@ -96,27 +97,29 @@ public class EditSales implements Serializable {
     }
     
     public String goToEditSales() {
-        
-        String redirectUrl = "/secured/sales/maintainsales?faces-redirect=true";
-        int sqlFlag = 0;
+        String redirectUrl = "/secured/sales/maintainsales?faces-redirect=true";       
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
-        FarmonDTO farmondto= new FarmonDTO();
+        FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-        
+
         InventoryDTO invrec;
         CropProductDTO cropprodrec;
+        ExpenseDTO exprec;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         int inveditres;
-        int invreccount = 0;
+        int saleseditres;
+        int cropprodres;
+        int expeditres;
+        int reccount = 0;
         String oldAmount;
-        String oldPricePerUnit;
+//        String oldPricePerUnit;
         String oldUpdDate;
         for (int i = 0; i < salesrecords.size(); i++) {
             SalesDTO salesrec = salesrecords.get(i);
             oldAmount = existingAmounts.get(i);
-            oldPricePerUnit = existPriceperUnit.get(i);
+//            oldPricePerUnit = existPriceperUnit.get(i);
             oldUpdDate = existUpdDate.get(i);
             if (salesrec.getQuantitySold() == null || salesrec.getQuantitySold().trim().isEmpty()) {
                 message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
@@ -124,14 +127,14 @@ public class EditSales implements Serializable {
                 f.addMessage(null, message);
                 return redirectUrl;
             }
-            
+
             if (salesrec.getPriceperUnit() == null || salesrec.getPriceperUnit().trim().isEmpty()) {
                 message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                         "Price per unit cannot be zero.");
                 f.addMessage(null, message);
                 return redirectUrl;
             }
-            
+
             invrec = new InventoryDTO();
             invrec.setCropId(salesrec.getCropId());
             invrec.setHarvestId(salesrec.getHarvestId());
@@ -140,59 +143,60 @@ public class EditSales implements Serializable {
             farmondto.setInventoryrec(invrec);
             farmondto = clientService.callLastInvForSalesService(farmondto);
             invrec = farmondto.getInventoryrec();
-            float invcurrqty = Float.parseFloat(invrec.getCurrentQty())*(-1);
+            float invcurrqty = Float.parseFloat(salesrec.getQuantitySold()) * (-1);
             invrec.setCurrentQty(String.format("%.2f", invcurrqty));
-            invrec.setLastupdatedate(invrec.getLastupdatedate());
+            invrec.setLastupdatedate(salesrec.getSalesDate());
             farmondto.setInventoryrec(invrec);
             farmondto = clientService.callEditInvService(farmondto);
             inveditres = farmondto.getResponses().getFarmon_EDIT_RES();
-            if (inveditres == SUCCESS){
+            if (inveditres == SUCCESS) {
                 farmondto.setSalesrec(salesrec);
-                farmondto = clientService.callEditSalesService(farmondto);
-            }
-            
-            cropprodrec = new CropProductDTO();
-            inventoryrec.setInventoryId(inventory.getInventoryId());
-            inventoryrec.setCropId(inventory.getCropId());
-            inventoryrec.setProductId(inventory.getProductId());
-            inventoryrec.setHarvestId(inventory.getHarvestId());
-            inventoryrec.setCurrentQty(inventory.getCurrentQty());
-            inventoryrec.setLastupdatedate(inventory.getLastupdatedate());
-            farmondto.setInventoryrec(inventoryrec);
-            farmondto = clientService.callEditInvService(farmondto);
-            inveditres = farmondto.getResponses().getFarmon_EDIT_RES();
-            if (inveditres == SUCCESS) {                
-                cropprodrec.setCropId(inventory.getCropId());
-                cropprodrec.setProductId(inventory.getProductId());
-                farmondto.setCropprodrec(cropprodrec);
-                farmondto = clientService.callCropprodForCropProdService(farmondto);
-                cropprodrec = farmondto.getCropprodrec();
-
-                float quantity = Float.parseFloat(cropprodrec.getTotalstock());                
-                quantity = quantity - Float.parseFloat(oldAmount)+Float.parseFloat(inventory.getCurrentQty());
-                cropprodrec.setTotalstock(String.format("%.2f", quantity));
-                farmondto.setCropprodrec(cropprodrec);
-                farmondto = clientService.callEditCropProdService(farmondto);
-                int response = farmondto.getResponses().getFarmon_EDIT_RES();
-                if (response == SUCCESS) {
-                    invrec = invrec + 1;
-                } else {
-                    break;
+                farmondto = clientService.callEditSalesRecService(farmondto);
+                saleseditres = farmondto.getResponses().getFarmon_EDIT_RES();
+                if (saleseditres == SUCCESS) {
+                    cropprodrec = new CropProductDTO();
+                    cropprodrec.setCropId(salesrec.getCropId());
+                    cropprodrec.setProductId(salesrec.getProdId());
+                    farmondto.setCropprodrec(cropprodrec);
+                    farmondto = clientService.callCropprodForCropProdService(farmondto);
+                    cropprodrec = farmondto.getCropprodrec();
+                    float quantity = Float.parseFloat(cropprodrec.getTotalstock());
+                    quantity = quantity + Float.parseFloat(oldAmount) - Float.parseFloat(salesrec.getQuantitySold());
+                    cropprodrec.setTotalstock(String.format("%.2f", quantity));
+                    farmondto.setCropprodrec(cropprodrec);
+                    farmondto = clientService.callEditCropProdService(farmondto);
+                    cropprodres = farmondto.getResponses().getFarmon_EDIT_RES();
+                    if (cropprodres == SUCCESS) {
+                        exprec = new ExpenseDTO();
+                        exprec.setExpenseRefId(salesrec.getSalesId());
+                        exprec.setExpenseType("SALE");
+                        farmondto = clientService.callGetExpRecService(farmondto);
+                        exprec = farmondto.getExpenserec();
+                        float rate = Float.parseFloat("-" + salesrec.getPriceperUnit());
+                        float appliedQuantity = Float.parseFloat(salesrec.getQuantitySold());
+                        float totalSalesAmt = rate * appliedQuantity;
+                        exprec.setExpenditure(String.format("%.2f", totalSalesAmt));
+                        exprec.setDate(salesrec.getSalesDate());
+                        farmondto = clientService.callEditExpService(farmondto);
+                        expeditres = farmondto.getResponses().getFarmon_EDIT_RES();
+                        if (expeditres == SUCCESS) {
+                            reccount = reccount + 1;
+                        } else {
+                            break;
+                        }
+                    }
                 }
             }
         }
-        
-        if(invrec == inventories.size()){
-            sqlFlag = sqlFlag+1;
-        } 
-        if (sqlFlag == 1) {
+        if (reccount == salesrecords.size()) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                    "Last Stock updated in inventory successfully.");
+                    "Last Sale is updated in inventory successfully.");
             f.addMessage(null, message);
         }
+
         return redirectUrl;
+    } 
         
-    }
     
     public String getSelectedCrop() {
         return selectedCrop;
