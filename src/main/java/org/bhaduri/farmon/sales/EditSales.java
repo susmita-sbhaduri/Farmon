@@ -85,13 +85,16 @@ public class EditSales implements Serializable {
                 salesrec.setProdId(product.getProductId());
                 salesrec.setHarvestId(harvestForCrop.getHarvestid());
                 farmondto.setSalesrec(salesrec);
-                farmondto = clientService.callLatestSalesForCropService(farmondto);                
+                farmondto = clientService.callLatestSalesForCropService(farmondto);    
+                
                 salesrec = farmondto.getSalesrec();
-                salesrec.setCurrentInventoryQty(qtyString);
-                salesrecords.add(salesrec);
-                existingAmounts.add(salesrec.getQuantitySold());
-                existPriceperUnit.add(salesrec.getPriceperUnit());  
-                existUpdDate.add(salesrec.getSalesDate());
+                if (salesrec != null) {
+                    salesrec.setCurrentInventoryQty(qtyString);
+                    salesrecords.add(salesrec);
+                    existingAmounts.add(salesrec.getQuantitySold());
+                    existPriceperUnit.add(salesrec.getPriceperUnit());
+                    existUpdDate.add(salesrec.getSalesDate());
+                }
             }
         }
     }
@@ -170,6 +173,7 @@ public class EditSales implements Serializable {
                         exprec = new ExpenseDTO();
                         exprec.setExpenseRefId(salesrec.getSalesId());
                         exprec.setExpenseType("SALE");
+                        farmondto.setExpenserec(exprec);
                         farmondto = clientService.callGetExpRecService(farmondto);
                         exprec = farmondto.getExpenserec();
                         float rate = Float.parseFloat("-" + salesrec.getPriceperUnit());
@@ -177,6 +181,7 @@ public class EditSales implements Serializable {
                         float totalSalesAmt = rate * appliedQuantity;
                         exprec.setExpenditure(String.format("%.2f", totalSalesAmt));
                         exprec.setDate(salesrec.getSalesDate());
+                        farmondto.setExpenserec(exprec);
                         farmondto = clientService.callEditExpService(farmondto);
                         expeditres = farmondto.getResponses().getFarmon_EDIT_RES();
                         if (expeditres == SUCCESS) {
