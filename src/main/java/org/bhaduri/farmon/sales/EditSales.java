@@ -20,7 +20,6 @@ import org.farmon.farmondto.ExpenseDTO;
 import org.farmon.farmondto.FarmonDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
-import org.farmon.farmondto.InvDetails;
 import org.farmon.farmondto.InventoryDTO;
 import org.farmon.farmondto.SalesDTO;
 
@@ -142,6 +141,20 @@ public class EditSales implements Serializable {
             invrec.setCropId(salesrec.getCropId());
             invrec.setHarvestId(salesrec.getHarvestId());
             invrec.setProductId(salesrec.getProdId());
+            farmondto.setInventoryrec(invrec);
+            farmondto = clientService.callSumForHarCropProdService(farmondto);
+            String qtyString = farmondto.getInventoryrec().getCurrentQty();
+            BigDecimal qty = new BigDecimal(qtyString.trim());
+            BigDecimal qtySold = new BigDecimal(salesrec.getQuantitySold().trim());
+            BigDecimal oldQty = new BigDecimal(oldAmount.trim());
+            BigDecimal totalOldQty = oldQty.add(qty);
+            if (qtySold.compareTo(totalOldQty)>0) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Quantity sold cannot be more than the amount in the stock.");
+                f.addMessage(null, message);
+                return redirectUrl;
+            }
+            
             invrec.setLastupdatedate(oldUpdDate);
             farmondto.setInventoryrec(invrec);
             farmondto = clientService.callLastInvForSalesService(farmondto);

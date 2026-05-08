@@ -14,6 +14,7 @@ import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
+import org.farmon.farmondto.SalesDTO;
 
 /**
  *
@@ -25,7 +26,7 @@ public class MaintainSales implements Serializable {
     private CropDTO selectedCrop;
     List<CropDTO> crops;
     private Map<String, Boolean> salesAddable = new HashMap<>();
-//    private Map<String, Boolean> salesNotUpdatable = new HashMap<>();
+    private Map<String, Boolean> salesUpdatable = new HashMap<>();
     public MaintainSales() {
     }
     public void fillValues() {
@@ -36,9 +37,12 @@ public class MaintainSales implements Serializable {
         
 //      Active crops which have stock can be sold
         CropDTO cropforstock = new CropDTO();
+        SalesDTO salesrecord = new SalesDTO();
         List<CropProductDTO> cropprodlist;
+        List<SalesDTO> saleslist;
         for (CropDTO crop : crops) {
-            boolean addable = false;            
+            boolean addable = false;      
+            boolean updatable = false;
             cropforstock.setCropId(crop.getCropId());
             farmondto.setCroprec(crop);
             farmondto = clientService.callNonzeroProdForCropService(farmondto);
@@ -47,6 +51,14 @@ public class MaintainSales implements Serializable {
                 addable = true;                
             }                     
             salesAddable.put(crop.getCropId(), addable);
+            salesrecord.setCropId(crop.getCropId());
+            farmondto.setSalesrec(salesrecord);
+            farmondto = clientService.callNonzeroSalesForCropService(farmondto);
+            saleslist = farmondto.getSaleslist();
+            if(!saleslist.isEmpty()){
+                updatable = true;                
+            } 
+            salesUpdatable.put(crop.getCropId(), updatable);
         }
     }
     public String addSales() {        
@@ -80,4 +92,14 @@ public class MaintainSales implements Serializable {
     public void setSalesAddable(Map<String, Boolean> salesAddable) {
         this.salesAddable = salesAddable;
     }
+
+    public Map<String, Boolean> getSalesUpdatable() {
+        return salesUpdatable;
+    }
+
+    public void setSalesUpdatable(Map<String, Boolean> salesUpdatable) {
+        this.salesUpdatable = salesUpdatable;
+    }
+    
+    
 }

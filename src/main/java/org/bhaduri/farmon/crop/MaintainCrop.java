@@ -42,15 +42,15 @@ public class MaintainCrop implements Serializable {
         for (CropDTO crop : crops) {
             boolean activatable = false;
             boolean addable = false;
-            boolean notupdatable = false;
+//            boolean notupdatable = false;
             if(crop.getEndDate()!=null){
                 activatable = true;                
-                notupdatable = true;                
+//                notupdatable = true;                
             } else {
                 addable = true;                
             }
             cropActivatable.put(crop.getCropId(), activatable);
-            cropNotUpdatable.put(crop.getCropId(), notupdatable);
+//            cropNotUpdatable.put(crop.getCropId(), notupdatable);
             cropAddable.put(crop.getCropId(), addable);
         }
 //      Crops which have stock in cropproduct cannot be deleted
@@ -63,10 +63,12 @@ public class MaintainCrop implements Serializable {
             farmondto.setCroprec(crop);
             farmondto = clientService.callNonzeroProdForCropService(farmondto);
             cropprodlist = farmondto.getCropprodlist();
-            if(cropprodlist.isEmpty()){
+            if(cropprodlist.isEmpty() && crop.getEndDate()==null){
                 deletable = true;
+            }   
+            if(cropprodlist.isEmpty()){
                 notupdatable = true;
-            }                     
+            } 
             cropDeletable.put(crop.getCropId(), deletable);
             cropNotUpdatable.put(crop.getCropId(), notupdatable);
         }
