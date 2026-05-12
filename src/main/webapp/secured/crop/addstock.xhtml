@@ -30,18 +30,20 @@
                             <f:selectItems value="#{addStock.harvestForCrop}" 
                                            var="harvest"
                                            itemLabel="#{harvest.siteName}-#{harvest.harvestName}" 
-                                           itemValue="#{harvest.harvestid}"/>                            
+                                           itemValue="#{harvest.harvestid}"/>  
+                            <p:ajax event="valueChange" listener="#{addStock.onSiteHarSelect}" 
+                                    update="productTable"/>
                         </p:selectOneRadio>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <h:outputLabel for="productid" value="Product Details" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:dataTable id="productTable" var="prodlist" 
-                                     value="#{addStock.cropproducts}" 
+                    <div class="ui-g-12 ui-md-6 ui-lg-9">
+                        <p:dataTable id="productTable" var="rowItem" 
+                                     value="#{addStock.displayList}" 
                                      selectionMode="single" 
                                      selection="#{addStock.selectedProduct}" 
-                                     rowKey="#{prodlist.id}" 
+                                     rowKey="#{rowItem.product.id}" 
                                      style="font-size: 10px;">
 
                             <p:ajax event="rowSelect" 
@@ -49,25 +51,29 @@
                                     update="productTable" />                            
 
                             <p:column headerText="Product Name">
-                                <h:outputText value="#{prodlist.productName}" /> 
+                                <h:outputText value="#{rowItem.product.productName}" /> 
+                            </p:column>
+
+                            <p:column headerText="Current Qty">
+                                <h:outputText value="#{rowItem.existingQuantity}" /> 
                             </p:column>
 
                             <p:column headerText="Amount">
-                                <p:inputText value="#{prodlist.totalstock}" 
+                                <p:inputText value="#{rowItem.product.totalstock}" 
                                              disabled="#{addStock.selectedProduct == null 
-                                                         or addStock.selectedProduct.id != prodlist.id}" 
+                                                         or addStock.selectedProduct.product.id != rowItem.product.id}" 
                                              size="10">                                    
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
 
                             <p:column headerText="Unit">
-                                <h:outputText value="#{prodlist.unit}" /> 
+                                <h:outputText value="#{rowItem.product.unit}" /> 
                             </p:column>
 
                         </p:dataTable>
                     </div>
-                    
+
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="sdate" value="Stock Date" />
                     </div>
@@ -82,12 +88,12 @@
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>
-                   
+
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:button icon="pi pi-times" value="Done" outcome="/secured/crop/maintaincrop" />
                     </div>
                 </div>
-                
+
             </h:form>
         </div>
     </ui:define>

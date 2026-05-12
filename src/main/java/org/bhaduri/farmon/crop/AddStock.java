@@ -9,11 +9,14 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
+import org.farmon.farmondto.CropProdWithStock;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.DB_DUPLICATE;
@@ -22,6 +25,7 @@ import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InventoryDTO;
+import org.farmon.farmondto.SalesDTO;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -37,7 +41,8 @@ public class AddStock implements Serializable {
     private String selectedHarvest;
     private List<HarvestDTO> harvestForCrop;
     private List<CropProductDTO> cropproducts;
-    private CropProductDTO selectedProduct;    
+    private List<CropProdWithStock> displayList;
+    private CropProdWithStock selectedProduct;    
     private String stock;
     private Date sdate = new Date();
     
@@ -65,27 +70,63 @@ public class AddStock implements Serializable {
         farmondto.setCropprodrec(cropprodrec);
         farmondto = clientService.callCropprodLstCropidService(farmondto);
         cropproducts = farmondto.getCropprodlist();
+        displayList = new ArrayList<>();
         if (cropproducts != null) {
+            CropProdWithStock rec;
             for (CropProductDTO product : cropproducts) {
                 product.setTotalstock(""); // Note: Use "" if totalstock is still a String
+                String existingQty = "";
+                rec = new CropProdWithStock(product,existingQty);
+                displayList.add(rec);
             }
         }
     }
     
-    public void onRowSelect(SelectEvent<CropProductDTO> event) {
-        CropProductDTO newlySelected = event.getObject();
+    public void onRowSelect(SelectEvent<CropProdWithStock> event) {
+        CropProdWithStock newlySelected = event.getObject();
 
         // Loop through the entire list of products
-        for (CropProductDTO product : cropproducts) {
+        for (CropProdWithStock product : displayList) {
             // If the product in the loop is NOT the one they just clicked...
-            if (!product.getId().equals(newlySelected.getId())) {
+            if (!product.getProduct().getId().equals(newlySelected.getProduct().getId())) {
                 // Clear out any amount they might have typed previously
-                product.setTotalstock(""); // Use "" if prodAmount is a String instead of Integer/Double
+                product.getProduct().setTotalstock(""); // Use "" if prodAmount is a String instead of Integer/Double
             }
         }
     }
     
-    
+    public void onSiteHarSelect() {
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        List<CropProdWithStock> cropprodwithstock = new ArrayList<>();
+        if (cropproducts != null) {
+            CropProdWithStock rec;
+            for (CropProductDTO product : cropproducts) {
+                InventoryDTO inventoryrec = new InventoryDTO();
+                inventoryrec.setCropId(selectedCrop);
+                inventoryrec.setProductId(product.getProductId());
+                inventoryrec.setHarvestId(this.selectedHarvest);
+                farmondto.setInventoryrec(inventoryrec);
+                farmondto = clientService.callSumForHarCropProdService(farmondto);
+                String qtyString = farmondto.getInventoryrec().getCurrentQty();
+                boolean hasStock = false;
+                if (qtyString != null && !qtyString.trim().isEmpty()) {
+                    BigDecimal qty = new BigDecimal(qtyString.trim());
+                    if (qty.compareTo(BigDecimal.ZERO) > 0) {
+                        hasStock = true;
+                    }
+                }
+                if (hasStock) {
+                    rec = new CropProdWithStock(product,qtyString);                    
+                    cropprodwithstock.add(rec);
+                }
+            }
+        }
+        displayList=cropprodwithstock;
+        // 7. Safety cleanup: Reset the selected row just in case the row they 
+    // had previously clicked on was just hidden!
+        this.selectedProduct = null;
+    }
     public String goToAddStock() {
         
         String redirectUrl = "/secured/crop/maintaincrop?faces-redirect=true";
@@ -108,7 +149,7 @@ public class AddStock implements Serializable {
             return redirectUrl;
         }
         
-        if (selectedProduct.getTotalstock() == null|| selectedProduct.getTotalstock().trim().isEmpty()) {
+        if (selectedProduct.getProduct().getTotalstock() == null|| selectedProduct.getProduct().getTotalstock().trim().isEmpty()) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                     "Provide a valid Amount.");
             f.addMessage(null, message);
@@ -127,9 +168,9 @@ public class AddStock implements Serializable {
         }
         inventoryrec.setInventoryId(String.valueOf(invid));
         inventoryrec.setCropId(selectedCrop);
-        inventoryrec.setProductId(selectedProduct.getProductId());
+        inventoryrec.setProductId(selectedProduct.getProduct().getProductId());
         inventoryrec.setHarvestId(selectedHarvest);
-        inventoryrec.setCurrentQty(selectedProduct.getTotalstock());
+        inventoryrec.setCurrentQty(selectedProduct.getProduct().getTotalstock());
         inventoryrec.setLastupdatedate(sdf.format(sdate));
         
         farmondto.setInventoryrec(inventoryrec);
@@ -140,7 +181,7 @@ public class AddStock implements Serializable {
         } else {
             if (invaddres == DB_DUPLICATE) {
                 message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                        "The product is already added, product name =" + selectedProduct.getProductName());
+                        "The product is already added, product name =" + selectedProduct.getProduct().getProductName());
                 f.addMessage(null, message);
             }
             if (invaddres == DB_SEVERE) {
@@ -152,14 +193,14 @@ public class AddStock implements Serializable {
         }
         CropProductDTO cropprodrec = new CropProductDTO();
         cropprodrec.setCropId(selectedCrop);
-        cropprodrec.setProductId(selectedProduct.getProductId());
+        cropprodrec.setProductId(selectedProduct.getProduct().getProductId());
         
         farmondto.setCropprodrec(cropprodrec);
         farmondto = clientService.callCropprodForCropProdService(farmondto);
         cropprodrec = farmondto.getCropprodrec();
         
         float appliedQuantity = Float.parseFloat(cropprodrec.getTotalstock());
-        appliedQuantity = appliedQuantity+Float.parseFloat(selectedProduct.getTotalstock());
+        appliedQuantity = appliedQuantity+Float.parseFloat(selectedProduct.getProduct().getTotalstock());
         cropprodrec.setTotalstock(String.format("%.2f", appliedQuantity));
         farmondto.setCropprodrec(cropprodrec);        
         farmondto = clientService.callEditCropProdService(farmondto);
@@ -198,10 +239,13 @@ public class AddStock implements Serializable {
         
     }
     
-//    public String goToAddAgainStock() {        
-//        String redirectUrl = "/secured/crop/addstock?faces-redirect=true&selectedCrop="+ selectedCrop;
-//        return redirectUrl;
-//    }
+    public List<CropProdWithStock> getDisplayList() {
+        return displayList;
+    }
+
+    public void setDisplayList(List<CropProdWithStock> displayList) {    
+        this.displayList = displayList;
+    }
 
     public String getSelectedCrop() {
         return selectedCrop;
@@ -245,14 +289,14 @@ public class AddStock implements Serializable {
         this.cropproducts = cropproducts;
     }
 
-    public CropProductDTO getSelectedProduct() {
+    public CropProdWithStock getSelectedProduct() {
         return selectedProduct;
     }
 
-    public void setSelectedProduct(CropProductDTO selectedProduct) {
+    public void setSelectedProduct(CropProdWithStock selectedProduct) {
         this.selectedProduct = selectedProduct;
     }
-
+    
     public String getStock() {
         return stock;
     }
