@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"                
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+     <ui:define name="content">
+        <h4>Harvest wise stock of products of crop.</h4>
+        <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
+
+        <f:metadata>  
+            <f:viewAction action="#{harvestWiseCropStock.fillValues()}" />
+        </f:metadata>
+        <div class="card">
+
+            <h:form id="invstockform" style="text-align: center">
+                <div style="text-align: left;">
+                    <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+                    &nbsp;&nbsp;&nbsp;
+                    <p:commandButton value="Export as CSV" ajax="false">
+                        <p:dataExporter type="csv" 
+                                        target="invstockform:invstock" 
+                                        fileName="InventoryStocks"/>
+                    </p:commandButton>
+                </div>
+                <p:dataTable id="invstock" var="invstock" value="#{harvestWiseCropStock.harveststocks}">                   
+
+                    <p:column headerText="Harvest Name" >
+                        <h:outputText value="#{invstock.siteName}-#{invstock.harvestName}" />
+                    </p:column>
+                    <p:column headerText="Crop Name">
+                        <h:outputText value="#{invstock.cropName}" />
+                    </p:column>
+                    <p:column headerText="Product name">
+                        <h:outputText value="#{invstock.productName}" />
+                    </p:column>
+                    <p:column headerText="Total Stock">
+                        <h:outputText value="#{invstock.stock} #{invstock.unit}" />
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </div>
+    </ui:define>    
+
+</ui:composition>
