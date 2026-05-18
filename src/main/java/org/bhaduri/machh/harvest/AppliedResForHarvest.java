@@ -28,8 +28,8 @@ public class AppliedResForHarvest implements Serializable {
     private List<ResourceCropDTO> appliedresources;
     private String appliedHarvest;   
     private String sitename;
-    private String cropcat;
-    private String cropname;
+//    private String cropcat;
+    private String harvestname;
     private ResourceCropDTO appliedRes;
     /**
      * Creates a new instance of AppliedResForHarvest
@@ -46,11 +46,10 @@ public class AppliedResForHarvest implements Serializable {
         farmondto = clientService.callHarvestRecService(farmondto);
         harvestRecord = farmondto.getHarvestrecord();
         
-//        MasterDataServices masterDataService = new MasterDataServices();
-//        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(appliedHarvest);
+
         sitename = harvestRecord.getSiteName();
-        cropcat = harvestRecord.getCropCategory();
-        cropname = harvestRecord.getCropName();
+//        cropcat = harvestRecord.getCropCategory();
+        harvestname = harvestRecord.getHarvestName();
         
         
         farmondto = clientService.callResCropListService(farmondto);
@@ -161,20 +160,12 @@ public class AppliedResForHarvest implements Serializable {
         this.sitename = sitename;
     }
 
-    public String getCropcat() {
-        return cropcat;
+    public String getHarvestname() {
+        return harvestname;
     }
 
-    public void setCropcat(String cropcat) {
-        this.cropcat = cropcat;
-    }
-
-    public String getCropname() {
-        return cropname;
-    }
-
-    public void setCropname(String cropname) {
-        this.cropname = cropname;
+    public void setHarvestname(String harvestname) {
+        this.harvestname = harvestname;
     }
 
     public ResourceCropDTO getAppliedRes() {
