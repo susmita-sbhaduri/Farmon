@@ -8,7 +8,6 @@ import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
@@ -16,8 +15,6 @@ import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.HarvestSalesDTO;
-import org.farmon.farmondto.HarvestStockDTO;
-import org.farmon.farmondto.InventoryDTO;
 import org.farmon.farmondto.SalesDTO;
 
 /**
@@ -63,41 +60,38 @@ public class HarvestWiseCropSales implements Serializable {
                     salesrec.setProdId(cropprodlist.get(i3).getProductId());
                     salesrec.setHarvestId(activeharvestlst.get(i).getHarvestid());                    
                     farmondto.setSalesrec(salesrec);
-                    farmondto = clientService.callSalesForHarCropProdService(farmondto);
-                    List<SalesDTO> recordList = farmondto.getSaleslist();
-                    if(!recordList.isEmpty()){
+                    farmondto = clientService.callSalesSumHarCropProdService(farmondto);
+                    SalesDTO salessum = farmondto.getSalesrec();
+                    if(!salessum.getQuantitySold().equals("0.00") &&
+                            !salessum.getPriceperUnit().equals("0.00")){
                         rec.setHarvestid(activeharvestlst.get(i).getHarvestid());
                         rec.setHarvestName(activeharvestlst.get(i).getHarvestName());
+                        rec.setSiteid(activeharvestlst.get(i).getSiteid());
+                        rec.setSiteName(activeharvestlst.get(i).getSiteName());
                         rec.setCropId(crops.get(ii).getCropId());
                         rec.setCropName(crops.get(ii).getCropName());
                         rec.setProdId(cropprodlist.get(i3).getProductId());
                         rec.setProductName(cropprodlist.get(i3).getProductName());
-                        rec.setSiteid(activeharvestlst.get(i).getSiteid());
-                        rec.setSiteName(activeharvestlst.get(i).getSiteName());
-                        rec.setSalesQty(startDt);
-                        float quantity = Float.parseFloat(cropprodrec.getTotalstock());
-                        quantity = quantity - Float.parseFloat(oldAmount) + Float.parseFloat(inventory.getCurrentQty());
-                        cropprodrec.setTotalstock(String.format("%.2f", quantity));
-                        farmondto.setInventoryrec(inventoryrec);
-                        farmondto = clientService.callSumForHarCropProdService(farmondto);
-                        String qtyString = farmondto.getInventoryrec().getCurrentQty();
-                        
-                        rec.setStock(qtyString);
                         rec.setUnit(cropprodlist.get(i3).getUnit());
-                        harveststocks.add(rec);
-                        rec = new HarvestStockDTO();
+                        
+                        rec.setSalesQty(salessum.getQuantitySold());
+                        rec.setSalesAmtRs(salessum.getPriceperUnit());
+                        
+                        
+                        harvestsales.add(rec);
+                        rec = new HarvestSalesDTO();
                     }
                 }
             }
         }
         
-        if (harveststocks != null) {
-            // Sort by Harvest Name, THEN Crop Name, THEN Product Name
-            harveststocks.sort(Comparator.comparing(HarvestStockDTO::getSiteName)
-                    .thenComparing(HarvestStockDTO::getHarvestName)
-                    .thenComparing(HarvestStockDTO::getCropName)
-                    .thenComparing(HarvestStockDTO::getProductName));
-        }
+//        if (harveststocks != null) {
+//            // Sort by Harvest Name, THEN Crop Name, THEN Product Name
+//            harveststocks.sort(Comparator.comparing(HarvestStockDTO::getSiteName)
+//                    .thenComparing(HarvestStockDTO::getHarvestName)
+//                    .thenComparing(HarvestStockDTO::getCropName)
+//                    .thenComparing(HarvestStockDTO::getProductName));
+//        }
     }
 
     public List<HarvestSalesDTO> getHarvestsales() {

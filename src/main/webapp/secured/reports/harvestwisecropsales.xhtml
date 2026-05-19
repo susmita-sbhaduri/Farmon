@@ -12,33 +12,38 @@
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
 
         <f:metadata>  
-            <f:viewAction action="#{harvestWiseCropStock.fillValues()}" />
+            <f:viewParam name="startDt" value="#{harvestWiseCropSales.startDt}"></f:viewParam>
+            <f:viewParam name="endDt" value="#{harvestWiseCropSales.endDt}"></f:viewParam>
+            <f:viewAction action="#{harvestWiseCropSales.fillValues()}" />
         </f:metadata>
         <div class="card">
 
-            <h:form id="invstockform" style="text-align: center">
+            <h:form id="salesform" style="text-align: center">
                 <div style="text-align: left;">
                     <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
                     &nbsp;&nbsp;&nbsp;
                     <p:commandButton value="Export as CSV" ajax="false">
                         <p:dataExporter type="csv" 
-                                        target="invstockform:invstock" 
-                                        fileName="InventoryStocks"/>
+                                        target="salesform:sales" 
+                                        fileName="TotalSales"/>
                     </p:commandButton>
                 </div>
-                <p:dataTable id="invstock" var="invstock" value="#{harvestWiseCropStock.harveststocks}">                   
+                <p:dataTable id="sales" var="sales" value="#{harvestWiseCropSales.harvestsales}">                   
 
                     <p:column headerText="Harvest Name" >
-                        <h:outputText value="#{invstock.siteName}-#{invstock.harvestName}" />
+                        <h:outputText value="#{sales.siteName}-#{sales.harvestName}" />
                     </p:column>
                     <p:column headerText="Crop Name">
-                        <h:outputText value="#{invstock.cropName}" />
+                        <h:outputText value="#{sales.cropName}" />
                     </p:column>
                     <p:column headerText="Product name">
-                        <h:outputText value="#{invstock.productName}" />
+                        <h:outputText value="#{sales.productName}" />
                     </p:column>
-                    <p:column headerText="Total Stock">
-                        <h:outputText value="#{invstock.stock} #{invstock.unit}" />
+                    <p:column headerText="Total Sales">
+                        <h:outputText value="#{sales.salesQty} #{sales.unit}" />
+                    </p:column>
+                    <p:column headerText="Total Sales(Rs.)">
+                        <h:outputText value="#{sales.salesAmtRs}" />
                     </p:column>
                 </p:dataTable>
             </h:form>
