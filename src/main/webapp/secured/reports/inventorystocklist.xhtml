@@ -7,43 +7,41 @@
                 xmlns:f="jakarta.faces.core"
                 xmlns:h="jakarta.faces.html">
 
-     <ui:define name="content">
-        <h4>Harvest wise sales of products of crop.</h4>
+    <ui:define name="content">
+        <h4>Date wise stock of products of crop.</h4>
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
 
-        <f:metadata>
-            <f:viewParam name="startDt" value="#{harvestWiseCropSales.startDt}"></f:viewParam>
-            <f:viewParam name="endDt" value="#{harvestWiseCropSales.endDt}"></f:viewParam>
-            <f:viewAction action="#{harvestWiseCropSales.fillValues()}" />
+        <f:metadata>            
+            <f:viewAction action="#{inventoryStockList.fillValues()}" />
         </f:metadata>
         <div class="card">
 
-            <h:form id="salesform" style="text-align: center">
+            <h:form id="invstockform" style="text-align: center">
                 <div style="text-align: left;">
                     <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
                     &nbsp;&nbsp;&nbsp;
                     <p:commandButton value="Export as CSV" ajax="false">
                         <p:dataExporter type="csv" 
-                                        target="salesform:sales" 
-                                        fileName="TotalSales"/>
+                                        target="invstockform:datestock" 
+                                        fileName="DateWiseStock"/>
                     </p:commandButton>
                 </div>
-                <p:dataTable id="sales" var="sales" value="#{harvestWiseCropSales.harvestsales}">                   
+                <p:dataTable id="datestock" var="datestock" value="#{inventoryStockList.invstocklist}">                   
 
                     <p:column headerText="Harvest Name" >
-                        <h:outputText value="#{sales.siteName}-#{sales.harvestName}" />
+                        <h:outputText value="#{datestock.siteName}-#{datestock.harvestName}" />
                     </p:column>
                     <p:column headerText="Crop Name">
-                        <h:outputText value="#{sales.cropName}" />
+                        <h:outputText value="#{datestock.cropName}" />
                     </p:column>
-                    <p:column headerText="Product name">
-                        <h:outputText value="#{sales.productName}" />
+                    <p:column headerText="Product Name">
+                        <h:outputText value="#{datestock.productName}" />
                     </p:column>
-                    <p:column headerText="Total Sales">
-                        <h:outputText value="#{sales.salesQty} #{sales.unit}" />
+                    <p:column headerText="Strock till Date">
+                        <h:outputText value="#{datestock.stock} #{datestock.unit}" />
                     </p:column>
-                    <p:column headerText="Total Sales(Rs.)">
-                        <h:outputText value="#{sales.salesAmtRs}" />
+                    <p:column headerText="Stock taken on">
+                        <h:outputText value="#{datestock.stockDate}" />
                     </p:column>
                 </p:dataTable>
             </h:form>
@@ -51,3 +49,4 @@
     </ui:define>    
 
 </ui:composition>
+

@@ -25,7 +25,6 @@ import static org.farmon.farmondto.FarmonResponseCodes.DB_SEVERE;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InventoryDTO;
-import org.farmon.farmondto.SalesDTO;
 import org.primefaces.event.SelectEvent;
 
 /**
