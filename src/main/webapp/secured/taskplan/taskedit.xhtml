@@ -45,8 +45,7 @@
                         <p:selectOneMenu id="harvestid" value="#{taskEdit.selectedIndexHarvest}" >
                             <f:selectItems value="#{taskEdit.activeharvests}" 
                                            var="harvest"
-                                           itemLabel="#{harvest.siteName}-#{harvest.cropCategory}-
-                                           #{harvest.cropName}" 
+                                           itemLabel="#{harvest.siteName}-#{harvest.harvestName}" 
                                            itemValue="#{taskEdit.activeharvests.indexOf(harvest)}"/>
 
                         </p:selectOneMenu>
