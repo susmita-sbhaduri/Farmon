@@ -39,7 +39,7 @@ public class MaintainShop implements Serializable {
         farmondto = clientService.callDisShopPerResService(farmondto);
         List<ShopResDTO> shopreslist = farmondto.getShopreslist();
         
-//      Shops which are ALREADY in shopres cannot be deleted
+//      Buyers which are ALREADY in ShopResource table cannot be deleted
         
         for (ShopDTO shop : shoplist) {
             boolean deletable = true;

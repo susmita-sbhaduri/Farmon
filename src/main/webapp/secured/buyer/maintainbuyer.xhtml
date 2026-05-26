@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+   <ui:define name="content">
+        <h4>Maintain Buyer</h4>
+        <p:growl id="growl" showDetail="true" />
+        
+        &nbsp;&nbsp;&nbsp;
+        <p:button value="Add" outcome="/secured/buyer/addbuyer"/>
+        
+        <f:metadata>
+            <f:viewAction action="#{maintainBuyer.fillShopValues()}" />
+        </f:metadata>
+
+        <div class="card">            
+            <h:form id="buyergrid" style="text-align: center">                
+                <p:dataTable var="existingbuyer" value="#{maintainBuyer.buyerlist}" 
+                             reflow="true">
+                    <p:column headerText="Buyer Name">
+                        <h:outputText value="#{existingbuyer.buyerName}" />
+                    </p:column>
+                                
+                    <p:column>
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Edit"
+                                         action="#{maintainBuyer.editShop()}" >
+                            <f:setPropertyActionListener value="#{existingbuyer}" target="#{maintainBuyer.selectedBuyer}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Delete"
+                                         action="#{maintainBuyer.deleteShop()}"
+                                         disabled="#{not maintainBuyer.buyerEditable[existingbuyer.buyerId]}"
+                                         >
+                            <f:setPropertyActionListener value="#{existingbuyer}" target="#{maintainBuyer.selectedBuyer}" />
+                        </p:commandButton>
+                    </p:column>
+                    
+                </p:dataTable>
+            </h:form>
+        </div>
+    </ui:define>    
+</ui:composition>
