@@ -52,6 +52,17 @@ public class MaintainBuyer implements Serializable {
             buyerEditable.put(buyer.getBuyerId(), deletable);
         }
     }
+    
+    public String deleteBuyer() { 
+        String redirectUrl = "/secured/buyer/deletebuyer?faces-redirect=true&selectedBuyer="+ selectedBuyer.getBuyerId();
+        return redirectUrl;
+    }
+    
+    public String editBuyer() {
+        String redirectUrl = "/secured/buyer/editbuyer?faces-redirect=true&selectedBuyer="+ selectedBuyer.getBuyerId();
+        return redirectUrl;
+
+    }
     public BuyerDTO getSelectedBuyer() {
         return selectedBuyer;
     }
