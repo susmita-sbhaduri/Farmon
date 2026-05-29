@@ -102,7 +102,7 @@ public class AddSales implements Serializable {
     public void onSiteHarSelect() {
         FarmonDTO farmondto = new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
-         List<SalesDTO> activesalesrecords = new ArrayList<>();
+        List<SalesDTO> activesalesrecords = new ArrayList<>();
         if (cropproducts != null) {
             SalesDTO salesrec;
             for (CropProductDTO product : cropproducts) {

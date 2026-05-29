@@ -118,6 +118,9 @@ public class AddStock implements Serializable {
                 if (hasStock) {
                     rec = new CropProdWithStock(product,qtyString);                    
                     cropprodwithstock.add(rec);
+                } else {
+                    rec = new CropProdWithStock(product,"0");                    
+                    cropprodwithstock.add(rec);
                 }
             }
         }

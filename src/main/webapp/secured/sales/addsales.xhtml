@@ -80,10 +80,26 @@
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
+                            <p:column headerText="Buyer">
 
+                                <p:selectOneMenu id="buyerid" 
+                                                 value="#{prodlist.buyerId}" 
+                                                 disabled="#{addSales.selectedProduct == null 
+                                                             or addSales.selectedProduct.prodId != prodlist.prodId}"
+                                                 style="width: 100%;">
+
+                                    <f:selectItem itemLabel="Select Buyer" itemValue="" noSelectionOption="true" />
+
+                                    <f:selectItems value="#{addSales.buyerlist}" var="buyer" 
+                                                   itemValue="#{buyer.buyerId}" 
+                                                   itemLabel="#{buyer.shopName}" />
+
+                                </p:selectOneMenu>
+
+                            </p:column>
                         </p:dataTable>
                     </div>
-                    
+
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="sdate" value="Sales Date" />
                     </div>
@@ -98,12 +114,12 @@
                                          update="@form growl" >                        
                         </p:commandButton>
                     </div>
-                    
+
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:button icon="pi pi-times" value="Done" outcome="/secured/sales/maintainsales" />
                     </div>
                 </div>
-                
+
             </h:form>
         </div>
     </ui:define>

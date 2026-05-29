@@ -29,14 +29,14 @@
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          value="Edit"
-                                         action="#{maintainBuyer.editShop()}" >
+                                         action="#{maintainBuyer.goToEditBuyer()}" >
                             <f:setPropertyActionListener value="#{existingbuyer}" target="#{maintainBuyer.selectedBuyer}" />
                         </p:commandButton>
                     </p:column>
                     <p:column>
                         <p:commandButton styleClass="blue-button" 
                                          value="Delete"
-                                         action="#{maintainBuyer.deleteShop()}"
+                                         action="#{maintainBuyer.goToDeleteBuyer()}"
                                          disabled="#{not maintainBuyer.buyerEditable[existingbuyer.buyerId]}"
                                          >
                             <f:setPropertyActionListener value="#{existingbuyer}" target="#{maintainBuyer.selectedBuyer}" />

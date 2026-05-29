@@ -9,46 +9,46 @@
 
     <ui:define name="content">
         <p:growl id="growl" showDetail="true" />
-        <h4>Delete Vendor.</h4>
+        <h4>Delete Buyer.</h4>
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         &nbsp;&nbsp;&nbsp;
-        <p:button value="Cancel" outcome="/secured/shop/maintainshop"/>
+        <p:button value="Cancel" outcome="/secured/buyer/maintainbuyer"/>
         <f:metadata>
-            <f:viewParam name="selectedShop" value="#{deleteShop.selectedShop}"></f:viewParam>
-            <f:viewAction action="#{deleteShop.fillValues()}" />
+            <f:viewParam name="selectedBuyer" value="#{deleteBuyer.selectedBuyer}"></f:viewParam>
+            <f:viewAction action="#{deleteBuyer.fillValues()}" />
         </f:metadata>
 
         <div class="card">
-            <h:form id="shopdeleteform" style="text-align: left">
+            <h:form id="buyerdeleteform" style="text-align: left">
                 <div class="ui-g">
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel value="Name" />                     
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6"> 
-                        <h:outputText value="#{deleteShop.name}" style="font-weight:bold;"/>
+                        <h:outputText value="#{deleteBuyer.name}" style="font-weight:bold;"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel value="Address"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{deleteShop.address}" style="font-weight:bold;"/>
+                        <h:outputText value="#{deleteBuyer.address}" style="font-weight:bold;"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:outputLabel value="Contact No." />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{deleteShop.phno}" style="font-weight:bold;"/>                        
+                        <h:outputText value="#{deleteBuyer.phno}" style="font-weight:bold;"/>                        
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel value="Availability Time" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{deleteShop.atime}" style="font-weight:bold;"/>
+                        <h:outputText value="#{deleteBuyer.atime}" style="font-weight:bold;"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Delete"
-                                         action="#{deleteShop.goToDeleteShop()}">                        
+                                         action="#{deleteBuyer.goToDeleteBuyer()}">                        
                         </p:commandButton>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
