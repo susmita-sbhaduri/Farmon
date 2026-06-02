@@ -28,43 +28,57 @@
                         <h:outputText value="#{editSales.harvestForCrop.siteName}-
                                       #{editSales.harvestForCrop.harvestName}" style="font-weight:bold;"/>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                    <div class="ui-g-12 ui-md-6 ui-lg-2">
                         <h:outputLabel for="productid" value="Product Details" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-9">
+                    <div class="ui-g-12 ui-md-6 ui-lg-10">
                         <p:dataTable id="productTable" var="prodlist" 
                                      value="#{editSales.salesrecords}"                                      
                                      rowKey="#{prodlist.salesId}" 
-                                     style="font-size: 10px;">
+                                     style="font-size: 10px;width: 100%;">
                                            
 
                             <p:column headerText="Product Name">
                                 <h:outputText value="#{prodlist.productname}" /> 
                             </p:column>
                             
-                            <p:column headerText="Remaining Qty">
+                            <p:column headerText="Remaining Qty" style="width: 80px; text-align: right;">
                                 <h:outputText value="#{prodlist.currentInventoryQty}" style="width: 110px;"/> 
                             </p:column>
 
-                            <p:column headerText="Qty sold">
-                                <p:inputText value="#{prodlist.quantitySold}" size="10" style="width: 110px;">                                    
+                            <p:column headerText="Qty sold" style="width: 80px;">
+                                <p:inputText value="#{prodlist.quantitySold}" style="width: 80px;">                                   
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
 
-                            <p:column headerText="Unit">
+                            <p:column headerText="Unit" style="width: 50px; text-align: center;">
                                 <h:outputText value="#{prodlist.produnit}" style="width: 110px;"/>
                                 
                             </p:column>
                             
-                            <p:column headerText="Price(Rs.)/unit">                                
-                                <p:inputText value="#{prodlist.priceperUnit}" size="10" style="width: 110px;"> 
+                            <p:column headerText="Price(Rs.)/unit" style="width: 90px;">                                
+                                <p:inputText value="#{prodlist.priceperUnit}" style="width: 100%;"> 
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
                             
-                            <p:column headerText="Date">
-                                <p:inputText value="#{prodlist.salesDate}" type="date" style="width: 110px;"/>
+                            <p:column headerText="Date" style="width: 135px;">
+                                <p:inputText value="#{prodlist.salesDate}" type="date" style="width: 100%; box-sizing: border-box;"/>
+                            </p:column>
+
+                            <p:column headerText="Buyer" style="width: 140px;">
+                                <p:selectOneMenu id="buyerid" 
+                                                 value="#{prodlist.buyerId}" 
+                                                 style="width: 100%; box-sizing: border-box;">
+
+                                    <f:selectItem itemLabel="Select Buyer" itemValue="" noSelectionOption="true" />
+
+                                    <f:selectItems value="#{editSales.buyerlist}" var="buyer" 
+                                                   itemValue="#{buyer.buyerId}" 
+                                                   itemLabel="#{buyer.buyerName}" />
+
+                                </p:selectOneMenu>
                             </p:column>
                         </p:dataTable>
                     </div>

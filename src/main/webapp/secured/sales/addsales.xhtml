@@ -62,7 +62,7 @@
                                 <p:inputText value="#{prodlist.quantitySold}" 
                                              disabled="#{addSales.selectedProduct == null 
                                                          or addSales.selectedProduct.prodId != prodlist.prodId}" 
-                                             size="10">                                    
+                                             size="8">                                    
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
@@ -76,7 +76,7 @@
                                 <p:inputText value="#{prodlist.priceperUnit}" 
                                              disabled="#{addSales.selectedProduct == null 
                                                          or addSales.selectedProduct.prodId != prodlist.prodId}"
-                                             size="10"> 
+                                             size="8"> 
                                     <p:keyFilter regEx="/[\d\.]/" />
                                 </p:inputText>
                             </p:column>
@@ -86,13 +86,14 @@
                                                  value="#{prodlist.buyerId}" 
                                                  disabled="#{addSales.selectedProduct == null 
                                                              or addSales.selectedProduct.prodId != prodlist.prodId}"
-                                                 style="width: 100%;">
+                                                 style="width: 100%;"
+                                                 >
 
                                     <f:selectItem itemLabel="Select Buyer" itemValue="" noSelectionOption="true" />
 
                                     <f:selectItems value="#{addSales.buyerlist}" var="buyer" 
                                                    itemValue="#{buyer.buyerId}" 
-                                                   itemLabel="#{buyer.shopName}" />
+                                                   itemLabel="#{buyer.buyerName}" />
 
                                 </p:selectOneMenu>
 

@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <h4>Harvest Reports.</h4>
+        <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
+        <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+        &nbsp;&nbsp;&nbsp;
+        <p:button value="Cancel" outcome="/secured/harvest/activehrvstlst"/>
+        &nbsp;&nbsp;&nbsp;
+        <f:metadata>
+            <f:viewAction action="#{hrvstReport.fillHarvestValues()}" />
+        </f:metadata>
+
+        <div class="card">
+            <h:form id="hrvstrptform" style="text-align: left">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="harvestid" value="Active Harvests" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        
+                        <p:selectOneMenu id="harvestid" value="#{hrvstReport.selectedIndexHarvest}">
+                            <f:selectItems value="#{hrvstReport.activeharvests}" 
+                                           var="hrvst"
+                                           itemLabel="#{hrvst.siteName}-#{hrvst.harvestName}" 
+                                           itemValue="#{hrvstReport.activeharvests.indexOf(hrvst)}"/>                        
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="sdate" value="Start Date" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:datePicker id="sdate" value="#{hrvstReport.startDt}" pattern="yyyy-MM-dd"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="edate" value="End Date" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:datePicker id="edate" value="#{hrvstReport.endDt}" pattern="yyyy-MM-dd"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button" 
+                                         icon="fa fa-edit" 
+                                         value="Summary"
+                                         action="#{hrvstReport.summaryAll()}" >                                     
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button" 
+                                         icon="fa fa-edit" 
+                                         value="Resource Details"
+                                         action="#{hrvstReport.resourceDetails()}" >                                     
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button" 
+                                         icon="fa fa-edit" 
+                                         value="Labour Details"
+                                         action="#{hrvstReport.labourDetails()}" >                                     
+                        </p:commandButton>
+                    </div>
+                </div>
+
+            </h:form>
+        </div>
+    </ui:define>    
+
+</ui:composition>

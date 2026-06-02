@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.BuyerDTO;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.ExpenseDTO;
@@ -42,6 +43,7 @@ public class AddSales implements Serializable {
     private List<HarvestDTO> harvestForCrop;
     private List<CropProductDTO> cropproducts;
     private List<SalesDTO> salesrecords;
+    private List<BuyerDTO> buyerlist;
     private SalesDTO selectedProduct;    
     private String oldcropprodstock;
     private Date sdate = new Date();
@@ -84,6 +86,8 @@ public class AddSales implements Serializable {
                 salesrecords.add(salesrec);
             }
         }
+        farmondto = clientService.callBuyerListService(farmondto);
+        buyerlist = farmondto.getBuyerlist();
     }
     public void onRowSelect(SelectEvent<SalesDTO> event) {
         SalesDTO newlySelected = event.getObject();
@@ -182,6 +186,13 @@ public class AddSales implements Serializable {
             f.addMessage(null, message);
             return redirectUrl;
         }
+        
+        if (selectedProduct.getBuyerId() == null || selectedProduct.getPriceperUnit().trim().isEmpty()) {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                    "A buyer must be selected.");
+            f.addMessage(null, message);
+            return redirectUrl;
+        }
         FarmonDTO farmondto= new FarmonDTO();
         FarmonClient clientService = new FarmonClient();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -270,6 +281,7 @@ public class AddSales implements Serializable {
         salesrecord.setHarvestId(selectedHarvest);
         salesrecord.setQuantitySold(selectedProduct.getQuantitySold());
         salesrecord.setPriceperUnit(selectedProduct.getPriceperUnit());
+        salesrecord.setBuyerId(selectedProduct.getBuyerId());
         salesrecord.setSalesDate(sdf.format(sdate));
         
         farmondto.setSalesrec(salesrecord);
@@ -446,6 +458,14 @@ public class AddSales implements Serializable {
 
     public void setSdate(Date sdate) {
         this.sdate = sdate;
+    }
+
+    public List<BuyerDTO> getBuyerlist() {
+        return buyerlist;
+    }
+
+    public void setBuyerlist(List<BuyerDTO> buyerlist) {
+        this.buyerlist = buyerlist;
     }
     
     

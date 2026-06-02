@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.farmon.farmonclient.FarmonClient;
+import org.farmon.farmondto.BuyerDTO;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.ExpenseDTO;
@@ -37,6 +38,7 @@ public class EditSales implements Serializable {
     private HarvestDTO harvestForCrop;
     private List<CropProductDTO> cropproducts;
     private List<SalesDTO> salesrecords;
+    private List<BuyerDTO> buyerlist;
     private List<String> existingAmounts;
     private List<String> existPriceperUnit;
     private List<String> existUpdDate;
@@ -96,6 +98,8 @@ public class EditSales implements Serializable {
                 }
             }
         }
+        farmondto = clientService.callBuyerListService(farmondto);
+        buyerlist = farmondto.getBuyerlist();
     }
     
     public String goToEditSales() {
@@ -133,6 +137,13 @@ public class EditSales implements Serializable {
             if (salesrec.getPriceperUnit() == null || salesrec.getPriceperUnit().trim().isEmpty()) {
                 message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
                         "Price per unit cannot be zero.");
+                f.addMessage(null, message);
+                return redirectUrl;
+            }
+            
+            if (salesrec.getBuyerId() == null || salesrec.getPriceperUnit().trim().isEmpty()) {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "A buyer must be selected.");
                 f.addMessage(null, message);
                 return redirectUrl;
             }
@@ -278,6 +289,22 @@ public class EditSales implements Serializable {
 
     public void setExistPriceperUnit(List<String> existPriceperUnit) {
         this.existPriceperUnit = existPriceperUnit;
+    }
+
+    public List<BuyerDTO> getBuyerlist() {
+        return buyerlist;
+    }
+
+    public void setBuyerlist(List<BuyerDTO> buyerlist) {
+        this.buyerlist = buyerlist;
+    }
+
+    public List<String> getExistUpdDate() {
+        return existUpdDate;
+    }
+
+    public void setExistUpdDate(List<String> existUpdDate) {
+        this.existUpdDate = existUpdDate;
     }
     
 }
