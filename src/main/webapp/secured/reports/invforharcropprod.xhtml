@@ -15,35 +15,52 @@
         <p:button value="Cancel" outcome="/secured/harvest/activehrvstlst"/>
         &nbsp;&nbsp;&nbsp;
         <f:metadata>
-            <f:viewAction action="#{hrvstReport.fillHarvestValues()}" />
+            <f:viewAction action="#{invForHarCropProd.fillHarvestValues()}" />
         </f:metadata>
 
         <div class="card">
             <h:form id="hrvstrptform" style="text-align: left">
                 <div class="ui-g">
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="harvestid" value="Active Harvests" />
+                        <h:outputLabel for="harvestid" value="Select Harvest" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         
-                        <p:selectOneMenu id="harvestid" value="#{hrvstReport.selectedIndexHarvest}">
-                            <f:selectItems value="#{hrvstReport.activeharvests}" 
+                        <p:selectOneMenu id="harvestid" value="#{invForHarCropProd.selectedHarvest}">
+                            <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{invForHarCropProd.harvests}" 
                                            var="hrvst"
                                            itemLabel="#{hrvst.siteName}-#{hrvst.harvestName}" 
-                                           itemValue="#{hrvstReport.activeharvests.indexOf(hrvst)}"/>                        
+                                           itemValue="#{hrvst.harvestid}"/> 
+                            <p:ajax event="change" listener="#{invForHarCropProd.onHarvestChange}" update="cropid cropprodid" />
                         </p:selectOneMenu>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="sdate" value="Start Date" />
+                        <h:outputLabel for="cropid" value="Select Crop" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:datePicker id="sdate" value="#{hrvstReport.startDt}" pattern="yyyy-MM-dd"/>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">                        
+                        <p:selectOneMenu id="cropid" value="#{invForHarCropProd.selectedCrop}">
+                            <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{invForHarCropProd.crops}" 
+                                           var="crop"
+                                           itemLabel="#{crop.cropName}" 
+                                           itemValue="#{crop.cropId}"/> 
+                            <p:ajax event="change" listener="#{invForHarCropProd.onCropChange}" update="cropprodid" />
+                        </p:selectOneMenu>
                     </div>
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel for="edate" value="End Date" />
+                        <h:outputLabel for="cropprodid" value="Select Product" />
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:datePicker id="edate" value="#{hrvstReport.endDt}" pattern="yyyy-MM-dd"/>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">                        
+                        <p:selectOneMenu id="cropprodid" value="#{invForHarCropProd.selectedCropProd}">
+                            <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{invForHarCropProd.cropprods}" 
+                                           var="cropprod"
+                                           itemLabel="#{cropprod.productName}" 
+                                           itemValue="#{cropprod.productId}"/> 
+                            
+                        </p:selectOneMenu>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <p:commandButton styleClass="blue-button" 
@@ -52,20 +69,7 @@
                                          action="#{hrvstReport.summaryAll()}" >                                     
                         </p:commandButton>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
-                                         value="Resource Details"
-                                         action="#{hrvstReport.resourceDetails()}" >                                     
-                        </p:commandButton>
-                    </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:commandButton styleClass="blue-button" 
-                                         icon="fa fa-edit" 
-                                         value="Labour Details"
-                                         action="#{hrvstReport.labourDetails()}" >                                     
-                        </p:commandButton>
-                    </div>
+                    
                 </div>
 
             </h:form>

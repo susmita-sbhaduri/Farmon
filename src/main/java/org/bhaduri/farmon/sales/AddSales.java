@@ -141,6 +141,7 @@ public class AddSales implements Serializable {
         // 7. Safety cleanup: Reset the selected row just in case the row they 
     // had previously clicked on was just hidden!
         this.selectedProduct = null;
+        //buyerlist is already populated as it's global variable
     }
     
     public String goToAddSales() {
