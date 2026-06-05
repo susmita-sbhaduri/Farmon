@@ -16,6 +16,7 @@ import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import org.farmon.farmondto.HarvestDTO;
+import org.farmon.farmondto.InventoryDTO;
 
 /**
  *
@@ -58,17 +59,30 @@ public class InvForHarCropProd implements Serializable {
     }
      
     public void onHarvestChange() {
-        selectedCrop = null;
-        selectedCropProd = null;
-
         if (selectedHarvest != null && !selectedHarvest.isEmpty()) {
             // Fetch associated crops using the String ID
             FarmonDTO farmondto= new FarmonDTO();
             FarmonClient clientService = new FarmonClient();
-            farmondto = clientService.callDistinctHarInvService(farmondto);
+            InventoryDTO invrec = new InventoryDTO();
+            invrec.setHarvestId(selectedHarvest);
+            farmondto.setInventoryrec(invrec);
+            farmondto = clientService.callCropsForHarInvService(farmondto);
             crops = farmondto.getCroplist();
         }
-    } 
+    }
+    public void onCropChange() {
+        if (selectedCrop != null && !selectedCrop.isEmpty()) {
+            // Fetch products associated with selected crop
+            FarmonDTO farmondto= new FarmonDTO();
+            FarmonClient clientService = new FarmonClient();
+            InventoryDTO invrec = new InventoryDTO();
+            invrec.setHarvestId(selectedHarvest);
+            invrec.setCropId(selectedCrop);
+            farmondto.setInventoryrec(invrec);
+            farmondto = clientService.callCropprodForHarCropService(farmondto);
+            cropprods = farmondto.getCropprodlist();
+        }
+    }
     
     public List<HarvestDTO> getHarvests() {
         return harvests;

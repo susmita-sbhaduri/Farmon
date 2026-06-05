@@ -8,7 +8,7 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <h4>Harvest Reports.</h4>
+        <h4>Cropwise Stock Report.</h4>
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         &nbsp;&nbsp;&nbsp;
@@ -65,8 +65,8 @@
                     <div class="ui-g-12 ui-md-6 ui-lg-3">
                         <p:commandButton styleClass="blue-button" 
                                          icon="fa fa-edit" 
-                                         value="Summary"
-                                         action="#{hrvstReport.summaryAll()}" >                                     
+                                         value="Details"
+                                         action="#{invForHarCropProd.summaryAll()}" >                                     
                         </p:commandButton>
                     </div>
                     
