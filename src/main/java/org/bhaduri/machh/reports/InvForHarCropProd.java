@@ -9,6 +9,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.naming.NamingException;
 import org.farmon.farmonclient.FarmonClient;
@@ -82,6 +83,25 @@ public class InvForHarCropProd implements Serializable {
             farmondto = clientService.callCropprodForHarCropService(farmondto);
             cropprods = farmondto.getCropprodlist();
         }
+    }
+    
+    public String goToDetails() {
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true);
+        
+        if(selectedHarvest == null || selectedHarvest.trim().isEmpty()
+                || selectedCrop == null || selectedCrop.trim().isEmpty()
+                || selectedCropProd == null || selectedCropProd.trim().isEmpty()){
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                    "All the fields are mandatory");
+            f.addMessage(null, message);
+            return "/secured/reports/invforharcropprod?faces-redirect=true";
+        }
+        
+        String redirectUrl = "/secured/reports/inventoryentries?faces-redirect=true&harvestId=" + selectedHarvest 
+                + "&cropId=" + selectedCrop + "&cropProdId=" + selectedCropProd;
+        return redirectUrl; 
     }
     
     public List<HarvestDTO> getHarvests() {

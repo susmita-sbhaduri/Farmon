@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <h4>Details of stocks of crop products for the harvest.</h4>
+        <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
+        
+        <f:metadata>   
+            <f:viewParam name="harvestId" value="#{inventoryEntries.harvestId}"></f:viewParam>
+            <f:viewParam name="cropId" value="#{inventoryEntries.cropId}"></f:viewParam>
+            <f:viewParam name="cropProdId" value="#{inventoryEntries.cropProdId}"></f:viewParam>
+            <f:viewAction action="#{inventoryEntries.fillValues()}" />
+        </f:metadata>
+        <div class="card">
+            
+            <h:form id="inventryform" style="text-align: left">
+                <h6 style="text-align: left;">
+                    Harvest:#{inventoryEntries.harvestrec.harvestName}-#{inventoryEntries.harvestrec.siteName}
+                </h6>
+                <h6 style="text-align: left;">                    
+                    Crop:#{inventoryEntries.croprec.cropName}                    
+                </h6>
+                <h6 style="text-align: left;">                    
+                    Product:#{inventoryEntries.cropprodrec.productName}                    
+                </h6>
+                <h6 style="text-align: left;">                    
+                    Unit:#{inventoryEntries.cropprodrec.unit}                    
+                </h6>
+                <div style="text-align: left;">
+                    <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+                    &nbsp;&nbsp;&nbsp;
+                    <p:commandButton value="Export as CSV" ajax="false">
+                        <p:dataExporter type="csv" 
+                                        target="inventryform:inventry" 
+                                        fileName="InvforHarCropprod"/>
+                    </p:commandButton>
+                </div>
+                <p:dataTable id="inventry" var="inventry" value="#{inventoryEntries.inventries}">                    
+                   
+                    <p:column headerText="Quamtity">
+                        <h:outputText value="#{inventry.currentQty}" />
+                    </p:column>
+                    
+                    <p:column headerText="Update Date">
+                        <h:outputText value="#{inventry.lastupdatedate}" />
+                    </p:column>                    
+                </p:dataTable>
+                
+                
+                
+            </h:form>
+        </div>
+    </ui:define>    
+
+</ui:composition>

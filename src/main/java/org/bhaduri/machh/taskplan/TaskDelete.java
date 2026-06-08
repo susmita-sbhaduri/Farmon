@@ -32,8 +32,7 @@ private String selectedTask;
     private String taskName;
     private String taskType;
     private String site;
-    private String cropcat;
-    private String cropname;
+    private String harvestName;
     private String resname;
     private String amount;
     private String unit;
@@ -66,8 +65,7 @@ private String selectedTask;
         
 //        HarvestDTO harvestRecord = masterDataService.getHarvestRecForId(taskplanRec.getHarvestId());
         site = harvestRecord.getSiteName();
-        cropcat = harvestRecord.getCropCategory();
-        cropname = harvestRecord.getCropName();
+        harvestName = harvestRecord.getHarvestName();
         if (taskplanRec.getTaskType().equals("RES")) {
             taskType = "Resource";
             FarmresourceDTO resourceRec = new FarmresourceDTO();
@@ -192,20 +190,12 @@ private String selectedTask;
         this.site = site;
     }
 
-    public String getCropcat() {
-        return cropcat;
+    public String getHarvestName() {
+        return harvestName;
     }
 
-    public void setCropcat(String cropcat) {
-        this.cropcat = cropcat;
-    }
-
-    public String getCropname() {
-        return cropname;
-    }
-
-    public void setCropname(String cropname) {
-        this.cropname = cropname;
+    public void setHarvestName(String harvestName) {
+        this.harvestName = harvestName;
     }
 
     public String getResname() {
