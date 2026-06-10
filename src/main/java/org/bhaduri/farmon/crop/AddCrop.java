@@ -116,6 +116,14 @@ public class AddCrop implements Serializable {
             f.addMessage("cropname", message);
             return redirectUrl;
         }
+        
+        if (entries == null || entries.isEmpty()) {            
+            message=new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure", 
+                            "Enter at least one product and unit.");
+            f.addMessage(null, message);
+            return redirectUrl; // Stop execution and stay on the page
+        }
+        boolean isTableDataFilled = true;
         for (int i = 0; i < entries.size(); i++) {
             CropProductDTO entry = entries.get(i);
             boolean isProdFilled = entry.getProductName() != null && !entry.getProductName().trim().isEmpty();
@@ -123,11 +131,21 @@ public class AddCrop implements Serializable {
 
             // If it's a half-filled row, block the save and show a message
             if ((isProdFilled && !isUnitFilled) || (!isProdFilled && isUnitFilled)) {
-                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure.",
                         "Both products and corresponding units are mandatory.");
                 f.addMessage(null, message);
                 return redirectUrl;
             }
+            
+            if (!isProdFilled && !isUnitFilled){
+                isTableDataFilled=false;
+            }
+        }
+        if (!isTableDataFilled) {
+            message=new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure", 
+                            "Enter at least one product and unit.");
+            f.addMessage(null, message);
+            return redirectUrl;
         }
         if (totalcount==0) {
             message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Count is mandatory.",

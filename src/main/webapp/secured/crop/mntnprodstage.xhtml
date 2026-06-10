@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <h4>Crop List.</h4>
+        <p:growl id="growl" showDetail="true" />
+        <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
+        
+        
+        <f:metadata>
+            <f:viewAction action="#{mntnProdStage.fillValues()}" />
+        </f:metadata>
+
+        <div class="card">            
+            <h:form id="cropgrid" style="text-align: center">                
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="cropid" value="Select Crop" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">                        
+                        <p:selectOneMenu id="cropid" value="#{mntnProdStage.selectedCrop}">
+                            <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{mntnProdStage.crops}" 
+                                           var="crop"
+                                           itemLabel="#{crop.cropName}" 
+                                           itemValue="#{crop.cropId}"/> 
+                            <p:ajax event="change" listener="#{mntnProdStage.onCropChange}" update="cropprodid" />
+                        </p:selectOneMenu>
+                    </div>
+                    
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="cropprodid" value="Select Product" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">                        
+                        <p:selectOneMenu id="cropprodid" value="#{mntnProdStage.selectedCropProd}">
+                            <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{mntnProdStage.cropprods}" 
+                                           var="cropprod"
+                                           itemLabel="#{cropprod.productName}" 
+                                           itemValue="#{cropprod.productId}"/> 
+                            
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button" 
+                                         icon="fa fa-edit" 
+                                         value="Details"
+                                         action="#{invForHarCropProd.goToDetails()}" >                                     
+                        </p:commandButton>
+                    </div>
+                    
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
+
