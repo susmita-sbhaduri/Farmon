@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html">
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" />
+        <h4>Add Crop Stage.</h4>
+        <f:metadata>  
+            <f:viewParam name="cropId" value="#{addCropStage.cropId}"></f:viewParam>
+            <f:viewParam name="cropProdId" value="#{addCropStage.cropProdId}"></f:viewParam>
+            <f:viewAction action="#{addCropStage.fillValues()}" />
+        </f:metadata>
+        
+        <div class="card">
+            <h:form id="stageaddform" style="text-align: left">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="cropname" value="Crop Name"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{addCropStage.cropname}" style="font-weight:bold;"/>
+                    </div>
+                     <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="productname" value="Product Name"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{addCropStage.cropprodname}" style="font-weight:bold;"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel value="Enter Stages" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:dataTable id="stagetable" value="#{addCropStage.stageEntries}" var="stageRow" 
+                                     rowIndexVar="rowIndex" style="font-size: 10px;">
+
+                            <p:column headerText="Production Stage">
+
+                                <h:outputText value="#{stageRow}" 
+                                              rendered="#{rowIndex lt (addCropStage.stageEntries.size() - 1)}" 
+                                              style="font-weight: bold; padding-left: 5px;" />
+
+                                <p:inputText value="#{addCropStage.stageEntries[rowIndex]}" 
+                                             rendered="#{rowIndex eq (addCropStage.stageEntries.size() - 1)}"
+                                             style="width: 100%;"
+                                             placeholder="Type new stage here...">
+                                    <p:ajax event="change" 
+                                            listener="#{addCropStage.onStageInputChanged(rowIndex)}" 
+                                            update="stagetable" />
+                                </p:inputText>
+
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+
+                </div>

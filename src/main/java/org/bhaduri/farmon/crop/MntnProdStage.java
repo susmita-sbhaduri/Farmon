@@ -4,6 +4,8 @@
  */
 package org.bhaduri.farmon.crop;
 
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
@@ -31,39 +33,73 @@ public class MntnProdStage implements Serializable {
         FarmonClient clientService = new FarmonClient();        
         farmondto = clientService.callCropListService(farmondto);
         crops = farmondto.getCroplist(); 
-        for (CropDTO crop : crops) {
-            boolean activatable = false;
-            boolean addable = false;
-//            boolean notupdatable = false;
+        for (CropDTO crop : crops) {            
             if(crop.getEndDate()!=null){
-                activatable = true;                
-//                notupdatable = true;                
-            } else {
-                addable = true;                
-            }
-//            cropActivatable.put(crop.getCropId(), activatable);
-//            cropAddable.put(crop.getCropId(), addable);
-        }
-//      Crops which have stock in cropproduct cannot be deleted
-        CropDTO cropforstage = new CropDTO();
-        List<CropProductDTO> cropprodlist;
-        for (CropDTO crop : crops) {
-            boolean deletable = false;
-            boolean notupdatable = false;
-            cropforstage.setCropId(crop.getCropId());
-            farmondto.setCroprec(crop);
-            farmondto = clientService.callNonzeroProdForCropService(farmondto);
-            cropprodlist = farmondto.getCropprodlist();
-            if(cropprodlist.isEmpty() && crop.getEndDate()==null){
-                deletable = true;
-            }   
-            if(cropprodlist.isEmpty()){
-                notupdatable = true;
+                crops.remove(crop);
             } 
-//            cropDeletable.put(crop.getCropId(), deletable);
-//            cropNotUpdatable.put(crop.getCropId(), notupdatable);
+        }
+    }
+    public void onCropChange() {
+        if (selectedCrop != null && !selectedCrop.isEmpty()) {
+            // Fetch products associated with selected crop
+            FarmonDTO farmondto= new FarmonDTO();
+            FarmonClient clientService = new FarmonClient();
+            CropDTO cropforstage = new CropDTO();
+            cropforstage.setCropId(selectedCrop);
+            farmondto.setCroprec(cropforstage);
+            farmondto = clientService.callNonzeroProdForCropService(farmondto);
+            cropprods = farmondto.getCropprodlist();
+        }
+    }
+    
+    public String goToAddStage() {
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true);
+        
+        if(selectedCrop == null || selectedCrop.trim().isEmpty()
+                || selectedCropProd == null || selectedCropProd.trim().isEmpty()){
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                    "All the fields are mandatory");
+            f.addMessage(null, message);
+            return "/secured/crop/mntnprodstage?faces-redirect=true";
         }
         
-       
+        String redirectUrl = "/secured/reports/inventoryentries?faces-redirect=true&cropId=" 
+                + selectedCrop + "&cropProdId=" + selectedCropProd;
+        return redirectUrl; 
     }
+
+    public String getSelectedCrop() {
+        return selectedCrop;
+    }
+
+    public void setSelectedCrop(String selectedCrop) {
+        this.selectedCrop = selectedCrop;
+    }
+
+    public String getSelectedCropProd() {
+        return selectedCropProd;
+    }
+
+    public void setSelectedCropProd(String selectedCropProd) {
+        this.selectedCropProd = selectedCropProd;
+    }
+
+    public List<CropDTO> getCrops() {
+        return crops;
+    }
+
+    public void setCrops(List<CropDTO> crops) {
+        this.crops = crops;
+    }
+
+    public List<CropProductDTO> getCropprods() {
+        return cropprods;
+    }
+
+    public void setCropprods(List<CropProductDTO> cropprods) {
+        this.cropprods = cropprods;
+    }
+    
 }

@@ -16,7 +16,6 @@ import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InventoryDTO;
-import org.farmon.farmondto.ResourceCropDTO;
 
 /**
  *
