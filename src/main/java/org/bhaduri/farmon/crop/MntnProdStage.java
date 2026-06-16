@@ -65,7 +65,7 @@ public class MntnProdStage implements Serializable {
             return "/secured/crop/mntnprodstage?faces-redirect=true";
         }
         
-        String redirectUrl = "/secured/reports/inventoryentries?faces-redirect=true&cropId=" 
+        String redirectUrl = "/secured/crop/addcropstage?faces-redirect=true&cropId=" 
                 + selectedCrop + "&cropProdId=" + selectedCropProd;
         return redirectUrl; 
     }

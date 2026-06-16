@@ -15,7 +15,7 @@
             <f:viewParam name="cropProdId" value="#{addCropStage.cropProdId}"></f:viewParam>
             <f:viewAction action="#{addCropStage.fillValues()}" />
         </f:metadata>
-        
+
         <div class="card">
             <h:form id="stageaddform" style="text-align: left">
                 <div class="ui-g">
@@ -25,7 +25,7 @@
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputText value="#{addCropStage.cropname}" style="font-weight:bold;"/>
                     </div>
-                     <div class="ui-g-12 ui-md-6 ui-lg-6">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="productname" value="Product Name"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
@@ -40,11 +40,11 @@
 
                             <p:column headerText="Production Stage">
 
-                                <h:outputText value="#{stageRow}" 
+                                <h:outputText value="#{stageRow.prodStageName}" 
                                               rendered="#{rowIndex lt (addCropStage.stageEntries.size() - 1)}" 
                                               style="font-weight: bold; padding-left: 5px;" />
 
-                                <p:inputText value="#{addCropStage.stageEntries[rowIndex]}" 
+                                <p:inputText value="#{stageRow.prodStageName}" 
                                              rendered="#{rowIndex eq (addCropStage.stageEntries.size() - 1)}"
                                              style="width: 100%;"
                                              placeholder="Type new stage here...">
@@ -58,4 +58,18 @@
                         </p:dataTable>
                     </div>
 
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:commandButton styleClass="blue-button" 
+                                         value="Save"
+                                         action="#{addCropStage.saveStages()}" >                        
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/mntnprodstage" />
+                    </div>
                 </div>
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
