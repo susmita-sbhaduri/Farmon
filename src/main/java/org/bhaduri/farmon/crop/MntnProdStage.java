@@ -69,6 +69,24 @@ public class MntnProdStage implements Serializable {
                 + selectedCrop + "&cropProdId=" + selectedCropProd;
         return redirectUrl; 
     }
+    
+    public String goToEditStage() {
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true);
+        
+        if(selectedCrop == null || selectedCrop.trim().isEmpty()
+                || selectedCropProd == null || selectedCropProd.trim().isEmpty()){
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                    "All the fields are mandatory");
+            f.addMessage(null, message);
+            return "/secured/crop/mntnprodstage?faces-redirect=true";
+        }
+        
+        String redirectUrl = "/secured/crop/editcropstage?faces-redirect=true&cropId=" 
+                + selectedCrop + "&cropProdId=" + selectedCropProd;
+        return redirectUrl; 
+    }
 
     public String getSelectedCrop() {
         return selectedCrop;

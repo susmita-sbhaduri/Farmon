@@ -11,15 +11,12 @@ import jakarta.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.naming.NamingException;
 import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
-import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.ProductStageDTO;
 
 /**
@@ -63,7 +60,7 @@ public class AddCropStage implements Serializable {
         stageEntries = farmondto.getProdstagelist();
         maxStageId = 0;
         if (stageEntries.isEmpty()) {
-            maxStageId = 1;
+            maxStageId = 0;
         } else {            
             for (ProductStageDTO stage : stageEntries) {
                 String currentIdStr = stage.getProdStageId();
@@ -104,7 +101,7 @@ public class AddCropStage implements Serializable {
     }
     
     public String saveStages() {
-        String redirectUrl = "/secured/crop/MntnProdStage?faces-redirect=true";
+        String redirectUrl = "/secured/crop/mntnprodstage?faces-redirect=true";
         FacesMessage message;
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
@@ -133,8 +130,9 @@ public class AddCropStage implements Serializable {
             return redirectUrl;
         }
         int sqlFlag = 0;
+        
         // 3. Send ONLY the new stages to your database client service
-        if (!newlyAddedStages.isEmpty()) {
+        if (!newlyAddedStages.isEmpty()) {            
             FarmonDTO farmondto = new FarmonDTO();
             FarmonClient clientService = new FarmonClient();
             ProductStageDTO newstage = new ProductStageDTO();
@@ -146,9 +144,8 @@ public class AddCropStage implements Serializable {
                 stageid = stageid + 1;
             }
             // Put the filtered list of new stages into your DTO payload
-            for (ProductStageDTO stagetoadd : newlyAddedStages) {
-                
-                
+            for (ProductStageDTO stagetoadd : newlyAddedStages) {                
+                maxStageId = maxStageId+1;
                 newstage.setId(String.valueOf(stageid));
                 newstage.setCropId(cropId);
                 newstage.setProductId(cropProdId);
@@ -168,7 +165,7 @@ public class AddCropStage implements Serializable {
                     break;
                 }
                 newstage = new ProductStageDTO();
-                maxStageId = maxStageId+1;
+                
                 stageid = stageid + 1;
             }
         }

@@ -8,7 +8,7 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <h4>Crop List.</h4>
+        <h4>Select crop and product for stages.</h4>
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         
@@ -51,6 +51,12 @@
                         <p:commandButton styleClass="blue-button"                                           
                                          value="Add"
                                          action="#{mntnProdStage.goToAddStage()}" >                                     
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                        <p:commandButton styleClass="blue-button"                                           
+                                         value="Edit"
+                                         action="#{mntnProdStage.goToEditStage()}" >                                     
                         </p:commandButton>
                     </div>
                     
