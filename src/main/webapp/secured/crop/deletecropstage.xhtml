@@ -35,15 +35,24 @@
                         <h:outputLabel value="Enter Stages" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:dataTable id="stagetable" value="#{deleteCropStage.stageEntries}" var="stageRow" 
-                                     rowIndexVar="rowIndex" style="font-size: 10px;">
+                        <p:dataTable id="stagetable" 
+                                     value="#{deleteCropStage.stageEntries}" 
+                                     var="stageRow" 
+                                     rowIndexVar="rowIndex" 
+                                     style="font-size: 10px;">
+
+                            <p:column style="width:40px; text-align:center;">
+                                <f:facet name="header">
+                                    <p:selectBooleanCheckbox value="#{deleteCropStage.selectAllChecked}">
+                                        <p:ajax listener="#{deleteCropStage.toggleSelectAll}" update="stagetable" />
+                                    </p:selectBooleanCheckbox>
+                                </f:facet>
+
+                                <p:selectBooleanCheckbox value="#{deleteCropStage.checkedMap[stageRow.id]}" />
+                            </p:column>
 
                             <p:column headerText="Production Stage">
-
-                                <h:outputText value="#{stageRow.prodStageName}" 
-                                              rendered="#{rowIndex lt (deleteCropStage.stageEntries.size())}" 
-                                              style="font-weight: bold; padding-left: 5px;" />
-
+                                <h:outputText value="#{stageRow.prodStageName}" style="font-weight: bold; padding-left: 5px;" />
                             </p:column>
 
                         </p:dataTable>
@@ -52,9 +61,12 @@
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Delete"
-                                         action="#{deleteCropStage.saveStages()}" >                        
-                        </p:commandButton>
+                                         action="#{deleteCropStage.saveStages()}"
+                                         process="@form"
+                                         update="stagetable growl" />
                     </div>
+
+                    
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/mntnprodstage" />
                     </div>

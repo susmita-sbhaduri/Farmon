@@ -8,29 +8,43 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <h4>Select crop and product for stages.</h4>
+        <h4>Select harvest, crop and product.</h4>
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
-        
+        &nbsp;&nbsp;&nbsp;
         
         <f:metadata>
-            <f:viewAction action="#{mntnProdStage.fillValues()}" />
+            <f:viewAction action="#{maintainGrowthStage.fillHarvestValues()}" />
         </f:metadata>
 
-        <div class="card">            
-            <h:form id="cropgrid" style="text-align: center">                
+        <div class="card">
+            <h:form id="hrvstrptform" style="text-align: left">
                 <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="harvestid" value="Select Harvest" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        
+                        <p:selectOneMenu id="harvestid" value="#{maintainGrowthStage.selectedHarvest}">
+                            <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{maintainGrowthStage.harvests}" 
+                                           var="hrvst"
+                                           itemLabel="#{hrvst.siteName}-#{hrvst.harvestName}" 
+                                           itemValue="#{hrvst.harvestid}"/> 
+                            <p:ajax event="change" listener="#{maintainGrowthStage.onHarvestChange}" update="cropid cropprodid" />
+                        </p:selectOneMenu>
+                    </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="cropid" value="Select Crop" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">                        
-                        <p:selectOneMenu id="cropid" value="#{mntnProdStage.selectedCrop}">
+                        <p:selectOneMenu id="cropid" value="#{maintainGrowthStage.selectedCrop}">
                             <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
-                            <f:selectItems value="#{mntnProdStage.crops}" 
+                            <f:selectItems value="#{maintainGrowthStage.crops}" 
                                            var="crop"
                                            itemLabel="#{crop.cropName}" 
                                            itemValue="#{crop.cropId}"/> 
-                            <p:ajax event="change" listener="#{mntnProdStage.onCropChange}" update="cropprodid" />
+                            <p:ajax event="change" listener="#{maintainGrowthStage.onCropChange}" update="cropprodid" />
                         </p:selectOneMenu>
                     </div>
                     
@@ -38,37 +52,33 @@
                         <h:outputLabel for="cropprodid" value="Select Product" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">                        
-                        <p:selectOneMenu id="cropprodid" value="#{mntnProdStage.selectedCropProd}">
+                        <p:selectOneMenu id="cropprodid" value="#{maintainGrowthStage.selectedCropProd}">
                             <f:selectItem itemLabel="-- Select --" itemValue="" noSelectionOption="true" />
-                            <f:selectItems value="#{mntnProdStage.cropprods}" 
+                            <f:selectItems value="#{maintainGrowthStage.cropprods}" 
                                            var="cropprod"
                                            itemLabel="#{cropprod.productName}" 
                                            itemValue="#{cropprod.productId}"/> 
                             
                         </p:selectOneMenu>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button"                                           
                                          value="Add"
-                                         action="#{mntnProdStage.goToAddStage()}" >                                     
+                                         action="#{maintainGrowthStage.goToAddStage()}" >                                     
                         </p:commandButton>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button"                                           
                                          value="Edit"
-                                         action="#{mntnProdStage.goToEditStage()}" >                                     
+                                         action="#{maintainGrowthStage.goToEditStage()}" >                                     
                         </p:commandButton>
                     </div>
-                    <div class="ui-g-12 ui-md-6 ui-lg-3">
-                        <p:commandButton styleClass="blue-button"                                           
-                                         value="Delete"
-                                         action="#{mntnProdStage.goToDeleteStage()}" >                                     
-                        </p:commandButton>
-                    </div>
+                    
                 </div>
+
             </h:form>
         </div>
-    </ui:define>
+    </ui:define>    
 
 </ui:composition>
 

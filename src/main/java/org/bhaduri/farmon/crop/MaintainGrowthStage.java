@@ -14,29 +14,60 @@ import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
+import org.farmon.farmondto.HarvestDTO;
+import org.farmon.farmondto.InventoryDTO;
 
 /**
  *
  * @author sb
  */
-@Named(value = "mntnProdStage")
+@Named(value = "maintainGrowthStage")
 @ViewScoped
-public class MntnProdStage implements Serializable {
+public class MaintainGrowthStage implements Serializable {
+
+    private String selectedHarvest;
     private String selectedCrop;
     private String selectedCropProd;
+    List<HarvestDTO> harvests;    
     List<CropDTO> crops;
     List<CropProductDTO> cropprods;
-    public MntnProdStage() {
+    
+    public MaintainGrowthStage() {
     }
-    public void fillValues() {
-        FarmonDTO farmondto= new FarmonDTO();
-        FarmonClient clientService = new FarmonClient();        
-        farmondto = clientService.callCropListService(farmondto);
-        crops = farmondto.getCroplist(); 
-        for (CropDTO crop : crops) {            
-            if(crop.getEndDate()!=null){
-                crops.remove(crop);
-            } 
+
+    public String fillHarvestValues() {
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        farmondto = clientService.callActiveHarvestListService(farmondto);
+        harvests = farmondto.getHarvestlist();
+
+        String redirectUrl = "/secured/userhome?faces-redirect=true";
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true);
+
+        if (harvests == null) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure",
+                    "No active harvests.");
+            f.addMessage(null, message);
+            return redirectUrl;
+        } else {
+            return null;
+        }
+    }
+    
+    public void onHarvestChange() {
+        if (selectedHarvest != null && !selectedHarvest.isEmpty()) {
+            // Fetch associated crops using the String ID
+            FarmonDTO farmondto = new FarmonDTO();
+            FarmonClient clientService = new FarmonClient();
+            farmondto = clientService.callCropListService(farmondto);
+            crops = farmondto.getCroplist();
+            for (CropDTO crop : crops) {
+                if (crop.getEndDate() != null) {
+                    crops.remove(crop);
+                }
+            }
         }
     }
     public void onCropChange() {
@@ -57,53 +88,26 @@ public class MntnProdStage implements Serializable {
         FacesContext f = FacesContext.getCurrentInstance();
         f.getExternalContext().getFlash().setKeepMessages(true);
         
-        if(selectedCrop == null || selectedCrop.trim().isEmpty()
+        if(selectedHarvest == null || selectedHarvest.trim().isEmpty()
+                || selectedCrop == null || selectedCrop.trim().isEmpty()
                 || selectedCropProd == null || selectedCropProd.trim().isEmpty()){
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
                     "All the fields are mandatory");
             f.addMessage(null, message);
-            return "/secured/crop/mntnprodstage?faces-redirect=true";
+            return "/secured/crop/maintaingrowthstage?faces-redirect=true";
         }
         
         String redirectUrl = "/secured/crop/addcropstage?faces-redirect=true&cropId=" 
                 + selectedCrop + "&cropProdId=" + selectedCropProd;
         return redirectUrl; 
     }
-    
-    public String goToEditStage() {
-        FacesMessage message;
-        FacesContext f = FacesContext.getCurrentInstance();
-        f.getExternalContext().getFlash().setKeepMessages(true);
-        
-        if(selectedCrop == null || selectedCrop.trim().isEmpty()
-                || selectedCropProd == null || selectedCropProd.trim().isEmpty()){
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                    "All the fields are mandatory");
-            f.addMessage(null, message);
-            return "/secured/crop/mntnprodstage?faces-redirect=true";
-        }
-        
-        String redirectUrl = "/secured/crop/editcropstage?faces-redirect=true&cropId=" 
-                + selectedCrop + "&cropProdId=" + selectedCropProd;
-        return redirectUrl; 
+
+    public String getSelectedHarvest() {
+        return selectedHarvest;
     }
-    
-    public String goToDeleteStage() {
-        FacesMessage message;
-        FacesContext f = FacesContext.getCurrentInstance();
-        f.getExternalContext().getFlash().setKeepMessages(true);
-        
-        if(selectedCrop == null || selectedCrop.trim().isEmpty()
-                || selectedCropProd == null || selectedCropProd.trim().isEmpty()){
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
-                    "All the fields are mandatory");
-            f.addMessage(null, message);
-            return "/secured/crop/mntnprodstage?faces-redirect=true";
-        }
-        
-        String redirectUrl = "/secured/crop/deletecropstage?faces-redirect=true&cropId=" 
-                + selectedCrop + "&cropProdId=" + selectedCropProd;
-        return redirectUrl; 
+
+    public void setSelectedHarvest(String selectedHarvest) {
+        this.selectedHarvest = selectedHarvest;
     }
 
     public String getSelectedCrop() {
@@ -122,6 +126,14 @@ public class MntnProdStage implements Serializable {
         this.selectedCropProd = selectedCropProd;
     }
 
+    public List<HarvestDTO> getHarvests() {
+        return harvests;
+    }
+
+    public void setHarvests(List<HarvestDTO> harvests) {
+        this.harvests = harvests;
+    }
+
     public List<CropDTO> getCrops() {
         return crops;
     }
@@ -137,5 +149,7 @@ public class MntnProdStage implements Serializable {
     public void setCropprods(List<CropProductDTO> cropprods) {
         this.cropprods = cropprods;
     }
+    
+    
     
 }

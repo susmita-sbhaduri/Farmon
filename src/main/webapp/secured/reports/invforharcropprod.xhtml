@@ -8,12 +8,11 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <h4>Cropwise Stock Report.</h4>
+        <h4>Crop wise Stock Report.</h4>
         <p:growl id="growl" showDetail="true" life="5000" sticky="false" />
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
         &nbsp;&nbsp;&nbsp;
-        <p:button value="Cancel" outcome="/secured/harvest/activehrvstlst"/>
-        &nbsp;&nbsp;&nbsp;
+       
         <f:metadata>
             <f:viewAction action="#{invForHarCropProd.fillHarvestValues()}" />
         </f:metadata>
