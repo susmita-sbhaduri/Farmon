@@ -9,55 +9,57 @@
 
     <ui:define name="content">
         <p:growl id="growl" showDetail="true" />
-        <h4>Add Crop Stage.</h4>
+        <h4>Add crop growth stage.</h4>
         <f:metadata>  
-            <f:viewParam name="cropId" value="#{addCropStage.cropId}"></f:viewParam>
-            <f:viewParam name="cropProdId" value="#{addCropStage.cropProdId}"></f:viewParam>
-            <f:viewAction action="#{addCropStage.fillValues()}" />
+            <f:viewParam name="harvestId" value="#{addGrowthStage.harvestId}"></f:viewParam>
+            <f:viewParam name="cropId" value="#{addGrowthStage.cropId}"></f:viewParam>
+            <f:viewParam name="cropProdId" value="#{addGrowthStage.cropProdId}"></f:viewParam>
+            <f:viewAction action="#{addGrowthStage.fillValues()}" />
         </f:metadata>
 
         <div class="card">
-            <h:form id="stageaddform" style="text-align: left">
+            <h:form id="growthaddform" style="text-align: left">
                 <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="harvestid" value="Site and Harvest" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{addGrowthStage.harvestRecord.siteName}-
+                                      #{addGrowthStage.harvestRecord.harvestName}" style="font-weight:bold;"/>
+                    </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="cropname" value="Crop Name"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{addCropStage.cropname}" style="font-weight:bold;"/>
+                        <h:outputText value="#{addGrowthStage.cropname}" style="font-weight:bold;"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <h:outputLabel for="productname" value="Product Name"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputText value="#{addCropStage.cropprodname}" style="font-weight:bold;"/>
+                        <h:outputText value="#{addGrowthStage.cropprodname}" style="font-weight:bold;"/>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <h:outputLabel value="Enter Stages" />
+                        <h:outputLabel for="growthstage" value="Initial Stage" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:dataTable id="stagetable" value="#{addCropStage.stageEntries}" var="stageRow" 
-                                     rowIndexVar="rowIndex" style="font-size: 10px;">
-
-                            <p:column headerText="Production Stage">
-
-                                <h:outputText value="#{stageRow.prodStageName}" 
-                                              rendered="#{rowIndex lt (addCropStage.stageEntries.size() - 1)}" 
-                                              style="font-weight: bold; padding-left: 5px;" />
-
-                                <p:inputText value="#{stageRow.prodStageName}" 
-                                             rendered="#{rowIndex eq (addCropStage.stageEntries.size() - 1)}"
-                                             style="width: 100%;"
-                                             placeholder="Type new stage here...">
-                                    <p:ajax event="change" 
-                                            listener="#{addCropStage.onStageInputChanged(rowIndex)}" 
-                                            update="stagetable" />
-                                </p:inputText>
-
-                            </p:column>
-
-                        </p:dataTable>
+                        <h:outputText value="#{addGrowthStage.firststage.prodStageName}" style="font-weight:bold;"/>
                     </div>
-
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="count" value="Count" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:inputText id="count" value="#{addGrowthStage.count}" maxlength="10">
+                            <p:keyFilter mask="num" />
+                            <f:validateLongRange minimum="1" maximum="9999999999" /> 
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <h:outputLabel for="date" value="Date" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:datePicker id="date" value="#{addGrowthStage.date}" pattern="yyyy-MM-dd"/>
+                    </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Save"
@@ -65,7 +67,7 @@
                         </p:commandButton>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
-                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/mntnprodstage" />
+                        <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/maintaingrowthstage" />
                     </div>
                 </div>
             </h:form>

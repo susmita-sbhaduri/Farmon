@@ -8,7 +8,7 @@
                 xmlns:h="jakarta.faces.html">
 
     <ui:define name="content">
-        <p:growl id="growl" showDetail="true" />
+        <p:growl id="growl" showDetail="true" sticky="false" life="4000" />
         <h4>Add New Employee.</h4>
         <p:button outcome="/secured/userhome" value="Home" id="h_buttonid" icon="pi pi-home"/>
 
@@ -33,8 +33,7 @@
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:inputText id="empph" value="#{employeeAdd.phno}" maxlength="10">
-                            <p:keyFilter regEx="/[0-9]/" />
-                            <f:validateRegex pattern="^$|^\d{10}$" />
+                            <p:keyFilter mask="num" />                            
                         </p:inputText>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
@@ -61,8 +60,9 @@
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:commandButton styleClass="blue-button" 
                                          value="Save"
-                                         action="#{employeeAdd.goToSaveEmp()}" >                        
-                        </p:commandButton>
+                                         action="#{employeeAdd.goToSaveEmp()}"                         
+                                         process="@form" 
+                                         update="growl" />
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:button icon="pi pi-times" value="Cancel" outcome="/secured/userhome" />

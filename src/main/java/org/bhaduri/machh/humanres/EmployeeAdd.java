@@ -62,6 +62,13 @@ public class EmployeeAdd implements Serializable {
             return redirectUrl;
         }
         
+        if (!phno.matches("^\\d{10}$")) {
+            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                    "Contact number must be exactly 10 digits long.");
+            f.addMessage("empph", message);
+            return redirectUrl;
+        }
+        
 //        if (salary == 0) {
 //            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
 //                    "Salary number is mandatory field.");

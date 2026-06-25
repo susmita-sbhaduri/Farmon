@@ -16,6 +16,7 @@ import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import org.farmon.farmondto.HarvestDTO;
 import org.farmon.farmondto.InventoryDTO;
+import org.farmon.farmondto.ProductStageDTO;
 
 /**
  *
@@ -96,9 +97,24 @@ public class MaintainGrowthStage implements Serializable {
             f.addMessage(null, message);
             return "/secured/crop/maintaingrowthstage?faces-redirect=true";
         }
+        FarmonDTO farmondto= new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        ProductStageDTO stagerec = new ProductStageDTO();
+        stagerec.setCropId(selectedCrop);
+        stagerec.setProductId(selectedCropProd);
+        farmondto.setProdstagerec(stagerec);
+        farmondto = clientService.callStagesPerCropProdService(farmondto);
+        List<ProductStageDTO> stagelist = farmondto.getProdstagelist();
+        if (stagelist.isEmpty()) {
+            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Failure.",
+                    "No Growth stages exist for this crop product");
+            f.addMessage(null, message);
+            return "/secured/crop/maintaingrowthstage?faces-redirect=true";
+        }
         
-        String redirectUrl = "/secured/crop/addcropstage?faces-redirect=true&cropId=" 
-                + selectedCrop + "&cropProdId=" + selectedCropProd;
+        String redirectUrl = "/secured/crop/addgrowthstage?faces-redirect=true&harvestId="
+                + selectedHarvest + "&cropId=" + selectedCrop 
+                + "&cropProdId=" + selectedCropProd;
         return redirectUrl; 
     }
 
