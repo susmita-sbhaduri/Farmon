@@ -36,6 +36,7 @@ public class DeleteCropStage implements Serializable {
     private boolean selectAllChecked; // Tracks the header "Select All" toggle state
     // Tracks checkbox states without modifying the ProductStageDTO class
     private Map<String, Boolean> checkedMap = new HashMap<>();
+    private boolean conditionalDeleteAllowed;
     public DeleteCropStage() {
     }
     public String fillValues() throws NamingException {
@@ -88,66 +89,69 @@ public class DeleteCropStage implements Serializable {
     }
     
     public String saveStages() {
-        FacesMessage message;
-        FacesContext f = FacesContext.getCurrentInstance();
-        f.getExternalContext().getFlash().setKeepMessages(true);
-        FarmonDTO farmondto = new FarmonDTO();
-        FarmonClient clientService = new FarmonClient();
-        // 1. Identify selected rows by scanning our helper Map
-        List<ProductStageDTO> selectedStages = new ArrayList<>();
-        for (ProductStageDTO stage : stageEntries) {
-            Boolean isChecked = checkedMap.get(stage.getId());
-            if (isChecked != null && isChecked) {
-                selectedStages.add(stage);
+        if (conditionalDeleteAllowed) {
+            FacesMessage message;
+            FacesContext f = FacesContext.getCurrentInstance();
+            f.getExternalContext().getFlash().setKeepMessages(true);
+            FarmonDTO farmondto = new FarmonDTO();
+            FarmonClient clientService = new FarmonClient();
+            // 1. Identify selected rows by scanning our helper Map
+            List<ProductStageDTO> selectedStages = new ArrayList<>();
+            for (ProductStageDTO stage : stageEntries) {
+                Boolean isChecked = checkedMap.get(stage.getId());
+                if (isChecked != null && isChecked) {
+                    selectedStages.add(stage);
+                }
             }
-        }
 
-        // SCENARIO 1: No checkboxes are checked -> Show warning message, stay on page
-        if (selectedStages.isEmpty()) {            
-            message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                        "Select atleast one stage to delete.");
-            f.addMessage(null, message);
-            return null;
-        }
-        
-        // Create a temporary list to track rows that successfully deleted from the DB
-        List<ProductStageDTO> successfullyDeleted = new ArrayList<>();
-        int sqlFlag = 0;
-        ProductStageDTO stagetodelete = new ProductStageDTO();
-        for (ProductStageDTO stage : selectedStages){
-             stagetodelete.setId(String.valueOf(stage.getId()));
-             farmondto.setProdstagerec(stagetodelete);
-             farmondto = clientService.callDeleteProdStageService(farmondto);
-             int stagedelres = farmondto.getResponses().getFarmon_DEL_RES();
-             if (stagedelres == SUCCESS) {
-                sqlFlag = sqlFlag + 1;
-                // 1. Remove from checkbox tracking map instantly
-                checkedMap.remove(stage.getId());
-        
-                // 2. Add to our local success list so we can purge it from the dataTable list
-                successfullyDeleted.add(stage);
-            } else {
+            // SCENARIO 1: No checkboxes are checked -> Show warning message, stay on page
+            if (selectedStages.isEmpty()) {
                 message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
-                        "Failure to delete stage.");
+                        "Select atleast one stage to delete.");
                 f.addMessage(null, message);
-                break;
-            }  
-        }
-        
-        if (sqlFlag == selectedStages.size()) {
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
-                    "Stages deleted for Crop Product successfully.");
-            f.addMessage(null, message);
-            if(stageEntries.size()> selectedStages.size()){
-                selectAllChecked = false;
-                stageEntries.removeAll(successfullyDeleted);
                 return null;
             }
-            if(stageEntries.size()== selectedStages.size()){
-                return "/secured/crop/mntnprodstage?faces-redirect=true";
+
+            // Create a temporary list to track rows that successfully deleted from the DB
+            List<ProductStageDTO> successfullyDeleted = new ArrayList<>();
+            int sqlFlag = 0;
+            ProductStageDTO stagetodelete = new ProductStageDTO();
+            for (ProductStageDTO stage : selectedStages) {
+                stagetodelete.setId(String.valueOf(stage.getId()));
+                farmondto.setProdstagerec(stagetodelete);
+                farmondto = clientService.callDeleteProdStageService(farmondto);
+                int stagedelres = farmondto.getResponses().getFarmon_DEL_RES();
+                if (stagedelres == SUCCESS) {
+                    sqlFlag = sqlFlag + 1;
+                    // 1. Remove from checkbox tracking map instantly
+                    checkedMap.remove(stage.getId());
+
+                    // 2. Add to our local success list so we can purge it from the dataTable list
+                    successfullyDeleted.add(stage);
+                } else {
+                    message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                            "Failure to delete stage.");
+                    f.addMessage(null, message);
+                    break;
+                }
             }
+
+            if (sqlFlag == selectedStages.size()) {
+                message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                        "Stages deleted for Crop Product successfully.");
+                f.addMessage(null, message);
+                if (stageEntries.size() > selectedStages.size()) {
+                    selectAllChecked = false;
+                    stageEntries.removeAll(successfullyDeleted);
+                    return null;
+                }
+                if (stageEntries.size() == selectedStages.size()) {
+                    return "/secured/crop/mntnprodstage?faces-redirect=true";
+                }
+            }
+        } else {
+            
         }
-        
         return "/secured/crop/mntnprodstage?faces-redirect=true";
     }
     public List<ProductStageDTO> getStageEntries() {
@@ -206,6 +210,12 @@ public class DeleteCropStage implements Serializable {
         this.cropprodname = cropprodname;
     }
 
-    
+    public boolean isConditionalDeleteAllowed() {
+        return conditionalDeleteAllowed;
+    }
+
+    public void setConditionalDeleteAllowed(boolean conditionalDeleteAllowed) {
+        this.conditionalDeleteAllowed = conditionalDeleteAllowed;
+    }
     
 }

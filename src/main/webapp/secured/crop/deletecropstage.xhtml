@@ -43,12 +43,15 @@
 
                             <p:column style="width:40px; text-align:center;">
                                 <f:facet name="header">
-                                    <p:selectBooleanCheckbox value="#{deleteCropStage.selectAllChecked}">
+                                    <p:selectBooleanCheckbox value="#{deleteCropStage.selectAllChecked}"
+                                                             rendered="#{deleteCropStage.conditionalDeleteAllowed}">
                                         <p:ajax listener="#{deleteCropStage.toggleSelectAll}" update="stagetable" />
                                     </p:selectBooleanCheckbox>
                                 </f:facet>
 
-                                <p:selectBooleanCheckbox value="#{deleteCropStage.checkedMap[stageRow.id]}" />
+                                <p:selectBooleanCheckbox value="#{deleteCropStage.checkedMap[stageRow.id]}" 
+                                                         rendered="#{deleteCropStage.conditionalDeleteAllowed or 
+                                                                     (rowIndex eq (deleteCropStage.stageEntries.size() - 1))}" />
                             </p:column>
 
                             <p:column headerText="Production Stage">
@@ -66,7 +69,7 @@
                                          update="stagetable growl" />
                     </div>
 
-                    
+
                     <div class="ui-g-12 ui-md-6 ui-lg-6">
                         <p:button icon="pi pi-times" value="Cancel" outcome="/secured/crop/mntnprodstage" />
                     </div>
