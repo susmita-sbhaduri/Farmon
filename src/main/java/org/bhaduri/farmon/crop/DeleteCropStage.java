@@ -19,6 +19,7 @@ import org.farmon.farmondto.CropDTO;
 import org.farmon.farmondto.CropProductDTO;
 import org.farmon.farmondto.FarmonDTO;
 import static org.farmon.farmondto.FarmonResponseCodes.SUCCESS;
+import org.farmon.farmondto.GrowthStageDTO;
 import org.farmon.farmondto.ProductStageDTO;
 
 /**
@@ -60,6 +61,16 @@ public class DeleteCropStage implements Serializable {
         farmondto = clientService.callCropprodForCropProdService(farmondto);
         cropprodname = farmondto.getCropprodrec().getProductName();
         
+        GrowthStageDTO growthstagerec = new GrowthStageDTO();
+        growthstagerec.setCropId(cropId);
+        growthstagerec.setProductId(cropProdId);
+        growthstagerec.setCurrentStageId("1");
+        farmondto.setGrowthstagerec(growthstagerec);
+        farmondto = clientService.callGrthStgsForCropPrdStgidService(farmondto);
+        if(farmondto.getGrowthstagelist().isEmpty()){
+            conditionalDeleteAllowed = true;
+        } else conditionalDeleteAllowed = false;
+        
         stageEntries = new ArrayList<>();
         ProductStageDTO prodstagerec = new ProductStageDTO();
         prodstagerec.setCropId(cropId);
@@ -75,7 +86,9 @@ public class DeleteCropStage implements Serializable {
             return redirectUrl;
         } else {  
             return null;
-        }             
+        }
+        
+        
     }
     // Triggered automatically when clicking the header checkbox
     public void toggleSelectAll() {
@@ -89,12 +102,12 @@ public class DeleteCropStage implements Serializable {
     }
     
     public String saveStages() {
-        if (conditionalDeleteAllowed) {
-            FacesMessage message;
-            FacesContext f = FacesContext.getCurrentInstance();
-            f.getExternalContext().getFlash().setKeepMessages(true);
-            FarmonDTO farmondto = new FarmonDTO();
-            FarmonClient clientService = new FarmonClient();
+        FacesMessage message;
+        FacesContext f = FacesContext.getCurrentInstance();
+        f.getExternalContext().getFlash().setKeepMessages(true);
+        FarmonDTO farmondto = new FarmonDTO();
+        FarmonClient clientService = new FarmonClient();
+        if (conditionalDeleteAllowed) {            
             // 1. Identify selected rows by scanning our helper Map
             List<ProductStageDTO> selectedStages = new ArrayList<>();
             for (ProductStageDTO stage : stageEntries) {
@@ -150,7 +163,30 @@ public class DeleteCropStage implements Serializable {
                 }
             }
         } else {
-            
+            GrowthStageDTO growthstagerec = new GrowthStageDTO();
+            growthstagerec.setCropId(cropId);
+            growthstagerec.setProductId(cropProdId);
+            growthstagerec.setCurrentStageId(stageEntries.get(stageEntries.size()-1).getProdStageId());
+            farmondto.setGrowthstagerec(growthstagerec);
+            farmondto = clientService.callGrthStgsForCropPrdStgidService(farmondto);
+            if (farmondto.getGrowthstagelist().isEmpty()) {
+                ProductStageDTO stagetodelete = new ProductStageDTO();
+                stagetodelete.setId(String.valueOf(stageEntries.get(stageEntries.size()-1).getId()));
+                farmondto.setProdstagerec(stagetodelete);
+                farmondto = clientService.callDeleteProdStageService(farmondto);
+                int stagedelres = farmondto.getResponses().getFarmon_DEL_RES();
+                if (stagedelres == SUCCESS) {
+                    message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success",
+                        "Stages deleted for Crop Product successfully.");
+                    f.addMessage(null, message);
+                    return "/secured/crop/mntnprodstage?faces-redirect=true";
+                }
+            } else {
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure",
+                        "Stage cannot be deleted as there are existing crop products in this stage.");
+                f.addMessage(null, message);
+                return "/secured/crop/mntnprodstage?faces-redirect=true";
+            }
         }
         return "/secured/crop/mntnprodstage?faces-redirect=true";
     }

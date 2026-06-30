@@ -25,6 +25,7 @@ import org.farmon.farmonclient.FarmonClient;
 import org.farmon.farmondto.FarmonDTO;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.LazyScheduleModel;
+import java.util.Comparator;
 
 /**
  *
@@ -154,6 +155,7 @@ public class OpenSchedule implements Serializable {
         // Find all events that occur on this date
         tasksForSelectedDate = taskModel.getEvents().stream()
                 .filter(evt -> evt.getStartDate().toLocalDate().isEqual(selectedTaskDate))
+                .sorted(Comparator.comparing(ScheduleEvent::getTitle, Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER)))
                 .collect(Collectors.toList());
     }
 

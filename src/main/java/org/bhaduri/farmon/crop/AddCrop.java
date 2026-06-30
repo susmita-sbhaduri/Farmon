@@ -137,7 +137,7 @@ public class AddCrop implements Serializable {
                 return redirectUrl;
             }
             
-            if (!isProdFilled && !isUnitFilled){
+            if (!isProdFilled && !isUnitFilled && i == 0){
                 isTableDataFilled=false;
             }
         }
